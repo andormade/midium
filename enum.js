@@ -1,0 +1,59 @@
+module.exports = {
+	/* Note Off event.
+	 * This message is sent when a note is released (ended). */
+	NOTE_OFF_CH1:  0x80,
+	NOTE_OFF_CH2:  0x81,
+	NOTE_OFF_CH3:  0x82,
+	NOTE_OFF_CH4:  0x83,
+	NOTE_OFF_CH5:  0x84,
+	NOTE_OFF_CH6:  0x85,
+	NOTE_OFF_CH7:  0x86,
+	NOTE_OFF_CH8:  0x87,
+	NOTE_OFF_CH9:  0x88,
+	NOTE_OFF_CH10: 0x89,
+	NOTE_OFF_CH11: 0x8a,
+	NOTE_OFF_CH12: 0x8b,
+	NOTE_OFF_CH13: 0x8c,
+	NOTE_OFF_CH14: 0x8d,
+	NOTE_OFF_CH15: 0x8e,
+	NOTE_OFF_CH16: 0x8f,
+
+	/* Note On event.
+	 * This message is sent when a note is depressed (start). */
+	NOTE_ON_CH1:  0x90,
+	NOTE_ON_CH2:  0x91,
+	NOTE_ON_CH3:  0x92,
+	NOTE_ON_CH4:  0x93,
+	NOTE_ON_CH5:  0x94,
+	NOTE_ON_CH6:  0x95,
+	NOTE_ON_CH7:  0x96,
+	NOTE_ON_CH8:  0x97,
+	NOTE_ON_CH9:  0x98,
+	NOTE_ON_CH10: 0x99,
+	NOTE_ON_CH11: 0x9a,
+	NOTE_ON_CH12: 0x9b,
+	NOTE_ON_CH13: 0x9c,
+	NOTE_ON_CH14: 0x9d,
+	NOTE_ON_CH15: 0x9e,
+	NOTE_ON_CH16: 0x9f,
+
+	/* Polyphonic Key Pressure (Aftertouch).
+	 * This message is most often sent by pressing down on the key after it
+	 * "bottoms out". */
+	POLYPHONIC_AFTERTOUCH_CH1:  0xa0,
+	POLYPHONIC_AFTERTOUCH_CH2:  0xa1,
+	POLYPHONIC_AFTERTOUCH_CH3:  0xa2,
+	POLYPHONIC_AFTERTOUCH_CH4:  0xa3,
+	POLYPHONIC_AFTERTOUCH_CH5:  0xa4,
+	POLYPHONIC_AFTERTOUCH_CH6:  0xa5,
+	POLYPHONIC_AFTERTOUCH_CH7:  0xa6,
+	POLYPHONIC_AFTERTOUCH_CH8:  0xa7,
+	POLYPHONIC_AFTERTOUCH_CH9:  0xa8,
+	POLYPHONIC_AFTERTOUCH_CH10: 0xa9,
+	POLYPHONIC_AFTERTOUCH_CH11: 0xaa,
+	POLYPHONIC_AFTERTOUCH_CH12: 0xab,
+	POLYPHONIC_AFTERTOUCH_CH13: 0xac,
+	POLYPHONIC_AFTERTOUCH_CH14: 0xad,
+	POLYPHONIC_AFTERTOUCH_CH15: 0xae,
+	POLYPHONIC_AFTERTOUCH_CH16: 0xaf
+};

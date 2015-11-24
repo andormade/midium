@@ -1,0 +1,14 @@
+{
+  "name": "nota",
+  "author": {
+    "name": "Andor Polgar",
+    "email": "hngrhorace@gmail.com",
+    "url": "http://polgarand.org"
+  },
+  "version": "1.0.0",
+  "description": "Device oriented Web MIDI API wrapper",
+  "main": "nota",
+  "dependencies": {},
+  "devDependencies": {},
+  "scripts": {}
+}
