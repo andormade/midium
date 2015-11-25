@@ -7,7 +7,7 @@
   },
   "version": "1.0.0",
   "description": "Device oriented Web MIDI API wrapper",
-  "main": "nota",
+  "main": "src/nota",
   "dependencies": {},
   "devDependencies": {},
   "scripts": {}

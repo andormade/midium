@@ -9,9 +9,13 @@ var Nota = {
 	 *
 	 * @returns {object}
 	 */
-	getPorts: function(callback) {
+	getPorts: function(callback, sysex) {
+		if (typeof sysex === 'undefined') {
+			var sysex = false;
+		}
+
 		navigator.requestMIDIAccess({
-			sysex: true
+			sysex: sysex
 		}).then(
 			/* MIDI access granted */
 			function(midiAccess) {

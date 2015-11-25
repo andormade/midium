@@ -30,5 +30,13 @@ module.exports = {
 			note,
 			velocity
 		]
+	},
+
+	isDefined: function(object) {
+		if (typeof object === 'undefined') {
+			return true;
+		}
+
+		return false;
 	}
 };
