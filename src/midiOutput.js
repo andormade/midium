@@ -1,6 +1,6 @@
 module.exports = function(Nota) {
 	/**
-	 *
+	 * MIDI output handler.
 	 *
 	 * @param {number} port
 	 * @param {number} channel
@@ -15,28 +15,25 @@ module.exports = function(Nota) {
 
 	MidiOutput.prototype = {
 		/**
+		 * Send MIDI message.
 		 *
+		 * @param {number} status    Status byte
+		 * @param {number} data1     Data byte 1
+		 * @param {number} data2     Data byte 2
 		 *
-		 * @param {number} note
-		 * @param {number} [channel]
-		 * @param {number} [data1]
-		 * @param {number} [data2]
-		 *
-		 * @returns {object}
+		 * @returns {object}    MidiOutput instance for method chaining.
 		 */
-		sendNote: function(note, channel, data1, data2) {
-			/* @TODO */
-			this.output.send([0x90, 60, 0x7f]);
-			this.output.send([0x80, 60, 0x40], window.performance.now() + 100.0);
+		sendMessage: function(status, data1, data2) {
+			this.output.send([status, data1, data2]);
 			return this;
 		},
 
 		/**
-		 *
+		 * Sets the MIDI channel.
 		 *
 		 * @param {number} channel
 		 *
-		 * @return {object}
+		 * @return {object}    MidiOutput instance for method chaining.
 		 */
 		setChannel: function(channel) {
 			this.channel = channel;

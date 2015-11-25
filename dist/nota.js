@@ -62,7 +62,7 @@ module.exports = {
 },{}],2:[function(require,module,exports){
 module.exports = function(Nota) {
 	/**
-	 *
+	 * MIDI input handler.
 	 *
 	 * @param {number} port
 	 * @param {number} channel
@@ -72,15 +72,16 @@ module.exports = function(Nota) {
 	var MidiInput = function(port, channel) {
 		this.port = port;
 		this.channel = channel;
+		this.input = Nota.MidiAccess.inputs.get(port);
 	};
 
 	MidiInput.prototype = {
 		/**
-		 *
+		 * Sets the MIDI channel.
 		 *
 		 * @param {number} channel
 		 *
-		 * @returns {object}
+		 * @returns {object}    MidiInput instance for method chaining.
 		 */
 		setChannel: function(channel) {
 			this.channel = channel;
@@ -88,16 +89,26 @@ module.exports = function(Nota) {
 		},
 
 		/**
+		 * Listens to MIDI messages.
 		 *
-		 *
-		 * @param {string} event
-		 * @param {number} channel
 		 * @param {function} callback
 		 *
-		 * @returns {object}
+		 * @returns {object}    MidiInput instance for method chaining.
 		 */
-		on: function(event, channel, callback) {
-			/* @TODO */
+		on: function(callback) {
+			this.input.onmidimessage = function(message) {
+				callback(message);
+			};
+			return this;
+		},
+
+		/**
+		 * Removes listeners from the MIDI input.
+		 *
+		 * @returns {object}    MidiInput instance for method chaining.
+		 */
+		off: function() {
+			this.input.onmidimessage = null;
 			return this;
 		}
 	};
@@ -108,7 +119,7 @@ module.exports = function(Nota) {
 },{}],3:[function(require,module,exports){
 module.exports = function(Nota) {
 	/**
-	 *
+	 * MIDI output handler.
 	 *
 	 * @param {number} port
 	 * @param {number} channel
@@ -123,28 +134,25 @@ module.exports = function(Nota) {
 
 	MidiOutput.prototype = {
 		/**
+		 * Send MIDI message.
 		 *
+		 * @param {number} status    Status byte
+		 * @param {number} data1     Data byte 1
+		 * @param {number} data2     Data byte 2
 		 *
-		 * @param {number} note
-		 * @param {number} [channel]
-		 * @param {number} [data1]
-		 * @param {number} [data2]
-		 *
-		 * @returns {object}
+		 * @returns {object}    MidiOutput instance for method chaining.
 		 */
-		sendNote: function(note, channel, data1, data2) {
-			// @TODO
-			this.output.send([0x90, 60, 0x7f]);
-			this.output.send([0x80, 60, 0x40], window.performance.now() + 100.0);
+		sendMessage: function(status, data1, data2) {
+			this.output.send([status, data1, data2]);
 			return this;
 		},
 
 		/**
-		 *
+		 * Sets the MIDI channel.
 		 *
 		 * @param {number} channel
 		 *
-		 * @return {object}
+		 * @return {object}    MidiOutput instance for method chaining.
 		 */
 		setChannel: function(channel) {
 			this.channel = channel;
@@ -161,7 +169,7 @@ var Nota = {
 	MidiAccess : null,
 
 	/**
-	 * Retrieves the open MIDI ports from the Web MIDI API.
+	 * Lists the open MIDI ports from the Web MIDI API.
 	 *
 	 * @param {function} callback
 	 *
@@ -181,12 +189,13 @@ var Nota = {
 				var outputs = {},
 					inputs = {};
 
-				for (var output of midiAccess.outputs) {
-					outputs[output[0]] = output[1];
-				}
-				for (var input of midiAccess.inputs) {
-					inputs[input[0]] = input[1];
-				}
+				midiAccess.inputs.forEach(function(input) {
+					inputs[input.id] = input;
+				});
+
+				midiAccess.outputs.forEach(function(output) {
+					outputs[output.id] = output;
+				});
 
 				callback({
 					outputs : outputs,

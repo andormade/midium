@@ -3,7 +3,7 @@ var Nota = {
 	MidiAccess : null,
 
 	/**
-	 * Retrieves the open MIDI ports from the Web MIDI API.
+	 * Lists the open MIDI ports from the Web MIDI API.
 	 *
 	 * @param {function} callback
 	 *
