@@ -23,12 +23,13 @@ var Nota = {
 				var outputs = {},
 					inputs = {};
 
-				for (var output of midiAccess.outputs) {
-					outputs[output[0]] = output[1];
-				}
-				for (var input of midiAccess.inputs) {
-					inputs[input[0]] = input[1];
-				}
+				midiAccess.inputs.forEach(function(input) {
+					inputs[input.id] = input;
+				});
+
+				midiAccess.outputs.forEach(function(output) {
+					outputs[output.id] = output;
+				});
 
 				callback({
 					outputs : outputs,

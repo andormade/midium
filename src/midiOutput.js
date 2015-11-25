@@ -25,7 +25,7 @@ module.exports = function(Nota) {
 		 * @returns {object}
 		 */
 		sendNote: function(note, channel, data1, data2) {
-			// @TODO
+			/* @TODO */
 			this.output.send([0x90, 60, 0x7f]);
 			this.output.send([0x80, 60, 0x40], window.performance.now() + 100.0);
 			return this;
