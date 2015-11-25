@@ -8,7 +8,11 @@
   "version": "1.0.0",
   "description": "Device oriented Web MIDI API wrapper",
   "main": "src/nota",
-  "dependencies": {},
+  "dependencies": {
+	  "browserify": "^12.0.1"
+  },
   "devDependencies": {},
-  "scripts": {}
+  "scripts": {
+  	"bundle": "browserify src/*.js > dist/nota.js"
+  }
 }
