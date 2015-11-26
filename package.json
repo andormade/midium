@@ -27,6 +27,6 @@
   },
   "scripts": {
     "bundle": "browserify src/*.js > dist/nota.js",
-	"eslint": "eslint src/*.js"
+    "eslint": "eslint src/*.js"
   }
 }

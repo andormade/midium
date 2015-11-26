@@ -1,42 +1,35 @@
 module.exports = {
 	/**
+	 * Returns true if the specified object is undefined.
 	 *
+	 * @param {*} object
 	 *
-	 * @param {number} channel
-	 * @param {number} note
-	 * @param {number} velocity
-	 *
-	 * @returns {number}
+	 * @returns {boolean}
 	 */
-	 noteOn: function(channel, note, velocity) {
-		return [
-			0x90 + (channel - 1),
-			note,
-			velocity
-		];
+	isUndefined: function(object) {
+		return (typeof object === 'undefined');
 	},
 
 	/**
+	 * Returns true if the specified object is defined.
 	 *
+	 * @param {*} object
 	 *
-	 * @param {number} channel
-	 * @param {number} note
-	 *
-	 * @returns {number}
+	 * @returns {boolean}
 	 */
-	noteOff: function(channel, note) {
-		return [
-			0x80 + (channel - 1),
-			note,
-			velocity
-		]
+	isDefined: function(object) {
+		return !this.isUndefined(object);
 	},
 
-	isDefined: function(object) {
-		if (typeof object === 'undefined') {
-			return true;
-		}
-
-		return false;
+	/**
+	 * Generates status byte from the specified MIDI event and channel.
+	 *
+	 * @param {number} event      MIDI event enum.
+	 * @param {number} channel    MIDI channel number. (1-16)
+	 *
+	 * @returns {number}    Status byte.
+	 */
+	getStatusByte: function(event, channel) {
+		return event + channel - 1;
 	}
 };

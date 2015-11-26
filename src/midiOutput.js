@@ -15,16 +15,14 @@ module.exports = function(Nota) {
 
 	MidiOutput.prototype = {
 		/**
-		 * Send MIDI message.
+		 * Sends a MIDI message.
 		 *
-		 * @param {number} status    Status byte
-		 * @param {number} data1     Data byte 1
-		 * @param {number} data2     Data byte 2
+		 * @param {array} dataArray    An array with three items, representing the bytes in a MIDI message.
 		 *
 		 * @returns {object}    MidiOutput instance for method chaining.
 		 */
-		sendMessage: function(status, data1, data2) {
-			this.output.send([status, data1, data2]);
+		sendRawMessage: function(dataArray) {
+			this.output.send(dataArray);
 			return this;
 		},
 
@@ -33,10 +31,52 @@ module.exports = function(Nota) {
 		 *
 		 * @param {number} channel
 		 *
-		 * @return {object}    MidiOutput instance for method chaining.
+		 * @returns {object}    MidiOutput instance for method chaining.
 		 */
 		setChannel: function(channel) {
 			this.channel = channel;
+			return this;
+		},
+
+		/**
+		 * Sets the specified note on.
+		 *
+		 * @param {number} note
+		 * @param {number} velocity
+		 * @param {number} [channel]
+		 *
+		 * @returns {object}
+		 */
+		noteOn: function(note, velocity, channel) {
+			if (Nota.Utils.isUndefined(channel)) {
+				var channel = this.channel;
+			}
+
+			var status = Nota.Utils.getStatusByte(Nota.Enum.NOTE_ON, channel);
+
+			this.sendRawMessage([status, note, velocity]);
+
+			return this;
+		},
+
+		/**
+		 * Sets the specified note off.
+		 *
+		 * @param {number} note
+		 * @param {number} velocity
+		 * @param {number} [channel]
+		 *
+		 * @returns {object}
+		 */
+		noteOff: function(note, velocity, channel) {
+			if (Nota.Utils.isUndefined(channel)) {
+				var channel = this.channel;
+			}
+
+			var status = Nota.Utils.getStatusByte(Nota.Enum.NOTE_OFF, channel);
+
+			this.sendRawMessage([status, note, velocity]);
+
 			return this;
 		}
 	};
