@@ -1,5 +1,270 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 module.exports = {
+	BANK_SELECT : 0x00,
+
+	MODULATION_WHEEL : 0x01,
+
+	BREATH_CONTROLLER : 0x02,
+
+	FOOT_CONTROLLER : 0x04,
+
+	PORTAMENTO_TIME : 0x05,
+
+	DATA_ENTRY_MSB : 0x06,
+
+	CHANNEL_VOLUME : 0x07,
+
+	BALANCE : 0x08,
+
+	PAN : 0x0a,
+
+	EXPRESSION_CONTROLLER : 0x0b,
+
+	EFFECT_CONTROL_1 : 0x0c,
+
+	EFFECT_CONTROL_2 : 0x0d,
+
+	GENERAL_PURPOSE_CONTROLLER_1 : 0x10,
+
+	GENERAL_PURPOSE_CONTROLLER_2 : 0x11,
+
+	GENERAL_PURPOSE_CONTROLLER_3 : 0x12,
+
+	GENERAL_PURPOSE_CONTROLLER_4 : 0x13,
+
+	BANK_SELECT_LSB : 0x20,
+
+	MODULATION_WHEEL_LSB : 0x21,
+
+	BREATH_CONTROLLER_LSB : 0x22,
+
+	FOOT_CONTROLLER_LSB : 0x24,
+
+	PORTAMENTO_TIME_LSB : 0x25,
+
+	DATA_ENTRY_LSB : 0x26,
+
+	CHANNEL_VOLUME_LSB : 0x27,
+
+	BALANCE_LSB : 0x28,
+
+	PAN_LSB : 0x2a,
+
+	EXPRESSION_CONTROLLER_LSB : 0x2b,
+
+	EFFECT_CONTROL_1_LSB : 0x2c,
+
+	EFFECT_CONTROL_2_LSB : 0x2d,
+
+	GENERAL_PURPOSE_CONTROLLER_1_LSB : 0x30,
+
+	GENERAL_PURPOSE_CONTROLLER_2_LSB : 0x31,
+
+	GENERAL_PURPOSE_CONTROLLER_3_LSB : 0x32,
+
+	GENERAL_PURPOSE_CONTROLLER_4_LSB : 0x33,
+
+	PORTAMENTO_ON_OFF : 0x41,
+
+	SOSTENUTO_ON_OFF : 0x42,
+
+	SOFT_PEDAL_ON_OFF : 0x43,
+
+	LEGATO_FOOTSWITCH : 0x44,
+
+	HOLD : 0x45,
+
+	SOUND_CONTROLLER_1 : 0x46,
+
+	SOUND_CONTROLLER_2 : 0x47,
+
+	SOUND_CONTROLLER_3 : 0x48,
+
+	SOUND_CONTROLLER_4 : 0x49,
+
+	SOUND_CONTROLLER_5 : 0x4a,
+
+	SOUND_CONTROLLER_6 : 0x4b,
+
+	SOUND_CONTROLLER_7 : 0x4c,
+
+	SOUND_CONTROLLER_8 : 0x4d,
+
+	SOUND_CONTROLLER_9 : 0x4e,
+
+	SOUND_CONTROLLER_10 : 0x4f,
+
+	GENERAL_PURPOSE_CONTROLLER_5 : 0x50,
+
+	GENERAL_PURPOSE_CONTROLLER_6 : 0x51,
+
+	GENERAL_PURPOSE_CONTROLLER_7 : 0x52,
+
+	GENERAL_PURPOSE_CONTROLLER_8 : 0x53,
+
+	PORTAMENTO_CONTROL : 0x54,
+
+	HIGH_RESOLUTION_VELOCITY_PREFIX : 0x58
+};
+
+},{}],2:[function(require,module,exports){
+module.exports = function(Nota) {
+
+	/**
+	 * MIDI input handler.
+	 *
+	 * @param {number} port
+	 * @param {number} channel
+	 *
+	 * @returns {void}
+	 */
+	function MidiInput(port, channel) {
+		this.port = port;
+		this.channel = channel;
+		this.input = Nota.MidiAccess.inputs.get(port);
+	}
+
+	MidiInput.prototype = {
+
+		/**
+		 * Sets the MIDI channel.
+		 *
+		 * @param {number} channel
+		 *
+		 * @returns {object}    MidiInput instance for method chaining.
+		 */
+		setChannel : function(channel) {
+			this.channel = channel;
+			return this;
+		},
+
+		/**
+		 * Listens to MIDI messages.
+		 *
+		 * @param {function} callback
+		 *
+		 * @returns {object}    MidiInput instance for method chaining.
+		 */
+		on : function(callback) {
+			this.input.onmidimessage = function(message) {
+				callback(message);
+			};
+			return this;
+		},
+
+		/**
+		 * Removes listeners from the MIDI input.
+		 *
+		 * @returns {object}    MidiInput instance for method chaining.
+		 */
+		off : function() {
+			this.input.onmidimessage = null;
+			return this;
+		}
+	};
+
+	return MidiInput;
+};
+
+},{}],3:[function(require,module,exports){
+module.exports = function(Nota) {
+
+	/**
+	 * MIDI output handler.
+	 *
+	 * @param {number} port
+	 * @param {number} channel
+	 *
+	 * @returns {void}
+	 */
+	function MidiOutput(port, channel) {
+		this.port = port;
+		this.channel = channel;
+		this.output = Nota.MidiAccess.outputs.get(port);
+	}
+
+	MidiOutput.prototype = {
+
+		/**
+		 * Sends a MIDI message.
+		 *
+		 * @param {array} dataArray    An array with three items, representing
+		 * the bytes in a MIDI message.
+		 *
+		 * @returns {object}    MidiOutput instance for method chaining.
+		 */
+		sendRawMessage : function(dataArray) {
+			this.output.send(dataArray);
+			return this;
+		},
+
+		/**
+		 * Sets the MIDI channel.
+		 *
+		 * @param {number} channel
+		 *
+		 * @returns {object}    MidiOutput instance for method chaining.
+		 */
+		setChannel : function(channel) {
+			this.channel = channel;
+			return this;
+		},
+
+		/**
+		 * Sets the specified note on.
+		 *
+		 * @param {number} note
+		 * @param {number} velocity
+		 * @param {number} [channel]
+		 *
+		 * @returns {object}
+		 */
+		noteOn : function(note, velocity, channel) {
+			var status = null;
+
+			if (Nota.Utils.isUndefined(channel)) {
+				channel = this.channel;
+			}
+
+			status = Nota.Utils.getStatusByte(
+				Nota.Enum.NOTE_ON,
+				channel ? channel : this.channel
+			);
+
+			this.sendRawMessage([status, note, velocity]);
+
+			return this;
+		},
+
+		/**
+		 * Sets the specified note off.
+		 *
+		 * @param {number} note
+		 * @param {number} velocity
+		 * @param {number} [channel]
+		 *
+		 * @returns {object}
+		 */
+		noteOff : function(note, velocity) {
+			if (Nota.Utils.isUndefined(channel)) {
+				channel = this.channel;
+			}
+
+			this.sendRawMessage([
+				Nota.Utils.getStatusByte(Nota.Enum.NOTE_OFF, channel),
+				note,
+				velocity]
+			);
+
+			return this;
+		}
+	};
+
+	return MidiOutput;
+};
+
+},{}],4:[function(require,module,exports){
+module.exports = {
 	NOTE_OFF              : 0x80,
 	NOTE_ON               : 0x90,
 	POLYPHONIC_AFTERTOUCH : 0xa0,
@@ -8,8 +273,10 @@ module.exports = {
 	CHANNEL_AFTERTOUCH    : 0xd0,
 	PITCH_WHEEL           : 0xe0,
 
-	/* Note Off event.
-	 * This message is sent when a note is released (ended). */
+	/*
+	 * Note Off event.
+	 * This message is sent when a note is released (ended).
+	 */
 	NOTE_OFF_CH1  : 0x80,
 	NOTE_OFF_CH2  : 0x81,
 	NOTE_OFF_CH3  : 0x82,
@@ -27,8 +294,10 @@ module.exports = {
 	NOTE_OFF_CH15 : 0x8e,
 	NOTE_OFF_CH16 : 0x8f,
 
-	/* Note On event.
-	 * This message is sent when a note is depressed (start). */
+	/*
+	 * Note On event.
+	 * This message is sent when a note is depressed (start).
+	 */
 	NOTE_ON_CH1  : 0x90,
 	NOTE_ON_CH2  : 0x91,
 	NOTE_ON_CH3  : 0x92,
@@ -46,9 +315,11 @@ module.exports = {
 	NOTE_ON_CH15 : 0x9e,
 	NOTE_ON_CH16 : 0x9f,
 
-	/* Polyphonic Key Pressure (Aftertouch).
+	/*
+	 * Polyphonic Key Pressure (Aftertouch).
 	 * This message is most often sent by pressing down on the key after it
-	 * "bottoms out". */
+	 * "bottoms out".
+	 */
 	POLYPHONIC_AFTERTOUCH_CH1  : 0xa0,
 	POLYPHONIC_AFTERTOUCH_CH2  : 0xa1,
 	POLYPHONIC_AFTERTOUCH_CH3  : 0xa2,
@@ -66,6 +337,12 @@ module.exports = {
 	POLYPHONIC_AFTERTOUCH_CH15 : 0xae,
 	POLYPHONIC_AFTERTOUCH_CH16 : 0xaf,
 
+	/*
+	 * Control Change.
+	 * This message is sent when a controller value changes. Controllers include
+	 * devices such as pedals and levers. Controller numbers 120-127 are
+	 * reserved as "Channel Mode Messages".
+	 */
 	CONTROL_CHANGE_CH1  : 0xb0,
 	CONTROL_CHANGE_CH2  : 0xb1,
 	CONTROL_CHANGE_CH3  : 0xb2,
@@ -83,6 +360,10 @@ module.exports = {
 	CONTROL_CHANGE_CH15 : 0xbe,
 	CONTROL_CHANGE_CH16 : 0xbf,
 
+	/*
+	 * Program Change.
+	 * This message sent when the patch number changes.
+	 */
 	PROGRAM_CHANGE_CH1  : 0xc0,
 	PROGRAM_CHANGE_CH2  : 0xc1,
 	PROGRAM_CHANGE_CH3  : 0xc2,
@@ -100,6 +381,13 @@ module.exports = {
 	PROGRAM_CHANGE_CH15 : 0xce,
 	PROGRAM_CHANGE_CH16 : 0xcf,
 
+	/*
+	 * Channel Pressure (After-touch).
+	 * This message is most often sent by pressing down on the key after it
+	 * "bottoms out". This message is different from polyphonic after-touch. Use
+	 * this message to send the single greatest pressure value (of all the
+	 * current depressed keys).
+	 */
 	CHANNEL_AFTERTOUCH_CH1  : 0xd0,
 	CHANNEL_AFTERTOUCH_CH2  : 0xd1,
 	CHANNEL_AFTERTOUCH_CH3  : 0xd2,
@@ -117,6 +405,12 @@ module.exports = {
 	CHANNEL_AFTERTOUCH_CH15 : 0xde,
 	CHANNEL_AFTERTOUCH_CH16 : 0xdf,
 
+	/*
+	 * Pitch Bend Change.
+	 * This message is sent to indicate a change in the pitch bender (wheel or
+	 * lever, typically). The pitch bender is measured by a fourteen bit value.
+	 * Center (no pitch change) is 2000H.
+	 */
 	PITCH_WHEEL_CH1  : 0xe0,
 	PITCH_WHEEL_CH2  : 0xe1,
 	PITCH_WHEEL_CH3  : 0xe2,
@@ -135,152 +429,9 @@ module.exports = {
 	PITCH_WHEEL_CH16 : 0xef
 };
 
-},{}],2:[function(require,module,exports){
-module.exports = function(Nota) {
-	/**
-	 * MIDI input handler.
-	 *
-	 * @param {number} port
-	 * @param {number} channel
-	 *
-	 * @returns {void}
-	 */
-	var MidiInput = function(port, channel) {
-		this.port = port;
-		this.channel = channel;
-		this.input = Nota.MidiAccess.inputs.get(port);
-	};
-
-	MidiInput.prototype = {
-		/**
-		 * Sets the MIDI channel.
-		 *
-		 * @param {number} channel
-		 *
-		 * @returns {object}    MidiInput instance for method chaining.
-		 */
-		setChannel: function(channel) {
-			this.channel = channel;
-			return this;
-		},
-
-		/**
-		 * Listens to MIDI messages.
-		 *
-		 * @param {function} callback
-		 *
-		 * @returns {object}    MidiInput instance for method chaining.
-		 */
-		on: function(callback) {
-			this.input.onmidimessage = function(message) {
-				callback(message);
-			};
-			return this;
-		},
-
-		/**
-		 * Removes listeners from the MIDI input.
-		 *
-		 * @returns {object}    MidiInput instance for method chaining.
-		 */
-		off: function() {
-			this.input.onmidimessage = null;
-			return this;
-		}
-	};
-
-	return MidiInput;
-};
-
-},{}],3:[function(require,module,exports){
-module.exports = function(Nota) {
-	/**
-	 * MIDI output handler.
-	 *
-	 * @param {number} port
-	 * @param {number} channel
-	 *
-	 * @returns {void}
-	 */
-	var MidiOutput = function(port, channel) {
-		this.port = port;
-		this.channel = channel;
-		this.output = Nota.MidiAccess.outputs.get(port);
-	};
-
-	MidiOutput.prototype = {
-		/**
-		 * Sends a MIDI message.
-		 *
-		 * @param {array} dataArray    An array with three items, representing the bytes in a MIDI message.
-		 *
-		 * @returns {object}    MidiOutput instance for method chaining.
-		 */
-		sendRawMessage: function(dataArray) {
-			this.output.send(dataArray);
-			return this;
-		},
-
-		/**
-		 * Sets the MIDI channel.
-		 *
-		 * @param {number} channel
-		 *
-		 * @returns {object}    MidiOutput instance for method chaining.
-		 */
-		setChannel: function(channel) {
-			this.channel = channel;
-			return this;
-		},
-
-		/**
-		 * Sets the specified note on.
-		 *
-		 * @param {number} note
-		 * @param {number} velocity
-		 * @param {number} [channel]
-		 *
-		 * @returns {object}
-		 */
-		noteOn: function(note, velocity, channel) {
-			if (Nota.Utils.isUndefined(channel)) {
-				var channel = this.channel;
-			}
-
-			var status = Nota.Utils.getStatusByte(Nota.Enum.NOTE_ON, channel);
-
-			this.sendRawMessage([status, note, velocity]);
-
-			return this;
-		},
-
-		/**
-		 * Sets the specified note off.
-		 *
-		 * @param {number} note
-		 * @param {number} velocity
-		 * @param {number} [channel]
-		 *
-		 * @returns {object}
-		 */
-		noteOff: function(note, velocity, channel) {
-			if (Nota.Utils.isUndefined(channel)) {
-				var channel = this.channel;
-			}
-
-			var status = Nota.Utils.getStatusByte(Nota.Enum.NOTE_OFF, channel);
-
-			this.sendRawMessage([status, note, velocity]);
-
-			return this;
-		}
-	};
-
-	return MidiOutput;
-};
-
-},{}],4:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 var Nota = {
+
 	/** @type {object} Midi access object. */
 	MidiAccess : null,
 
@@ -291,19 +442,21 @@ var Nota = {
 	 *
 	 * @returns {object}
 	 */
-	getPorts: function(callback, sysex) {
+	getPorts : function(callback, sysex) {
 		if (typeof sysex === 'undefined') {
-			var sysex = false;
+			sysex = false;
 		}
 
 		navigator.requestMIDIAccess({
-			sysex: sysex
+			sysex : sysex
 		}).then(
+
 			/* MIDI access granted */
 			function(midiAccess) {
-				Nota.MidiAccess = midiAccess;
 				var outputs = {},
 					inputs = {};
+
+				Nota.MidiAccess = midiAccess;
 
 				midiAccess.inputs.forEach(function(input) {
 					inputs[input.id] = input;
@@ -318,6 +471,7 @@ var Nota = {
 					inputs  : inputs
 				});
 			},
+
 			/* MIDI access denied */
 			function(error) {
 				console.log(error);
@@ -328,13 +482,14 @@ var Nota = {
 
 Nota.MidiOutput = require('./midiOutput.js')(Nota);
 Nota.MidiInput = require('./midiInput.js')(Nota);
-Nota.Enum = require('./enum.js');
+Nota.Status = require('./midiStatusEnum.js');
 Nota.Utils = require('./utils.js');
 
 module.exports = Nota;
 
-},{"./enum.js":1,"./midiInput.js":2,"./midiOutput.js":3,"./utils.js":5}],5:[function(require,module,exports){
+},{"./midiInput.js":2,"./midiOutput.js":3,"./midiStatusEnum.js":4,"./utils.js":6}],6:[function(require,module,exports){
 module.exports = {
+
 	/**
 	 * Returns true if the specified object is undefined.
 	 *
@@ -342,8 +497,8 @@ module.exports = {
 	 *
 	 * @returns {boolean}
 	 */
-	isUndefined: function(object) {
-		return (typeof object === 'undefined');
+	isUndefined : function(object) {
+		return typeof object === 'undefined';
 	},
 
 	/**
@@ -353,7 +508,7 @@ module.exports = {
 	 *
 	 * @returns {boolean}
 	 */
-	isDefined: function(object) {
+	isDefined : function(object) {
 		return !this.isUndefined(object);
 	},
 
@@ -365,9 +520,9 @@ module.exports = {
 	 *
 	 * @returns {number}    Status byte.
 	 */
-	getStatusByte: function(event, channel) {
+	getStatusByte : function(event, channel) {
 		return event + channel - 1;
 	}
 };
 
-},{}]},{},[1,2,3,4,5]);
+},{}]},{},[1,2,3,4,5,6]);
