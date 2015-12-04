@@ -1,4 +1,5 @@
 module.exports = function(Nota) {
+
 	/**
 	 * MIDI input handler.
 	 *
@@ -7,13 +8,14 @@ module.exports = function(Nota) {
 	 *
 	 * @returns {void}
 	 */
-	var MidiInput = function(port, channel) {
+	function MidiInput(port, channel) {
 		this.port = port;
 		this.channel = channel;
 		this.input = Nota.MidiAccess.inputs.get(port);
-	};
+	}
 
 	MidiInput.prototype = {
+
 		/**
 		 * Sets the MIDI channel.
 		 *
@@ -21,7 +23,7 @@ module.exports = function(Nota) {
 		 *
 		 * @returns {object}    MidiInput instance for method chaining.
 		 */
-		setChannel: function(channel) {
+		setChannel : function(channel) {
 			this.channel = channel;
 			return this;
 		},
@@ -33,7 +35,7 @@ module.exports = function(Nota) {
 		 *
 		 * @returns {object}    MidiInput instance for method chaining.
 		 */
-		on: function(callback) {
+		on : function(callback) {
 			this.input.onmidimessage = function(message) {
 				callback(message);
 			};
@@ -45,7 +47,7 @@ module.exports = function(Nota) {
 		 *
 		 * @returns {object}    MidiInput instance for method chaining.
 		 */
-		off: function() {
+		off : function() {
 			this.input.onmidimessage = null;
 			return this;
 		}

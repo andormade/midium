@@ -1,4 +1,5 @@
 module.exports = {
+
 	/**
 	 * Returns true if the specified object is undefined.
 	 *
@@ -6,8 +7,8 @@ module.exports = {
 	 *
 	 * @returns {boolean}
 	 */
-	isUndefined: function(object) {
-		return (typeof object === 'undefined');
+	isUndefined : function(object) {
+		return typeof object === 'undefined';
 	},
 
 	/**
@@ -17,7 +18,7 @@ module.exports = {
 	 *
 	 * @returns {boolean}
 	 */
-	isDefined: function(object) {
+	isDefined : function(object) {
 		return !this.isUndefined(object);
 	},
 
@@ -29,7 +30,7 @@ module.exports = {
 	 *
 	 * @returns {number}    Status byte.
 	 */
-	getStatusByte: function(event, channel) {
+	getStatusByte : function(event, channel) {
 		return event + channel - 1;
 	}
 };

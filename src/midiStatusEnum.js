@@ -7,8 +7,10 @@ module.exports = {
 	CHANNEL_AFTERTOUCH    : 0xd0,
 	PITCH_WHEEL           : 0xe0,
 
-	/* Note Off event.
-	 * This message is sent when a note is released (ended). */
+	/*
+	 * Note Off event.
+	 * This message is sent when a note is released (ended).
+	 */
 	NOTE_OFF_CH1  : 0x80,
 	NOTE_OFF_CH2  : 0x81,
 	NOTE_OFF_CH3  : 0x82,
@@ -26,8 +28,10 @@ module.exports = {
 	NOTE_OFF_CH15 : 0x8e,
 	NOTE_OFF_CH16 : 0x8f,
 
-	/* Note On event.
-	 * This message is sent when a note is depressed (start). */
+	/*
+	 * Note On event.
+	 * This message is sent when a note is depressed (start).
+	 */
 	NOTE_ON_CH1  : 0x90,
 	NOTE_ON_CH2  : 0x91,
 	NOTE_ON_CH3  : 0x92,
@@ -45,9 +49,11 @@ module.exports = {
 	NOTE_ON_CH15 : 0x9e,
 	NOTE_ON_CH16 : 0x9f,
 
-	/* Polyphonic Key Pressure (Aftertouch).
+	/*
+	 * Polyphonic Key Pressure (Aftertouch).
 	 * This message is most often sent by pressing down on the key after it
-	 * "bottoms out". */
+	 * "bottoms out".
+	 */
 	POLYPHONIC_AFTERTOUCH_CH1  : 0xa0,
 	POLYPHONIC_AFTERTOUCH_CH2  : 0xa1,
 	POLYPHONIC_AFTERTOUCH_CH3  : 0xa2,
@@ -65,6 +71,12 @@ module.exports = {
 	POLYPHONIC_AFTERTOUCH_CH15 : 0xae,
 	POLYPHONIC_AFTERTOUCH_CH16 : 0xaf,
 
+	/*
+	 * Control Change.
+	 * This message is sent when a controller value changes. Controllers include
+	 * devices such as pedals and levers. Controller numbers 120-127 are
+	 * reserved as "Channel Mode Messages".
+	 */
 	CONTROL_CHANGE_CH1  : 0xb0,
 	CONTROL_CHANGE_CH2  : 0xb1,
 	CONTROL_CHANGE_CH3  : 0xb2,
@@ -82,6 +94,10 @@ module.exports = {
 	CONTROL_CHANGE_CH15 : 0xbe,
 	CONTROL_CHANGE_CH16 : 0xbf,
 
+	/*
+	 * Program Change.
+	 * This message sent when the patch number changes.
+	 */
 	PROGRAM_CHANGE_CH1  : 0xc0,
 	PROGRAM_CHANGE_CH2  : 0xc1,
 	PROGRAM_CHANGE_CH3  : 0xc2,
@@ -99,6 +115,13 @@ module.exports = {
 	PROGRAM_CHANGE_CH15 : 0xce,
 	PROGRAM_CHANGE_CH16 : 0xcf,
 
+	/*
+	 * Channel Pressure (After-touch).
+	 * This message is most often sent by pressing down on the key after it
+	 * "bottoms out". This message is different from polyphonic after-touch. Use
+	 * this message to send the single greatest pressure value (of all the
+	 * current depressed keys).
+	 */
 	CHANNEL_AFTERTOUCH_CH1  : 0xd0,
 	CHANNEL_AFTERTOUCH_CH2  : 0xd1,
 	CHANNEL_AFTERTOUCH_CH3  : 0xd2,
@@ -116,6 +139,12 @@ module.exports = {
 	CHANNEL_AFTERTOUCH_CH15 : 0xde,
 	CHANNEL_AFTERTOUCH_CH16 : 0xdf,
 
+	/*
+	 * Pitch Bend Change.
+	 * This message is sent to indicate a change in the pitch bender (wheel or
+	 * lever, typically). The pitch bender is measured by a fourteen bit value.
+	 * Center (no pitch change) is 2000H.
+	 */
 	PITCH_WHEEL_CH1  : 0xe0,
 	PITCH_WHEEL_CH2  : 0xe1,
 	PITCH_WHEEL_CH3  : 0xe2,

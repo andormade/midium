@@ -1,4 +1,5 @@
 module.exports = function(Nota) {
+
 	/**
 	 * MIDI output handler.
 	 *
@@ -7,21 +8,23 @@ module.exports = function(Nota) {
 	 *
 	 * @returns {void}
 	 */
-	var MidiOutput = function(port, channel) {
+	function MidiOutput(port, channel) {
 		this.port = port;
 		this.channel = channel;
 		this.output = Nota.MidiAccess.outputs.get(port);
-	};
+	}
 
 	MidiOutput.prototype = {
+
 		/**
 		 * Sends a MIDI message.
 		 *
-		 * @param {array} dataArray    An array with three items, representing the bytes in a MIDI message.
+		 * @param {array} dataArray    An array with three items, representing
+		 * the bytes in a MIDI message.
 		 *
 		 * @returns {object}    MidiOutput instance for method chaining.
 		 */
-		sendRawMessage: function(dataArray) {
+		sendRawMessage : function(dataArray) {
 			this.output.send(dataArray);
 			return this;
 		},
@@ -33,7 +36,7 @@ module.exports = function(Nota) {
 		 *
 		 * @returns {object}    MidiOutput instance for method chaining.
 		 */
-		setChannel: function(channel) {
+		setChannel : function(channel) {
 			this.channel = channel;
 			return this;
 		},
@@ -47,12 +50,17 @@ module.exports = function(Nota) {
 		 *
 		 * @returns {object}
 		 */
-		noteOn: function(note, velocity, channel) {
+		noteOn : function(note, velocity, channel) {
+			var status = null;
+
 			if (Nota.Utils.isUndefined(channel)) {
-				var channel = this.channel;
+				channel = this.channel;
 			}
 
-			var status = Nota.Utils.getStatusByte(Nota.Enum.NOTE_ON, channel);
+			status = Nota.Utils.getStatusByte(
+				Nota.Enum.NOTE_ON,
+				channel ? channel : this.channel
+			);
 
 			this.sendRawMessage([status, note, velocity]);
 
@@ -68,14 +76,16 @@ module.exports = function(Nota) {
 		 *
 		 * @returns {object}
 		 */
-		noteOff: function(note, velocity, channel) {
+		noteOff : function(note, velocity) {
 			if (Nota.Utils.isUndefined(channel)) {
-				var channel = this.channel;
+				channel = this.channel;
 			}
 
-			var status = Nota.Utils.getStatusByte(Nota.Enum.NOTE_OFF, channel);
-
-			this.sendRawMessage([status, note, velocity]);
+			this.sendRawMessage([
+				Nota.Utils.getStatusByte(Nota.Enum.NOTE_OFF, channel),
+				note,
+				velocity]
+			);
 
 			return this;
 		}

@@ -1,4 +1,5 @@
 var Nota = {
+
 	/** @type {object} Midi access object. */
 	MidiAccess : null,
 
@@ -9,19 +10,21 @@ var Nota = {
 	 *
 	 * @returns {object}
 	 */
-	getPorts: function(callback, sysex) {
+	getPorts : function(callback, sysex) {
 		if (typeof sysex === 'undefined') {
-			var sysex = false;
+			sysex = false;
 		}
 
 		navigator.requestMIDIAccess({
-			sysex: sysex
+			sysex : sysex
 		}).then(
+
 			/* MIDI access granted */
 			function(midiAccess) {
-				Nota.MidiAccess = midiAccess;
 				var outputs = {},
 					inputs = {};
+
+				Nota.MidiAccess = midiAccess;
 
 				midiAccess.inputs.forEach(function(input) {
 					inputs[input.id] = input;
@@ -36,6 +39,7 @@ var Nota = {
 					inputs  : inputs
 				});
 			},
+
 			/* MIDI access denied */
 			function(error) {
 				console.log(error);
@@ -46,7 +50,7 @@ var Nota = {
 
 Nota.MidiOutput = require('./midiOutput.js')(Nota);
 Nota.MidiInput = require('./midiInput.js')(Nota);
-Nota.Enum = require('./enum.js');
+Nota.Status = require('./midiStatusEnum.js');
 Nota.Utils = require('./utils.js');
 
 module.exports = Nota;
