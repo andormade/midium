@@ -1,3 +1,5 @@
+var Status = require('./midiStatusEnum.js');
+
 module.exports = {
 
 	/**
@@ -32,5 +34,19 @@ module.exports = {
 	 */
 	getStatusByte : function(event, channel) {
 		return event + channel - 1;
+	},
+
+	getChannelFromStatus : function(status) {
+		return status % 0xf0;
+	},
+
+	isNoteOn : function(status) {
+		return status >= Status.NOTE_ON_CH1 &&
+			status <= Status.NOTE_ON_CH16;
+	},
+
+	isNoteOff : function(status) {
+		return status >= Status.NOTE_OFF_CH1 &&
+			status <= Status.NOTE_OFF_CH16;
 	}
 };

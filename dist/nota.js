@@ -430,10 +430,44 @@ module.exports = {
 };
 
 },{}],5:[function(require,module,exports){
+(function (global){
 var Nota = {
 
 	/** @type {object} Midi access object. */
-	MidiAccess : null,
+	midiAccess : null,
+
+	isReady : false,
+
+	/**
+	 * Calls back when the MIDI driver is ready.
+	 *
+	 * @param {function} callback
+	 *
+	 * @returns {void}
+	 */
+	ready : function(callback) {
+		if (global.Nota.isReady) {
+			callback();
+		}
+
+		navigator.requestMIDIAccess({
+			sysex : false
+		}).then(
+
+			/* MIDI access granted */
+			function(midiAccess) {
+				global.Nota.isReady = true;
+				global.Nota.midiAccess = midiAccess;
+				callback();
+			},
+
+			/* MIDI access denied */
+			function(error) {
+				global.Nota.isReady = false;
+				console.log(error);
+			}
+		);
+	},
 
 	/**
 	 * Lists the open MIDI ports from the Web MIDI API.
@@ -456,7 +490,8 @@ var Nota = {
 				var outputs = {},
 					inputs = {};
 
-				Nota.MidiAccess = midiAccess;
+				global.Nota.isReady = true;
+				global.Nota.midiAccess = midiAccess;
 
 				midiAccess.inputs.forEach(function(input) {
 					inputs[input.id] = input;
@@ -477,6 +512,72 @@ var Nota = {
 				console.log(error);
 			}
 		);
+	},
+
+	/**
+	 * Returns with an array of MIDI inputs and outputs.
+	 *
+	 * @param {object|number|string|array}
+	 *
+	 * @returns {array}
+	 */
+	select : function(selector) {
+		if (!global.Nota.isReady) {
+			return [];
+		}
+
+		var devices = [];
+
+		/* If the query is a MIDIInput or output. */
+		if (
+			selector instanceof window.MIDIOutput ||
+			selector instanceof window.MIDIInput
+		) {
+			devices[0] = selector;
+		}
+
+		else if (
+			typeof selector === 'number' &&
+			global.Nota.midiAccess.inputs.has(query)
+		) {
+			devices[0] = global.Nota.midiAccess.inputs.get(query);
+		}
+
+		else if (
+			typeof query === 'number' &&
+			global.Nota.midiAccess.outputs.has(query)
+		) {
+			devices[0] = global.Nota.midiAccess.outputs.get(query);
+		}
+
+		else if (selector instanceof Array) {
+			selector.forEach(function(item) {
+				devices.push(Nota.select(item)[0]);
+			});
+		}
+
+		else if (
+			typeof selector === 'string' ||
+			selector instanceof window.RegExp
+		) {
+			var name = '';
+
+			global.Nota.midiAccess.inputs.forEach(function each(device) {
+				name = device.name + ' ' + device.manufacturer;
+				if (new RegExp(selector, 'i').test(name)) {
+					devices.push(device);
+				}
+			});
+
+			global.Nota.midiAccess.outputs.forEach(function each(device) {
+				name = device.name + ' ' + device.manufacturer;
+				if (new RegExp(selector, 'i').test(name)) {
+					devices.push(device);
+				}
+			});
+		}
+
+		return devices;
 	}
 };
 
@@ -485,9 +586,13 @@ Nota.MidiInput = require('./midiInput.js')(Nota);
 Nota.Status = require('./midiStatusEnum.js');
 Nota.Utils = require('./utils.js');
 
+global.Nota = Nota;
 module.exports = Nota;
 
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"./midiInput.js":2,"./midiOutput.js":3,"./midiStatusEnum.js":4,"./utils.js":6}],6:[function(require,module,exports){
+var Status = require('./midiStatusEnum.js');
+
 module.exports = {
 
 	/**
@@ -522,7 +627,21 @@ module.exports = {
 	 */
 	getStatusByte : function(event, channel) {
 		return event + channel - 1;
+	},
+
+	getChannelFromStatus : function(status) {
+		return status % 0xf0;
+	},
+
+	isNoteOn : function(status) {
+		return status >= Status.NOTE_ON_CH1 &&
+			status <= Status.NOTE_ON_CH16;
+	},
+
+	isNoteOff : function(status) {
+		return status >= Status.NOTE_OFF_CH1 &&
+			status <= Status.NOTE_OFF_CH16;
 	}
 };
 
-},{}]},{},[1,2,3,4,5,6]);
+},{"./midiStatusEnum.js":4}]},{},[1,2,3,4,5,6]);
