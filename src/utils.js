@@ -1,6 +1,14 @@
-var Status = require('./midiStatusEnum.js');
+var Note = require('./noteEnum.js'),
+	Status = require('./midiStatusEnum.js');
 
 module.exports = {
+
+	defaultValue : function(object, defaultObject) {
+		if (this.isDefined(object)) {
+			return object;
+		}
+		return defaultObject;
+	},
 
 	/**
 	 * Returns true if the specified object is undefined.
@@ -48,5 +56,9 @@ module.exports = {
 	isNoteOff : function(status) {
 		return status >= Status.NOTE_OFF_CH1 &&
 			status <= Status.NOTE_OFF_CH16;
+	},
+
+	noteStringToMIDICode : function(note) {
+		return this.defaultValue(Note[note], 0);
 	}
 };

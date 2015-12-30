@@ -1,4 +1,7 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+var Status = require('./midiStatusEnum.js'),
+	Utils = require('./utils.js');
+
 /**
  * Constructor.
  *
@@ -20,6 +23,50 @@ DeviceCollection.prototype = {
 	 */
 	initialize : function(devices) {
 		this.devices = devices;
+	},
+
+	/**
+	 * Sets the specified note on.
+	 *
+	 * @param {note} note          MIDI note 0-127
+	 * @param {number} channel     Channel 1-16
+	 * @param {number} velocity    Velocity 0-127
+	 *
+	 * @returns {object}
+	 */
+	noteOn : function(note, channel, velocity) {
+		velocity = Utils.defaultValue(velocity, 127);
+		channel = Utils.defaultValue(channel, 1);
+
+		this.send([
+			Utils.getStatusByte(Status.NOTE_ON, channel),
+			note,
+			velocity
+		]);
+
+		return this;
+	},
+
+	/**
+	 * Sets the specified note off.
+	 *
+	 * @param {note} note            MIDI note 0-127
+	 * @param {number} [channel]     Channel 1-16
+	 * @param {number} [velocity]    Velocity 0-127
+	 *
+	 * @returns {object}
+	 */
+	noteOff : function(note, channel, velocity) {
+		velocity = Utils.defaultValue(velocity, 127);
+		channel = Utils.defaultValue(channel, 1);
+
+		this.send([
+			Utils.getStatusByte(Status.NOTE_OFF, channel),
+			note,
+			velocity
+		]);
+
+		return this;
 	},
 
 	/**
@@ -57,7 +104,7 @@ DeviceCollection.prototype = {
 
 module.exports = DeviceCollection;
 
-},{}],2:[function(require,module,exports){
+},{"./midiStatusEnum.js":5,"./utils.js":8}],2:[function(require,module,exports){
 module.exports = {
 	BANK_SELECT : 0x00,
 
@@ -604,10 +651,150 @@ global.Nota = Nota;
 module.exports = Nota;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./deviceCollection":1,"./midiInput.js":3,"./midiOutput.js":4,"./midiStatusEnum.js":5,"./utils.js":7}],7:[function(require,module,exports){
-var Status = require('./midiStatusEnum.js');
+},{"./deviceCollection":1,"./midiInput.js":3,"./midiOutput.js":4,"./midiStatusEnum.js":5,"./utils.js":8}],7:[function(require,module,exports){
+module.exports = {
+	'C0'   : 0,
+	'C#0'  : 1,
+	'D0'   : 2,
+	'D#0'  : 3,
+	'E0'   : 4,
+	'F0'   : 5,
+	'F#0'  : 6,
+	'G0'   : 7,
+	'G#0'  : 8,
+	'A0'   : 9,
+	'A#0'  : 10,
+	'B0'   : 11,
+	'C1'   : 12,
+	'C#1'  : 13,
+	'D1'   : 14,
+	'D#1'  : 15,
+	'E1'   : 16,
+	'F1'   : 17,
+	'F#1'  : 18,
+	'G1'   : 19,
+	'G#1'  : 20,
+	'A1'   : 21,
+	'A#1'  : 22,
+	'B1'   : 23,
+	'C2'   : 24,
+	'C#2'  : 25,
+	'D2'   : 26,
+	'D#2'  : 27,
+	'E2'   : 28,
+	'F2'   : 29,
+	'F#2'  : 30,
+	'G2'   : 31,
+	'G#2'  : 32,
+	'A2'   : 33,
+	'A#2'  : 34,
+	'B2'   : 35,
+	'C3'   : 36,
+	'C#3'  : 37,
+	'D3'   : 38,
+	'D#3'  : 39,
+	'E3'   : 40,
+	'F3'   : 41,
+	'F#3'  : 42,
+	'G3'   : 43,
+	'G#3'  : 44,
+	'A3'   : 45,
+	'A#3'  : 46,
+	'B3'   : 47,
+	'C4'   : 48,
+	'C#4'  : 49,
+	'D4'   : 50,
+	'D#4'  : 51,
+	'E4'   : 52,
+	'F4'   : 53,
+	'F#4'  : 54,
+	'G4'   : 55,
+	'G#4'  : 56,
+	'A4'   : 57,
+	'A#4'  : 58,
+	'B4'   : 59,
+	'C5'   : 60,
+	'C#5'  : 61,
+	'D5'   : 62,
+	'D#5'  : 63,
+	'E5'   : 64,
+	'F5'   : 65,
+	'F#5'  : 66,
+	'G5'   : 67,
+	'G#5'  : 68,
+	'A5'   : 69,
+	'A#5'  : 70,
+	'B5'   : 71,
+	'C6'   : 72,
+	'C#6'  : 73,
+	'D6'   : 74,
+	'D#6'  : 75,
+	'E6'   : 76,
+	'F6'   : 77,
+	'F#6'  : 78,
+	'G6'   : 79,
+	'G#6'  : 80,
+	'A6'   : 81,
+	'A#6'  : 82,
+	'B6'   : 83,
+	'C7'   : 84,
+	'C#7'  : 85,
+	'D7'   : 86,
+	'D#7'  : 87,
+	'E7'   : 88,
+	'F7'   : 89,
+	'F#7'  : 90,
+	'G7'   : 91,
+	'G#7'  : 92,
+	'A7'   : 93,
+	'A#7'  : 94,
+	'B7'   : 95,
+	'C8'   : 96,
+	'C#8'  : 97,
+	'D8'   : 98,
+	'D#8'  : 99,
+	'E8'   : 100,
+	'F8'   : 101,
+	'F#8'  : 102,
+	'G8'   : 103,
+	'G#8'  : 104,
+	'A8'   : 105,
+	'A#8'  : 106,
+	'B8'   : 107,
+	'C9'   : 108,
+	'C#9'  : 109,
+	'D9'   : 110,
+	'D#9'  : 111,
+	'E9'   : 112,
+	'F9'   : 113,
+	'F#9'  : 114,
+	'G9'   : 115,
+	'G#9'  : 116,
+	'A9'   : 117,
+	'A#9'  : 118,
+	'B9'   : 119,
+	'C10'  : 120,
+	'C#10' : 121,
+	'D10'  : 122,
+	'D#10' : 123,
+	'E10'  : 124,
+	'F10'  : 125,
+	'F#10' : 126,
+	'G10'  : 127
+};
+
+},{}],8:[function(require,module,exports){
+var Note = require('./noteEnum.js'),
+	Status = require('./midiStatusEnum.js');
 
 module.exports = {
+
+	defaultValue : function(object, defaultObject) {
+		if (this.isDefined(object)) {
+			return object;
+		}
+		return defaultObject;
+	},
 
 	/**
 	 * Returns true if the specified object is undefined.
@@ -655,7 +842,11 @@ module.exports = {
 	isNoteOff : function(status) {
 		return status >= Status.NOTE_OFF_CH1 &&
 			status <= Status.NOTE_OFF_CH16;
+	},
+
+	noteStringToMIDICode : function(note) {
+		return this.defaultValue(Note[note], 0);
 	}
 };
 
-},{"./midiStatusEnum.js":5}]},{},[1,2,3,4,5,6,7]);
+},{"./midiStatusEnum.js":5,"./noteEnum.js":7}]},{},[1,2,3,4,5,6,7,8]);

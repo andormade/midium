@@ -1,3 +1,6 @@
+var Status = require('./midiStatusEnum.js'),
+	Utils = require('./utils.js');
+
 /**
  * Constructor.
  *
@@ -19,6 +22,50 @@ DeviceCollection.prototype = {
 	 */
 	initialize : function(devices) {
 		this.devices = devices;
+	},
+
+	/**
+	 * Sets the specified note on.
+	 *
+	 * @param {note} note          MIDI note 0-127
+	 * @param {number} channel     Channel 1-16
+	 * @param {number} velocity    Velocity 0-127
+	 *
+	 * @returns {object}
+	 */
+	noteOn : function(note, channel, velocity) {
+		velocity = Utils.defaultValue(velocity, 127);
+		channel = Utils.defaultValue(channel, 1);
+
+		this.send([
+			Utils.getStatusByte(Status.NOTE_ON, channel),
+			note,
+			velocity
+		]);
+
+		return this;
+	},
+
+	/**
+	 * Sets the specified note off.
+	 *
+	 * @param {note} note            MIDI note 0-127
+	 * @param {number} [channel]     Channel 1-16
+	 * @param {number} [velocity]    Velocity 0-127
+	 *
+	 * @returns {object}
+	 */
+	noteOff : function(note, channel, velocity) {
+		velocity = Utils.defaultValue(velocity, 127);
+		channel = Utils.defaultValue(channel, 1);
+
+		this.send([
+			Utils.getStatusByte(Status.NOTE_OFF, channel),
+			note,
+			velocity
+		]);
+
+		return this;
 	},
 
 	/**
