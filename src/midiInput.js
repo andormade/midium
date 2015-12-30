@@ -1,5 +1,4 @@
 module.exports = function(Nota) {
-
 	/**
 	 * MIDI input handler.
 	 *

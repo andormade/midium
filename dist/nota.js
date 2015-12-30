@@ -1,4 +1,63 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+/**
+ * Constructor.
+ *
+ * @param {array} devices    Array of midi devices
+ *
+ * @returns {void}
+ */
+function DeviceCollection(devices) {
+	this.initialize(devices);
+}
+
+DeviceCollection.prototype = {
+	/**
+	 * Initiializes the device collection object.
+	 *
+	 * @param {array} devices    Array of midi devices
+	 *
+	 * @returns {void}
+	 */
+	initialize : function(devices) {
+		this.devices = devices;
+	},
+
+	/**
+	 * Sends raw MIDI data
+	 *
+	 * @param {array} midiData    Array of MIDI data
+	 *
+	 * @returns {object}
+	 */
+	send : function(midiData) {
+		this.each(function(device) {
+			if (device.type === 'output') {
+				device.send(midiData);
+			}
+		});
+
+		return this;
+	},
+
+	/**
+	 * Iterates through the devices in the collection.
+	 *
+	 * @param {function} callback   Callback function.
+	 *
+	 * @returns {object}
+	 */
+	each : function(callback) {
+		for (var i = 0; i < this.devices.length; i++) {
+			callback(this.devices[i]);
+		}
+
+		return this;
+	}
+};
+
+module.exports = DeviceCollection;
+
+},{}],2:[function(require,module,exports){
 module.exports = {
 	BANK_SELECT : 0x00,
 
@@ -107,9 +166,8 @@ module.exports = {
 	HIGH_RESOLUTION_VELOCITY_PREFIX : 0x58
 };
 
-},{}],2:[function(require,module,exports){
+},{}],3:[function(require,module,exports){
 module.exports = function(Nota) {
-
 	/**
 	 * MIDI input handler.
 	 *
@@ -166,9 +224,8 @@ module.exports = function(Nota) {
 	return MidiInput;
 };
 
-},{}],3:[function(require,module,exports){
+},{}],4:[function(require,module,exports){
 module.exports = function(Nota) {
-
 	/**
 	 * MIDI output handler.
 	 *
@@ -263,7 +320,7 @@ module.exports = function(Nota) {
 	return MidiOutput;
 };
 
-},{}],4:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 module.exports = {
 	NOTE_OFF              : 0x80,
 	NOTE_ON               : 0x90,
@@ -429,8 +486,10 @@ module.exports = {
 	PITCH_WHEEL_CH16 : 0xef
 };
 
-},{}],5:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 (function (global){
+var DeviceCollection = require('./deviceCollection');
+
 var Nota = {
 
 	/** @type {object} Midi access object. */
@@ -441,7 +500,7 @@ var Nota = {
 	/**
 	 * Calls back when the MIDI driver is ready.
 	 *
-	 * @param {function} callback
+	 * @param {function} callback    Calls when the MIDI connection is ready.
 	 *
 	 * @returns {void}
 	 */
@@ -470,54 +529,9 @@ var Nota = {
 	},
 
 	/**
-	 * Lists the open MIDI ports from the Web MIDI API.
-	 *
-	 * @param {function} callback
-	 *
-	 * @returns {object}
-	 */
-	getPorts : function(callback, sysex) {
-		if (typeof sysex === 'undefined') {
-			sysex = false;
-		}
-
-		navigator.requestMIDIAccess({
-			sysex : sysex
-		}).then(
-
-			/* MIDI access granted */
-			function(midiAccess) {
-				var outputs = {},
-					inputs = {};
-
-				global.Nota.isReady = true;
-				global.Nota.midiAccess = midiAccess;
-
-				midiAccess.inputs.forEach(function(input) {
-					inputs[input.id] = input;
-				});
-
-				midiAccess.outputs.forEach(function(output) {
-					outputs[output.id] = output;
-				});
-
-				callback({
-					outputs : outputs,
-					inputs  : inputs
-				});
-			},
-
-			/* MIDI access denied */
-			function(error) {
-				console.log(error);
-			}
-		);
-	},
-
-	/**
 	 * Returns with an array of MIDI inputs and outputs.
 	 *
-	 * @param {object|number|string|array}
+	 * @param {object|number|string|array} selector    Selector
 	 *
 	 * @returns {array}
 	 */
@@ -577,7 +591,7 @@ var Nota = {
 			});
 		}
 
-		return devices;
+		return new DeviceCollection(devices);
 	}
 };
 
@@ -590,7 +604,7 @@ global.Nota = Nota;
 module.exports = Nota;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./midiInput.js":2,"./midiOutput.js":3,"./midiStatusEnum.js":4,"./utils.js":6}],6:[function(require,module,exports){
+},{"./deviceCollection":1,"./midiInput.js":3,"./midiOutput.js":4,"./midiStatusEnum.js":5,"./utils.js":7}],7:[function(require,module,exports){
 var Status = require('./midiStatusEnum.js');
 
 module.exports = {
@@ -644,4 +658,4 @@ module.exports = {
 	}
 };
 
-},{"./midiStatusEnum.js":4}]},{},[1,2,3,4,5,6]);
+},{"./midiStatusEnum.js":5}]},{},[1,2,3,4,5,6,7]);

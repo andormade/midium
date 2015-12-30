@@ -1,3 +1,5 @@
+var DeviceCollection = require('./deviceCollection');
+
 var Nota = {
 
 	/** @type {object} Midi access object. */
@@ -8,7 +10,7 @@ var Nota = {
 	/**
 	 * Calls back when the MIDI driver is ready.
 	 *
-	 * @param {function} callback
+	 * @param {function} callback    Calls when the MIDI connection is ready.
 	 *
 	 * @returns {void}
 	 */
@@ -37,54 +39,9 @@ var Nota = {
 	},
 
 	/**
-	 * Lists the open MIDI ports from the Web MIDI API.
-	 *
-	 * @param {function} callback
-	 *
-	 * @returns {object}
-	 */
-	getPorts : function(callback, sysex) {
-		if (typeof sysex === 'undefined') {
-			sysex = false;
-		}
-
-		navigator.requestMIDIAccess({
-			sysex : sysex
-		}).then(
-
-			/* MIDI access granted */
-			function(midiAccess) {
-				var outputs = {},
-					inputs = {};
-
-				global.Nota.isReady = true;
-				global.Nota.midiAccess = midiAccess;
-
-				midiAccess.inputs.forEach(function(input) {
-					inputs[input.id] = input;
-				});
-
-				midiAccess.outputs.forEach(function(output) {
-					outputs[output.id] = output;
-				});
-
-				callback({
-					outputs : outputs,
-					inputs  : inputs
-				});
-			},
-
-			/* MIDI access denied */
-			function(error) {
-				console.log(error);
-			}
-		);
-	},
-
-	/**
 	 * Returns with an array of MIDI inputs and outputs.
 	 *
-	 * @param {object|number|string|array}
+	 * @param {object|number|string|array} selector    Selector
 	 *
 	 * @returns {array}
 	 */
@@ -144,7 +101,7 @@ var Nota = {
 			});
 		}
 
-		return devices;
+		return new DeviceCollection(devices);
 	}
 };
 
