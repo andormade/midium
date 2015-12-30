@@ -1,4 +1,5 @@
-var Status = require('./midiStatusEnum.js'),
+var MIDIUtils = require('./midiUtils.js'),
+	Status = require('./midiStatusEnum.js'),
 	Utils = require('./utils.js');
 
 /**
@@ -38,7 +39,7 @@ DeviceCollection.prototype = {
 		channel = Utils.defaultValue(channel, 1);
 
 		this.send([
-			Utils.getStatusByte(Status.NOTE_ON, channel),
+			MIDIUtils.getStatusByte(Status.NOTE_ON, channel),
 			note,
 			velocity
 		]);
@@ -60,7 +61,7 @@ DeviceCollection.prototype = {
 		channel = Utils.defaultValue(channel, 1);
 
 		this.send([
-			Utils.getStatusByte(Status.NOTE_OFF, channel),
+			MIDIUtils.getStatusByte(Status.NOTE_OFF, channel),
 			note,
 			velocity
 		]);

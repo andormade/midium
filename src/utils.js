@@ -1,8 +1,12 @@
-var Note = require('./noteEnum.js'),
-	Status = require('./midiStatusEnum.js');
-
 module.exports = {
-
+	/**
+	 * Returns with the default value if the specified object is not available.
+	 *
+	 * @param {*} object           Object to check if it is defined.
+	 * @param {*} defaultObject    Default object.
+	 *
+	 * @returns {*}
+	 */
 	defaultValue : function(object, defaultObject) {
 		if (this.isDefined(object)) {
 			return object;
@@ -30,35 +34,5 @@ module.exports = {
 	 */
 	isDefined : function(object) {
 		return !this.isUndefined(object);
-	},
-
-	/**
-	 * Generates status byte from the specified MIDI event and channel.
-	 *
-	 * @param {number} event      MIDI event enum.
-	 * @param {number} channel    MIDI channel number. (1-16)
-	 *
-	 * @returns {number}    Status byte.
-	 */
-	getStatusByte : function(event, channel) {
-		return event + channel - 1;
-	},
-
-	getChannelFromStatus : function(status) {
-		return status % 0xf0;
-	},
-
-	isNoteOn : function(status) {
-		return status >= Status.NOTE_ON_CH1 &&
-			status <= Status.NOTE_ON_CH16;
-	},
-
-	isNoteOff : function(status) {
-		return status >= Status.NOTE_OFF_CH1 &&
-			status <= Status.NOTE_OFF_CH16;
-	},
-
-	noteStringToMIDICode : function(note) {
-		return this.defaultValue(Note[note], 0);
 	}
 };

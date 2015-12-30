@@ -1,5 +1,6 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-var Status = require('./midiStatusEnum.js'),
+var MIDIUtils = require('./midiUtils.js'),
+	Status = require('./midiStatusEnum.js'),
 	Utils = require('./utils.js');
 
 /**
@@ -39,7 +40,7 @@ DeviceCollection.prototype = {
 		channel = Utils.defaultValue(channel, 1);
 
 		this.send([
-			Utils.getStatusByte(Status.NOTE_ON, channel),
+			MIDIUtils.getStatusByte(Status.NOTE_ON, channel),
 			note,
 			velocity
 		]);
@@ -61,7 +62,7 @@ DeviceCollection.prototype = {
 		channel = Utils.defaultValue(channel, 1);
 
 		this.send([
-			Utils.getStatusByte(Status.NOTE_OFF, channel),
+			MIDIUtils.getStatusByte(Status.NOTE_OFF, channel),
 			note,
 			velocity
 		]);
@@ -104,7 +105,7 @@ DeviceCollection.prototype = {
 
 module.exports = DeviceCollection;
 
-},{"./midiStatusEnum.js":5,"./utils.js":8}],2:[function(require,module,exports){
+},{"./midiStatusEnum.js":5,"./midiUtils.js":6,"./utils.js":9}],2:[function(require,module,exports){
 module.exports = {
 	BANK_SELECT : 0x00,
 
@@ -534,6 +535,43 @@ module.exports = {
 };
 
 },{}],6:[function(require,module,exports){
+var Note = require('./noteEnum.js'),
+	Status = require('./midiStatusEnum.js'),
+	Utils = require('./utils.js');
+
+module.exports = {
+	/**
+	 * Generates status byte from the specified MIDI event and channel.
+	 *
+	 * @param {number} event      MIDI event enum.
+	 * @param {number} channel    MIDI channel number. (1-16)
+	 *
+	 * @returns {number}    Status byte.
+	 */
+	getStatusByte : function(event, channel) {
+		return event + channel - 1;
+	},
+
+	getChannelFromStatus : function(status) {
+		return status % 0xf0;
+	},
+
+	isNoteOn : function(status) {
+		return status >= Status.NOTE_ON_CH1 &&
+			status <= Status.NOTE_ON_CH16;
+	},
+
+	isNoteOff : function(status) {
+		return status >= Status.NOTE_OFF_CH1 &&
+			status <= Status.NOTE_OFF_CH16;
+	},
+
+	noteStringToMIDICode : function(note) {
+		return Utils.defaultValue(Note[note], 0);
+	}
+};
+
+},{"./midiStatusEnum.js":5,"./noteEnum.js":8,"./utils.js":9}],7:[function(require,module,exports){
 (function (global){
 var DeviceCollection = require('./deviceCollection');
 
@@ -651,7 +689,7 @@ global.Nota = Nota;
 module.exports = Nota;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./deviceCollection":1,"./midiInput.js":3,"./midiOutput.js":4,"./midiStatusEnum.js":5,"./utils.js":8}],7:[function(require,module,exports){
+},{"./deviceCollection":1,"./midiInput.js":3,"./midiOutput.js":4,"./midiStatusEnum.js":5,"./utils.js":9}],8:[function(require,module,exports){
 module.exports = {
 	'C0'   : 0,
 	'C#0'  : 1,
@@ -783,12 +821,16 @@ module.exports = {
 	'G10'  : 127
 };
 
-},{}],8:[function(require,module,exports){
-var Note = require('./noteEnum.js'),
-	Status = require('./midiStatusEnum.js');
-
+},{}],9:[function(require,module,exports){
 module.exports = {
-
+	/**
+	 * Returns with the default value if the specified object is not available.
+	 *
+	 * @param {*} object           Object to check if it is defined.
+	 * @param {*} defaultObject    Default object.
+	 *
+	 * @returns {*}
+	 */
 	defaultValue : function(object, defaultObject) {
 		if (this.isDefined(object)) {
 			return object;
@@ -816,37 +858,7 @@ module.exports = {
 	 */
 	isDefined : function(object) {
 		return !this.isUndefined(object);
-	},
-
-	/**
-	 * Generates status byte from the specified MIDI event and channel.
-	 *
-	 * @param {number} event      MIDI event enum.
-	 * @param {number} channel    MIDI channel number. (1-16)
-	 *
-	 * @returns {number}    Status byte.
-	 */
-	getStatusByte : function(event, channel) {
-		return event + channel - 1;
-	},
-
-	getChannelFromStatus : function(status) {
-		return status % 0xf0;
-	},
-
-	isNoteOn : function(status) {
-		return status >= Status.NOTE_ON_CH1 &&
-			status <= Status.NOTE_ON_CH16;
-	},
-
-	isNoteOff : function(status) {
-		return status >= Status.NOTE_OFF_CH1 &&
-			status <= Status.NOTE_OFF_CH16;
-	},
-
-	noteStringToMIDICode : function(note) {
-		return this.defaultValue(Note[note], 0);
 	}
 };
 
-},{"./midiStatusEnum.js":5,"./noteEnum.js":7}]},{},[1,2,3,4,5,6,7,8]);
+},{}]},{},[1,2,3,4,5,6,7,8,9]);
