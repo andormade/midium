@@ -1,10 +1,8 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-var MIDIUtils = require('./midiUtils.js'),
-	Status = require('./midiStatusEnum.js'),
-	Utils = require('./utils.js');
+var Utils = require('../utils');
 
 /**
- * Constructor.
+ * Constructor for the device collection class.
  *
  * @param {array} devices    Array of midi devices
  *
@@ -14,98 +12,266 @@ function DeviceCollection(devices) {
 	this.initialize(devices);
 }
 
-DeviceCollection.prototype = {
-	/**
-	 * Initiializes the device collection object.
-	 *
-	 * @param {array} devices    Array of midi devices
-	 *
-	 * @returns {void}
-	 */
-	initialize : function(devices) {
-		this.devices = devices;
-	},
-
-	/**
-	 * Sets the specified note on.
-	 *
-	 * @param {note} note          MIDI note 0-127
-	 * @param {number} channel     Channel 1-16
-	 * @param {number} velocity    Velocity 0-127
-	 *
-	 * @returns {object}
-	 */
-	noteOn : function(note, channel, velocity) {
-		velocity = Utils.defaultValue(velocity, 127);
-		channel = Utils.defaultValue(channel, 1);
-
-		this.send([
-			MIDIUtils.getStatusByte(Status.NOTE_ON, channel),
-			note,
-			velocity
-		]);
-
-		return this;
-	},
-
-	/**
-	 * Sets the specified note off.
-	 *
-	 * @param {note} note            MIDI note 0-127
-	 * @param {number} [channel]     Channel 1-16
-	 * @param {number} [velocity]    Velocity 0-127
-	 *
-	 * @returns {object}
-	 */
-	noteOff : function(note, channel, velocity) {
-		velocity = Utils.defaultValue(velocity, 127);
-		channel = Utils.defaultValue(channel, 1);
-
-		this.send([
-			MIDIUtils.getStatusByte(Status.NOTE_OFF, channel),
-			note,
-			velocity
-		]);
-
-		return this;
-	},
-
-	/**
-	 * Sends raw MIDI data
-	 *
-	 * @param {array} midiData    Array of MIDI data
-	 *
-	 * @returns {object}
-	 */
-	send : function(midiData) {
-		this.each(function(device) {
-			if (device.type === 'output') {
-				device.send(midiData);
-			}
-		});
-
-		return this;
-	},
-
-	/**
-	 * Iterates through the devices in the collection.
-	 *
-	 * @param {function} callback   Callback function.
-	 *
-	 * @returns {object}
-	 */
-	each : function(callback) {
-		for (var i = 0; i < this.devices.length; i++) {
-			callback(this.devices[i]);
-		}
-
-		return this;
+/**
+ * Initiializes the device collection object.
+ *
+ * @param {array} devices    Array of midi devices
+ *
+ * @returns {void}
+ */
+DeviceCollection.prototype.initialize = function(devices) {
+	for (var i = 0; i < devices.length; i++) {
+		this.add(devices[i]);
 	}
+};
+
+/**
+ * Adds MIDI device to the collection.
+ *
+ * @param {object} device    MIDI device
+ *
+ * @returns {object} Reference of this for method chaining.
+ */
+DeviceCollection.prototype.add = function(device) {
+	if (Utils.isUndefined(this.devices)) {
+		this.devices = [];
+	}
+
+	device.onstatechange = this._onStateChange.bind(this);
+	device.onmidimessage = this._onMIDIMessage.bind(this);
+	this.devices.push(device);
+
+	return this;
+};
+
+/**
+ * Removes the references from the selected MIDI devices.
+ *
+ * @returns {void}
+ */
+DeviceCollection.prototype.removeReferences = function() {
+	this.each(function(device) {
+		device.onmidimessage = null;
+		device.onstatechange = null;
+	});
+};
+
+/**
+ * Iterates through the devices in the collection.
+ *
+ * @param {function} callback   Callback function.
+ *
+ * @returns {object} Reference of this for method chaining.
+ */
+DeviceCollection.prototype.each = function(callback) {
+	for (var i = 0; i < this.devices.length; i++) {
+		callback(this.devices[i]);
+	}
+
+	return this;
+};
+
+/**
+ * State change event handler.
+ *
+ * @param {object} event    State change event data.
+ *
+ * @returns {void}
+ */
+DeviceCollection.prototype._onStateChange = function(event) {
+	console.log('state', event);
 };
 
 module.exports = DeviceCollection;
 
-},{"./midiStatusEnum.js":5,"./midiUtils.js":6,"./utils.js":9}],2:[function(require,module,exports){
+},{"../utils":12}],2:[function(require,module,exports){
+var DeviceCollection = require('./deviceCollection');
+
+require('./inputFunctions');
+require('./outputFunctions');
+require('./inputShorthands');
+require('./outputShorthands');
+
+module.exports = DeviceCollection;
+
+},{"./deviceCollection":1,"./inputFunctions":3,"./inputShorthands":4,"./outputFunctions":5,"./outputShorthands":6}],3:[function(require,module,exports){
+var DeviceCollection = require('./deviceCollection'),
+	MIDIUtils = require('../midiUtils'),
+	Utils = require('../utils');
+
+/**
+ * Binds an event listener to the device collection.
+ *
+ * @param {string} event         Event name
+ * @param {function} callback    Callback function
+ *
+ * @returns {object} Reference of this for method chaining.
+ */
+DeviceCollection.prototype.on = function(event, callback) {
+	if (Utils.isUndefined(this.eventListeners)) {
+		this.eventListeners = [];
+	}
+
+	this.eventListeners.push({
+		event    : event,
+		callback : callback
+	});
+
+	return this;
+};
+
+/**
+ * Unbinds the specified event listener.
+ *
+ * @param {string} event         Event name
+ * @param {function} callback    Callback function
+ *
+ * @returns {object} Reference of this for method chaining.
+ */
+DeviceCollection.prototype.off = function(event, callback) {
+	for (var i = 0; i < this.eventListeners.length; i++) {
+		if (
+			this.eventListeners[i].event === event &&
+			this.eventListeners[i].callback === callback
+		) {
+			this.eventListeners.splice(i, 1);
+		}
+	}
+};
+
+DeviceCollection.prototype.trigger = function(event, data) {
+	if (Utils.isUndefined(this.eventListeners)) {
+		this.eventListeners = [];
+	}
+
+	for (var i = 0; i < this.eventListeners.length; i++) {
+		if (this.eventListeners[i].event === event) {
+			this.eventListeners[i].callback(data);
+		}
+	}
+};
+
+/**
+ * MIDI message event handler.
+ *
+ * @param {object} event    MIDI event data.
+ *
+ * @returns {void}
+ */
+DeviceCollection.prototype._onMIDIMessage = function(event) {
+	if (MIDIUtils.isNoteOn(event.data)) {
+		event.channel = MIDIUtils.getChannelFromStatus(event.data[0]);
+		event.note = event.data[1];
+		event.velocity = event.data[2];
+		this.trigger('noteon', event);
+	}
+
+	else if (MIDIUtils.isNoteOff(event.data)) {
+		event.channel = MIDIUtils.getChannelFromStatus(event.data[0]);
+		event.note = event.data[1];
+		event.velocity = event.data[2];
+		this.trigger('noteoff', event);
+	}
+};
+
+},{"../midiUtils":9,"../utils":12,"./deviceCollection":1}],4:[function(require,module,exports){
+var DeviceCollection = require('./deviceCollection');
+
+/**
+ * Registers an event listener for the note on events.
+ *
+ * @param {function} callback
+ *
+ * @returns {object} Reference of this for method chaining.
+ */
+DeviceCollection.prototype.onNoteOn = function(callback) {
+	return this.on('noteon', callback);
+};
+
+/**
+ * Registers an event listener for the note off events.
+ *
+ * @param {function} callback
+ *
+ * @returns {object} Reference of this for method chaining.
+ */
+DeviceCollection.prototype.onNoteOff = function(callback) {
+	return this.on('noteoff', callback);
+};
+
+},{"./deviceCollection":1}],5:[function(require,module,exports){
+var DeviceCollection = require('./deviceCollection');
+
+/**
+ * Sends raw MIDI data
+ *
+ * @param {array} midiData    Array of MIDI data
+ *
+ * @returns {object} Reference of this for method chaining.
+ */
+DeviceCollection.prototype.send = function(midiData) {
+	this.each(function(device) {
+		if (device.type === 'output') {
+			device.send(midiData);
+		}
+	});
+
+	return this;
+};
+
+},{"./deviceCollection":1}],6:[function(require,module,exports){
+var DeviceCollection = require('./deviceCollection'),
+	MIDIUtils = require('../midiUtils'),
+	Status = require('../midiStatusEnum'),
+	Utils = require('../utils');
+
+/**
+ * Sets the specified note on.
+ *
+ * @param {note} note          MIDI note 0-127
+ * @param {number} channel     Channel 1-16
+ * @param {number} velocity    Velocity 0-127
+ *
+ * @returns {object}
+ */
+DeviceCollection.prototype.noteOn = function(note, channel, velocity) {
+	note = MIDIUtils.noteStringToMIDICode(note);
+	velocity = Utils.defaultValue(velocity, 127);
+	channel = Utils.defaultValue(channel, 1);
+
+	this.send([
+		MIDIUtils.getStatusByte(Status.NOTE_ON, channel),
+		note,
+		velocity
+	]);
+
+	return this;
+};
+
+/**
+ * Sets the specified note off.
+ *
+ * @param {note} note            MIDI note 0-127
+ * @param {number} [channel]     Channel 1-16
+ * @param {number} [velocity]    Velocity 0-127
+ *
+ * @returns {object}
+ */
+DeviceCollection.prototype.noteOff = function(note, channel, velocity) {
+	note = MIDIUtils.noteStringToMIDICode(note);
+	velocity = Utils.defaultValue(velocity, 127);
+	channel = Utils.defaultValue(channel, 1);
+
+	this.send([
+		MIDIUtils.getStatusByte(Status.NOTE_OFF, channel),
+		note,
+		velocity
+	]);
+
+	return this;
+};
+
+},{"../midiStatusEnum":8,"../midiUtils":9,"../utils":12,"./deviceCollection":1}],7:[function(require,module,exports){
 module.exports = {
 	BANK_SELECT : 0x00,
 
@@ -214,161 +380,7 @@ module.exports = {
 	HIGH_RESOLUTION_VELOCITY_PREFIX : 0x58
 };
 
-},{}],3:[function(require,module,exports){
-module.exports = function(Nota) {
-	/**
-	 * MIDI input handler.
-	 *
-	 * @param {number} port
-	 * @param {number} channel
-	 *
-	 * @returns {void}
-	 */
-	function MidiInput(port, channel) {
-		this.port = port;
-		this.channel = channel;
-		this.input = Nota.MidiAccess.inputs.get(port);
-	}
-
-	MidiInput.prototype = {
-
-		/**
-		 * Sets the MIDI channel.
-		 *
-		 * @param {number} channel
-		 *
-		 * @returns {object}    MidiInput instance for method chaining.
-		 */
-		setChannel : function(channel) {
-			this.channel = channel;
-			return this;
-		},
-
-		/**
-		 * Listens to MIDI messages.
-		 *
-		 * @param {function} callback
-		 *
-		 * @returns {object}    MidiInput instance for method chaining.
-		 */
-		on : function(callback) {
-			this.input.onmidimessage = function(message) {
-				callback(message);
-			};
-			return this;
-		},
-
-		/**
-		 * Removes listeners from the MIDI input.
-		 *
-		 * @returns {object}    MidiInput instance for method chaining.
-		 */
-		off : function() {
-			this.input.onmidimessage = null;
-			return this;
-		}
-	};
-
-	return MidiInput;
-};
-
-},{}],4:[function(require,module,exports){
-module.exports = function(Nota) {
-	/**
-	 * MIDI output handler.
-	 *
-	 * @param {number} port
-	 * @param {number} channel
-	 *
-	 * @returns {void}
-	 */
-	function MidiOutput(port, channel) {
-		this.port = port;
-		this.channel = channel;
-		this.output = Nota.MidiAccess.outputs.get(port);
-	}
-
-	MidiOutput.prototype = {
-
-		/**
-		 * Sends a MIDI message.
-		 *
-		 * @param {array} dataArray    An array with three items, representing
-		 * the bytes in a MIDI message.
-		 *
-		 * @returns {object}    MidiOutput instance for method chaining.
-		 */
-		sendRawMessage : function(dataArray) {
-			this.output.send(dataArray);
-			return this;
-		},
-
-		/**
-		 * Sets the MIDI channel.
-		 *
-		 * @param {number} channel
-		 *
-		 * @returns {object}    MidiOutput instance for method chaining.
-		 */
-		setChannel : function(channel) {
-			this.channel = channel;
-			return this;
-		},
-
-		/**
-		 * Sets the specified note on.
-		 *
-		 * @param {number} note
-		 * @param {number} velocity
-		 * @param {number} [channel]
-		 *
-		 * @returns {object}
-		 */
-		noteOn : function(note, velocity, channel) {
-			var status = null;
-
-			if (Nota.Utils.isUndefined(channel)) {
-				channel = this.channel;
-			}
-
-			status = Nota.Utils.getStatusByte(
-				Nota.Enum.NOTE_ON,
-				channel ? channel : this.channel
-			);
-
-			this.sendRawMessage([status, note, velocity]);
-
-			return this;
-		},
-
-		/**
-		 * Sets the specified note off.
-		 *
-		 * @param {number} note
-		 * @param {number} velocity
-		 * @param {number} [channel]
-		 *
-		 * @returns {object}
-		 */
-		noteOff : function(note, velocity) {
-			if (Nota.Utils.isUndefined(channel)) {
-				channel = this.channel;
-			}
-
-			this.sendRawMessage([
-				Nota.Utils.getStatusByte(Nota.Enum.NOTE_OFF, channel),
-				note,
-				velocity]
-			);
-
-			return this;
-		}
-	};
-
-	return MidiOutput;
-};
-
-},{}],5:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 module.exports = {
 	NOTE_OFF              : 0x80,
 	NOTE_ON               : 0x90,
@@ -534,7 +546,7 @@ module.exports = {
 	PITCH_WHEEL_CH16 : 0xef
 };
 
-},{}],6:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 var Note = require('./noteEnum.js'),
 	Status = require('./midiStatusEnum.js'),
 	Utils = require('./utils.js');
@@ -553,25 +565,54 @@ module.exports = {
 	},
 
 	getChannelFromStatus : function(status) {
-		return status % 0xf0;
+		return (status % 0x10) + 1;
 	},
 
-	isNoteOn : function(status) {
-		return status >= Status.NOTE_ON_CH1 &&
-			status <= Status.NOTE_ON_CH16;
+	/**
+	 * Checks if the given midi message is a note on message.
+	 *
+	 * @param {array}    MIDI message data array.
+	 *
+	 * @returns {boolean}
+	 */
+	isNoteOn : function(data) {
+		return (
+			data[0] >= Status.NOTE_ON_CH1 &&
+			data[0] <= Status.NOTE_ON_CH16 &&
+			data[2] !== 0
+		);
 	},
 
-	isNoteOff : function(status) {
-		return status >= Status.NOTE_OFF_CH1 &&
-			status <= Status.NOTE_OFF_CH16;
+	/**
+	 * Checks if the given midi message is a note off message.
+	 *
+	 * @param {array}    MIDI message data array.
+	 *
+	 * @returns {boolean}
+	 */
+	isNoteOff : function(data) {
+		return (
+			data[0] >= Status.NOTE_OFF_CH1 &&
+			data[0] <= Status.NOTE_OFF_CH16
+		) || (
+			data[0] >= Status.NOTE_ON_CH1 &&
+			data[0] <= Status.NOTE_ON_CH16 &&
+			data[2] === 0
+		);
 	},
 
 	noteStringToMIDICode : function(note) {
-		return Utils.defaultValue(Note[note], 0);
+		if (typeof note === 'string') {
+			return Utils.defaultValue(Note[note], 0);
+		}
+		else if (typeof note === 'number') {
+			return note;
+		}
+		return 0;
 	}
 };
 
-},{"./midiStatusEnum.js":5,"./noteEnum.js":8,"./utils.js":9}],7:[function(require,module,exports){
+},{"./midiStatusEnum.js":8,"./noteEnum.js":11,"./utils.js":12}],10:[function(require,module,exports){
 (function (global){
 var DeviceCollection = require('./deviceCollection');
 
@@ -680,16 +721,11 @@ var Nota = {
 	}
 };
 
-Nota.MidiOutput = require('./midiOutput.js')(Nota);
-Nota.MidiInput = require('./midiInput.js')(Nota);
-Nota.Status = require('./midiStatusEnum.js');
-Nota.Utils = require('./utils.js');
-
 global.Nota = Nota;
 module.exports = Nota;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./deviceCollection":1,"./midiInput.js":3,"./midiOutput.js":4,"./midiStatusEnum.js":5,"./utils.js":9}],8:[function(require,module,exports){
+},{"./deviceCollection":2}],11:[function(require,module,exports){
 module.exports = {
 	'C0'   : 0,
 	'C#0'  : 1,
@@ -821,7 +857,7 @@ module.exports = {
 	'G10'  : 127
 };
 
-},{}],9:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 module.exports = {
 	/**
 	 * Returns with the default value if the specified object is not available.
@@ -861,4 +897,4 @@ module.exports = {
 	}
 };
 
-},{}]},{},[1,2,3,4,5,6,7,8,9]);
+},{}]},{},[7,8,9,10,11,12]);

@@ -16,20 +16,49 @@ module.exports = {
 	},
 
 	getChannelFromStatus : function(status) {
-		return status % 0xf0;
+		return (status % 0x10) + 1;
 	},
 
-	isNoteOn : function(status) {
-		return status >= Status.NOTE_ON_CH1 &&
-			status <= Status.NOTE_ON_CH16;
+	/**
+	 * Checks if the given midi message is a note on message.
+	 *
+	 * @param {array}    MIDI message data array.
+	 *
+	 * @returns {boolean}
+	 */
+	isNoteOn : function(data) {
+		return (
+			data[0] >= Status.NOTE_ON_CH1 &&
+			data[0] <= Status.NOTE_ON_CH16 &&
+			data[2] !== 0
+		);
 	},
 
-	isNoteOff : function(status) {
-		return status >= Status.NOTE_OFF_CH1 &&
-			status <= Status.NOTE_OFF_CH16;
+	/**
+	 * Checks if the given midi message is a note off message.
+	 *
+	 * @param {array}    MIDI message data array.
+	 *
+	 * @returns {boolean}
+	 */
+	isNoteOff : function(data) {
+		return (
+			data[0] >= Status.NOTE_OFF_CH1 &&
+			data[0] <= Status.NOTE_OFF_CH16
+		) || (
+			data[0] >= Status.NOTE_ON_CH1 &&
+			data[0] <= Status.NOTE_ON_CH16 &&
+			data[2] === 0
+		);
 	},
 
 	noteStringToMIDICode : function(note) {
-		return Utils.defaultValue(Note[note], 0);
+		if (typeof note === 'string') {
+			return Utils.defaultValue(Note[note], 0);
+		}
+		else if (typeof note === 'number') {
+			return note;
+		}
+		return 0;
 	}
 };

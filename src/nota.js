@@ -105,10 +105,5 @@ var Nota = {
 	}
 };
 
-Nota.MidiOutput = require('./midiOutput.js')(Nota);
-Nota.MidiInput = require('./midiInput.js')(Nota);
-Nota.Status = require('./midiStatusEnum.js');
-Nota.Utils = require('./utils.js');
-
 global.Nota = Nota;
 module.exports = Nota;
