@@ -74,6 +74,15 @@ DeviceCollection.prototype._onMIDIMessage = function(event) {
 	else if (MIDIUtils.isPitchWheel(event.data)) {
 		this._onPitchWheel(event);
 	}
+	else if (MIDIUtils.isPolyphonicAftertouch(event.data)) {
+		this._onPolyphonicAftertouch(event);
+	}
+	else if (MIDIUtils.isProgramChange(event.data)) {
+		this._onProgramChange(event);
+	}
+	else if (MIDIUtils.isChannelAftertouch(event.data)) {
+		this._onChannelAftertouch(event);
+	}
 };
 
 /**
@@ -137,4 +146,26 @@ DeviceCollection.prototype._onPitchWheel = function(event) {
 	event.event = 'pitchwheel';
 	event.value = event.data[2];
 	this.trigger('pitchwheel', event);
+};
+
+DeviceCollection.prototype._onPolyphonicAftertouch = function(event) {
+	event.channel = MIDIUtils.getChannelFromStatus(event.data[0]);
+	event.event = 'polyphonicaftertouch';
+	event.note = event.data[1];
+	event.pressure = event.data[2];
+	this.trigger('polyphonicaftertouch', event);
+};
+
+DeviceCollection.prototype._onProgramChange = function(event) {
+	event.channel = MIDIUtils.getChannelFromStatus(event.data[0]);
+	event.event = 'programchange';
+	event.program = event.data[1];
+	this.trigger('programchange', event);
+};
+
+DeviceCollection.prototype._onChannelAftertouch = function() {
+	event.channel = MIDIUtils.getChannelFromStatus(event.data[0]);
+	event.event = 'channelaftertouch';
+	event.pressure = event.data[1];
+	this.trigger('channelaftertouch', event);
 };

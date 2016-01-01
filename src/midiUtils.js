@@ -66,6 +66,27 @@ module.exports = {
 		);
 	},
 
+	isPolyphonicAftertouch : function(data) {
+		return (
+			data[0] >= Status.POLYPHONIC_AFTERTOUCH_CH1 &&
+			data[0] <= Status.POLYPHONIC_AFTERTOUCH_CH16
+		);
+	},
+
+	isProgramChange : function(data) {
+		return (
+			data[0] >= Status.PROGRAM_CHANGE_CH1 &&
+			data[0] <= Status.PROGRAM_CHANGE_CH16
+		);
+	},
+
+	isChannelAftertouch : function(data) {
+		return (
+			data[0] >= Status.CHANNEL_AFTERTOUCH_CH1 &&
+			data[0] <= Status.CHANNEL_AFTERTOUCH_CH16
+		);
+	},
+
 	noteStringToMIDICode : function(note) {
 		if (typeof note === 'string') {
 			return Utils.defaultValue(Note[note], 0);
