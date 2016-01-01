@@ -160,18 +160,80 @@ DeviceCollection.prototype.trigger = function(event, data) {
  */
 DeviceCollection.prototype._onMIDIMessage = function(event) {
 	if (MIDIUtils.isNoteOn(event.data)) {
-		event.channel = MIDIUtils.getChannelFromStatus(event.data[0]);
-		event.note = event.data[1];
-		event.velocity = event.data[2];
-		this.trigger('noteon', event);
+		this._onNoteOn(event);
 	}
-
 	else if (MIDIUtils.isNoteOff(event.data)) {
-		event.channel = MIDIUtils.getChannelFromStatus(event.data[0]);
-		event.note = event.data[1];
-		event.velocity = event.data[2];
-		this.trigger('noteoff', event);
+		this._onNoteOff(event);
 	}
+	else if (MIDIUtils.isControlChange(event.data)) {
+		this._onControlChange(event);
+	}
+	else if (MIDIUtils.isPitchWheel(event.data)) {
+		this._onPitchWheel(event);
+	}
+};
+
+/**
+ * Handles note on events. Extends the MIDI message event object.
+ *
+ * @param {object} event    MIDI event data.
+ *
+ * @private
+ * @returns {void}
+ */
+DeviceCollection.prototype._onNoteOn = function(event) {
+	event.channel = MIDIUtils.getChannelFromStatus(event.data[0]);
+	event.note = event.data[1];
+	event.velocity = event.data[2];
+	event.event = 'noteon';
+	this.trigger('noteon', event);
+};
+
+/**
+ * Handles note off events. Extends the MIDI message event object.
+ *
+ * @param {object} event    MIDI event data.
+ *
+ * @private
+ * @returns {void}
+ */
+DeviceCollection.prototype._onNoteOff = function(event) {
+	event.channel = MIDIUtils.getChannelFromStatus(event.data[0]);
+	event.note = event.data[1];
+	event.velocity = event.data[2];
+	event.event = 'noteoff';
+	this.trigger('noteoff', event);
+};
+
+/**
+ * Handles control change events. Extends the MIDI message event object.
+ *
+ * @param {object} event    MIDI event data.
+ *
+ * @private
+ * @returns {void}
+ */
+DeviceCollection.prototype._onControlChange = function(event) {
+	event.channel = MIDIUtils.getChannelFromStatus(event.data[0]);
+	event.event = 'controlchange';
+	event.controller = event.data[1];
+	event.controllerValue = event.data[2];
+	this.trigger('controlchange', event);
+};
+
+/**
+ * Handles pitch wheel events. Extends the MIDI message event object.
+ *
+ * @param {object} event    MIDI event data.
+ *
+ * @private
+ * @returns {void}
+ */
+DeviceCollection.prototype._onPitchWheel = function(event) {
+	event.channel = MIDIUtils.getChannelFromStatus(event.data[0]);
+	event.event = 'pitchwheel';
+	event.value = event.data[2];
+	this.trigger('pitchwheel', event);
 };
 
 },{"../midiUtils":9,"../utils":12,"./deviceCollection":1}],4:[function(require,module,exports){
@@ -598,6 +660,20 @@ module.exports = {
 			data[0] >= Status.NOTE_ON_CH1 &&
 			data[0] <= Status.NOTE_ON_CH16 &&
 			data[2] === 0
+		);
+	},
+
+	isControlChange : function(data) {
+		return (
+			data[0] >= Status.CONTROL_CHANGE_CH1 &&
+			data[0] <= Status.CONTROL_CHANGE_CH16
+		);
+	},
+
+	isPitchWheel : function(data) {
+		return (
+			data[0] >= Status.PITCH_WHEEL_CH1 &&
+			data[0] <= Status.PITCH_WHEEL_CH16
 		);
 	},
 

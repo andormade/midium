@@ -52,6 +52,20 @@ module.exports = {
 		);
 	},
 
+	isControlChange : function(data) {
+		return (
+			data[0] >= Status.CONTROL_CHANGE_CH1 &&
+			data[0] <= Status.CONTROL_CHANGE_CH16
+		);
+	},
+
+	isPitchWheel : function(data) {
+		return (
+			data[0] >= Status.PITCH_WHEEL_CH1 &&
+			data[0] <= Status.PITCH_WHEEL_CH16
+		);
+	},
+
 	noteStringToMIDICode : function(note) {
 		if (typeof note === 'string') {
 			return Utils.defaultValue(Note[note], 0);
