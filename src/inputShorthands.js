@@ -1,4 +1,4 @@
-var DeviceCollection = require('./deviceCollection');
+var Nota = require('./nota');
 
 /**
  * Registers an event listener for the note on events.
@@ -7,7 +7,7 @@ var DeviceCollection = require('./deviceCollection');
  *
  * @returns {object} Reference of this for method chaining.
  */
-DeviceCollection.prototype.onNoteOn = function(callback) {
+Nota.prototype.onNoteOn = function(callback) {
 	return this.on('noteon', callback);
 };
 
@@ -18,6 +18,6 @@ DeviceCollection.prototype.onNoteOn = function(callback) {
  *
  * @returns {object} Reference of this for method chaining.
  */
-DeviceCollection.prototype.onNoteOff = function(callback) {
+Nota.prototype.onNoteOff = function(callback) {
 	return this.on('noteoff', callback);
 };

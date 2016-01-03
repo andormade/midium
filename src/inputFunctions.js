@@ -1,6 +1,6 @@
-var DeviceCollection = require('./deviceCollection'),
-	MIDIUtils = require('../midiUtils'),
-	Utils = require('../utils');
+var MIDIUtils = require('./midiUtils'),
+	Nota = require('./nota'),
+	Utils = require('./utils');
 
 /**
  * Binds an event listener to the device collection.
@@ -10,7 +10,7 @@ var DeviceCollection = require('./deviceCollection'),
  *
  * @returns {object} Reference of this for method chaining.
  */
-DeviceCollection.prototype.on = function(event, callback) {
+Nota.prototype.on = function(event, callback) {
 	if (Utils.isUndefined(this.eventListeners)) {
 		this.eventListeners = [];
 	}
@@ -31,7 +31,7 @@ DeviceCollection.prototype.on = function(event, callback) {
  *
  * @returns {object} Reference of this for method chaining.
  */
-DeviceCollection.prototype.off = function(event, callback) {
+Nota.prototype.off = function(event, callback) {
 	for (var i = 0; i < this.eventListeners.length; i++) {
 		if (
 			this.eventListeners[i].event === event &&
@@ -42,7 +42,7 @@ DeviceCollection.prototype.off = function(event, callback) {
 	}
 };
 
-DeviceCollection.prototype.trigger = function(event, data) {
+Nota.prototype.trigger = function(event, data) {
 	if (Utils.isUndefined(this.eventListeners)) {
 		this.eventListeners = [];
 	}
@@ -61,7 +61,7 @@ DeviceCollection.prototype.trigger = function(event, data) {
  *
  * @returns {void}
  */
-DeviceCollection.prototype._onMIDIMessage = function(event) {
+Nota.prototype._onMIDIMessage = function(event) {
 	if (MIDIUtils.isNoteOn(event.data)) {
 		this._onNoteOn(event);
 	}
@@ -93,7 +93,7 @@ DeviceCollection.prototype._onMIDIMessage = function(event) {
  * @private
  * @returns {void}
  */
-DeviceCollection.prototype._onNoteOn = function(event) {
+Nota.prototype._onNoteOn = function(event) {
 	event.channel = MIDIUtils.getChannelFromStatus(event.data[0]);
 	event.note = event.data[1];
 	event.velocity = event.data[2];
@@ -109,7 +109,7 @@ DeviceCollection.prototype._onNoteOn = function(event) {
  * @private
  * @returns {void}
  */
-DeviceCollection.prototype._onNoteOff = function(event) {
+Nota.prototype._onNoteOff = function(event) {
 	event.channel = MIDIUtils.getChannelFromStatus(event.data[0]);
 	event.note = event.data[1];
 	event.velocity = event.data[2];
@@ -125,7 +125,7 @@ DeviceCollection.prototype._onNoteOff = function(event) {
  * @private
  * @returns {void}
  */
-DeviceCollection.prototype._onControlChange = function(event) {
+Nota.prototype._onControlChange = function(event) {
 	event.channel = MIDIUtils.getChannelFromStatus(event.data[0]);
 	event.event = 'controlchange';
 	event.controller = event.data[1];
@@ -141,14 +141,14 @@ DeviceCollection.prototype._onControlChange = function(event) {
  * @private
  * @returns {void}
  */
-DeviceCollection.prototype._onPitchWheel = function(event) {
+Nota.prototype._onPitchWheel = function(event) {
 	event.channel = MIDIUtils.getChannelFromStatus(event.data[0]);
 	event.event = 'pitchwheel';
 	event.value = event.data[2];
 	this.trigger('pitchwheel', event);
 };
 
-DeviceCollection.prototype._onPolyphonicAftertouch = function(event) {
+Nota.prototype._onPolyphonicAftertouch = function(event) {
 	event.channel = MIDIUtils.getChannelFromStatus(event.data[0]);
 	event.event = 'polyphonicaftertouch';
 	event.note = event.data[1];
@@ -156,14 +156,14 @@ DeviceCollection.prototype._onPolyphonicAftertouch = function(event) {
 	this.trigger('polyphonicaftertouch', event);
 };
 
-DeviceCollection.prototype._onProgramChange = function(event) {
+Nota.prototype._onProgramChange = function(event) {
 	event.channel = MIDIUtils.getChannelFromStatus(event.data[0]);
 	event.event = 'programchange';
 	event.program = event.data[1];
 	this.trigger('programchange', event);
 };
 
-DeviceCollection.prototype._onChannelAftertouch = function() {
+Nota.prototype._onChannelAftertouch = function() {
 	event.channel = MIDIUtils.getChannelFromStatus(event.data[0]);
 	event.event = 'channelaftertouch';
 	event.pressure = event.data[1];

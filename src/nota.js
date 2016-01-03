@@ -1,5 +1,3 @@
-var DeviceCollection = require('./deviceCollection');
-
 /**
  * Shorthand for nota static functions.
  *
@@ -7,13 +5,8 @@ var DeviceCollection = require('./deviceCollection');
  *
  * @returns {*}
  */
-function Nota(attr) {
-	if (typeof attr === 'function') {
-		Nota.ready(attr);
-	}
-	else {
-		return Nota.select(attr);
-	}
+function Nota(devices) {
+	this.initialize(devices);
 }
 
 /** @type {object} Midi access object. */
@@ -115,8 +108,7 @@ Nota.select = function(selector) {
 		});
 	}
 
-	return new DeviceCollection(devices);
-}
+	return new Nota(devices);
+};
 
-global.Nota = Nota;
 module.exports = Nota;

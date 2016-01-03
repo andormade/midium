@@ -1,4 +1,4 @@
-var DeviceCollection = require('./deviceCollection');
+var Nota = require('./nota');
 
 /**
  * Sends raw MIDI data
@@ -7,7 +7,7 @@ var DeviceCollection = require('./deviceCollection');
  *
  * @returns {object} Reference of this for method chaining.
  */
-DeviceCollection.prototype.send = function(midiData) {
+Nota.prototype.send = function(midiData) {
 	this.each(function(device) {
 		if (device.type === 'output') {
 			device.send(midiData);

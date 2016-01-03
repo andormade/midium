@@ -1,15 +1,5 @@
-var Utils = require('../utils');
-
-/**
- * Constructor for the device collection class.
- *
- * @param {array} devices    Array of midi devices
- *
- * @returns {void}
- */
-function DeviceCollection(devices) {
-	this.initialize(devices);
-}
+var Nota = require('./nota.js'),
+	Utils = require('./utils.js');
 
 /**
  * Initiializes the device collection object.
@@ -18,7 +8,7 @@ function DeviceCollection(devices) {
  *
  * @returns {void}
  */
-DeviceCollection.prototype.initialize = function(devices) {
+Nota.prototype.initialize = function(devices) {
 	for (var i = 0; i < devices.length; i++) {
 		this.add(devices[i]);
 	}
@@ -31,7 +21,7 @@ DeviceCollection.prototype.initialize = function(devices) {
  *
  * @returns {object} Reference of this for method chaining.
  */
-DeviceCollection.prototype.add = function(device) {
+Nota.prototype.add = function(device) {
 	if (Utils.isUndefined(this.devices)) {
 		this.devices = [];
 	}
@@ -48,7 +38,7 @@ DeviceCollection.prototype.add = function(device) {
  *
  * @returns {void}
  */
-DeviceCollection.prototype.removeReferences = function() {
+Nota.prototype.removeReferences = function() {
 	this.each(function(device) {
 		device.onmidimessage = null;
 		device.onstatechange = null;
@@ -62,7 +52,7 @@ DeviceCollection.prototype.removeReferences = function() {
  *
  * @returns {object} Reference of this for method chaining.
  */
-DeviceCollection.prototype.each = function(callback) {
+Nota.prototype.each = function(callback) {
 	for (var i = 0; i < this.devices.length; i++) {
 		callback(this.devices[i]);
 	}
@@ -77,8 +67,6 @@ DeviceCollection.prototype.each = function(callback) {
  *
  * @returns {void}
  */
-DeviceCollection.prototype._onStateChange = function(event) {
+Nota.prototype._onStateChange = function(event) {
 	console.log('state', event);
 };
-
-module.exports = DeviceCollection;

@@ -1,7 +1,7 @@
-var DeviceCollection = require('./deviceCollection'),
-	MIDIUtils = require('../midiUtils'),
-	Status = require('../midiStatusEnum'),
-	Utils = require('../utils');
+var MIDIUtils = require('./midiUtils'),
+	Nota = require('./nota'),
+	Status = require('./midiStatusEnum'),
+	Utils = require('./utils');
 
 /**
  * Sets the specified note on.
@@ -12,7 +12,7 @@ var DeviceCollection = require('./deviceCollection'),
  *
  * @returns {object}
  */
-DeviceCollection.prototype.noteOn = function(note, channel, velocity) {
+Nota.prototype.noteOn = function(note, channel, velocity) {
 	note = MIDIUtils.noteStringToMIDICode(note);
 	velocity = Utils.defaultValue(velocity, 127);
 	channel = Utils.defaultValue(channel, 1);
@@ -35,7 +35,7 @@ DeviceCollection.prototype.noteOn = function(note, channel, velocity) {
  *
  * @returns {object}
  */
-DeviceCollection.prototype.noteOff = function(note, channel, velocity) {
+Nota.prototype.noteOff = function(note, channel, velocity) {
 	note = MIDIUtils.noteStringToMIDICode(note);
 	velocity = Utils.defaultValue(velocity, 127);
 	channel = Utils.defaultValue(channel, 1);
