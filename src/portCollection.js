@@ -9,6 +9,8 @@ var Nota = require('./nota.js'),
  * @returns {void}
  */
 Nota.prototype.initialize = function(devices) {
+	this.eventListeners = [];
+
 	for (var i = 0; i < devices.length; i++) {
 		this.add(devices[i]);
 	}

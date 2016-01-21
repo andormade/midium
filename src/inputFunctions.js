@@ -5,20 +5,33 @@ var MIDIUtils = require('./midiUtils'),
 /**
  * Binds an event listener to the device collection.
  *
- * @param {string} event         Event name
+ * @param {number} status        MIDI Status
  * @param {function} callback    Callback function
  *
  * @returns {object} Reference of this for method chaining.
  */
-Nota.prototype.on = function(event, callback) {
-	if (Utils.isUndefined(this.eventListeners)) {
-		this.eventListeners = [];
+Nota.prototype.on = function(status, callback, options) {
+	if (Utils.isDefined(options)) {
+		Utils.defaultValue(options.matchHighNibble, true);
+		Utils.defaultValue(options.matchLowNibble, true);
+	}
+	else {
+		options = {
+			matchHighNibble : true,
+			matchLowNibble  : true
+		};
 	}
 
-	this.eventListeners.push({
-		event    : event,
-		callback : callback
-	});
+	var listener = {
+		midiStatus      : status,
+		matchHighNibble : options.matchHighNibble,
+		matchLowNibble  : options.matchLowNibble,
+		highNibble      : Utils.getHighNibble(status),
+		lowNibble       : Utils.getLowNibble(status),
+		callback        : callback
+	};
+
+	this.eventListeners.push(listener);
 
 	return this;
 };
@@ -31,27 +44,17 @@ Nota.prototype.on = function(event, callback) {
  *
  * @returns {object} Reference of this for method chaining.
  */
-Nota.prototype.off = function(event, callback) {
-	for (var i = 0; i < this.eventListeners.length; i++) {
+Nota.prototype.off = function(status, callback) {
+	this.eventListeners.forEach(function(eventListener) {
 		if (
-			this.eventListeners[i].event === event &&
-			this.eventListeners[i].callback === callback
+			eventListener[i].status === status &&
+			eventListener[i].callback === callback
 		) {
-			this.eventListeners.splice(i, 1);
+			eventListener.splice(i, 1);
 		}
-	}
-};
+	});
 
-Nota.prototype.trigger = function(event, data) {
-	if (Utils.isUndefined(this.eventListeners)) {
-		this.eventListeners = [];
-	}
-
-	for (var i = 0; i < this.eventListeners.length; i++) {
-		if (this.eventListeners[i].event === event) {
-			this.eventListeners[i].callback(data);
-		}
-	}
+	return this;
 };
 
 /**
@@ -62,110 +65,85 @@ Nota.prototype.trigger = function(event, data) {
  * @returns {void}
  */
 Nota.prototype._onMIDIMessage = function(event) {
+	this.eventListeners.forEach(function(eventListener) {
+		if (this._isThisTheEventWeAreLookingFor(eventListener, event)) {
+			event = this._extendEventObject(event);
+			eventListener.callback(event);
+		}
+	}, this);
+};
+
+/**
+ * Checks if the specified listener is listening to the specified MIDI event.
+ *
+ * @param {object} listener
+ * @param {object} event
+ *
+ * @returns {bool}
+ */
+Nota.prototype._isThisTheEventWeAreLookingFor = function(listener, event) {
+	if (
+		listener.matchHighNibble === true &&
+		listener.matchLowNibble === true &&
+		listener.midiStatus === event.data[0]
+	) {
+		return true;
+	}
+
+	else if (
+		listener.matchHighNibble === true &&
+		listener.matchLowNibble === false &&
+		listener.highNibble === Utils.getHighNibble(event.data[0])
+	) {
+		return true;
+	}
+
+	else if (
+		listener.matchHighNibble === false &&
+		listener.matchLowNibble === true &&
+		listener.lowNibble === Utils.getLowNibble(event.data[0])
+	) {
+		return true;
+	}
+
+	return false;
+};
+
+/**
+ * Extends the MIDI event object with shorthads to the most useful informations.
+ *
+ * @param {object} event
+ *
+ * @returns {object}
+ */
+Nota.prototype._extendEventObject = function(event) {
+	event.channel = MIDIUtils.getChannelFromStatus(event.data[0]);
+
 	if (MIDIUtils.isNoteOn(event.data)) {
-		this._onNoteOn(event);
+		event.note = event.data[1];
+		event.velocity = event.data[2];
 	}
 	else if (MIDIUtils.isNoteOff(event.data)) {
-		this._onNoteOff(event);
+		event.note = event.data[1];
+		event.velocity = event.data[2];
 	}
 	else if (MIDIUtils.isControlChange(event.data)) {
-		this._onControlChange(event);
+		event.controller = event.data[1];
+		event.controllerValue = event.data[2];
 	}
 	else if (MIDIUtils.isPitchWheel(event.data)) {
-		this._onPitchWheel(event);
+		event.pitchWheel = event.data[2];
 	}
 	else if (MIDIUtils.isPolyphonicAftertouch(event.data)) {
-		this._onPolyphonicAftertouch(event);
+		event.note = event.data[1];
+		event.pressure = event.data[2];
 	}
 	else if (MIDIUtils.isProgramChange(event.data)) {
-		this._onProgramChange(event);
+		event.program = event.data[1];
 	}
 	else if (MIDIUtils.isChannelAftertouch(event.data)) {
-		this._onChannelAftertouch(event);
+		event.pressure = event.data[1];
 	}
-};
 
-/**
- * Handles note on events. Extends the MIDI message event object.
- *
- * @param {object} event    MIDI event data.
- *
- * @private
- * @returns {void}
- */
-Nota.prototype._onNoteOn = function(event) {
-	event.channel = MIDIUtils.getChannelFromStatus(event.data[0]);
-	event.note = event.data[1];
-	event.velocity = event.data[2];
-	event.event = 'noteon';
-	this.trigger('noteon', event);
-};
-
-/**
- * Handles note off events. Extends the MIDI message event object.
- *
- * @param {object} event    MIDI event data.
- *
- * @private
- * @returns {void}
- */
-Nota.prototype._onNoteOff = function(event) {
-	event.channel = MIDIUtils.getChannelFromStatus(event.data[0]);
-	event.note = event.data[1];
-	event.velocity = event.data[2];
-	event.event = 'noteoff';
-	this.trigger('noteoff', event);
-};
-
-/**
- * Handles control change events. Extends the MIDI message event object.
- *
- * @param {object} event    MIDI event data.
- *
- * @private
- * @returns {void}
- */
-Nota.prototype._onControlChange = function(event) {
-	event.channel = MIDIUtils.getChannelFromStatus(event.data[0]);
-	event.event = 'controlchange';
-	event.controller = event.data[1];
-	event.controllerValue = event.data[2];
-	this.trigger('controlchange', event);
-};
-
-/**
- * Handles pitch wheel events. Extends the MIDI message event object.
- *
- * @param {object} event    MIDI event data.
- *
- * @private
- * @returns {void}
- */
-Nota.prototype._onPitchWheel = function(event) {
-	event.channel = MIDIUtils.getChannelFromStatus(event.data[0]);
-	event.event = 'pitchwheel';
-	event.value = event.data[2];
-	this.trigger('pitchwheel', event);
-};
-
-Nota.prototype._onPolyphonicAftertouch = function(event) {
-	event.channel = MIDIUtils.getChannelFromStatus(event.data[0]);
-	event.event = 'polyphonicaftertouch';
-	event.note = event.data[1];
-	event.pressure = event.data[2];
-	this.trigger('polyphonicaftertouch', event);
-};
-
-Nota.prototype._onProgramChange = function(event) {
-	event.channel = MIDIUtils.getChannelFromStatus(event.data[0]);
-	event.event = 'programchange';
-	event.program = event.data[1];
-	this.trigger('programchange', event);
-};
-
-Nota.prototype._onChannelAftertouch = function() {
-	event.channel = MIDIUtils.getChannelFromStatus(event.data[0]);
-	event.event = 'channelaftertouch';
-	event.pressure = event.data[1];
-	this.trigger('channelaftertouch', event);
+	return event;
 };

@@ -34,5 +34,28 @@ module.exports = {
 	 */
 	isDefined : function(object) {
 		return !this.isUndefined(object);
+	},
+
+	/**
+	 * Returns with the low nibble of the given byte.
+	 *
+	 * @param {number} byte
+	 *
+	 * @returns {number}
+	 */
+	getLowNibble : function(byte) {
+		return byte & 0x0F;
+	},
+
+
+	/**
+	 * Returns with the high nibble of the given byte.
+	 *
+	 * @param {number} byte
+	 *
+	 * @returns {number}
+	 */
+	getHighNibble : function(byte) {
+		return (byte >> 4) & 0x0f;
 	}
 };
