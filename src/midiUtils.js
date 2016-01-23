@@ -12,11 +12,38 @@ module.exports = {
 	 * @returns {number}    Status byte.
 	 */
 	getStatusByte : function(event, channel) {
-		return event + channel - 1;
+		return ({
+			noteoff           : 0x80,
+			noteon            : 0x90,
+			polyaftertouch    : 0xa0,
+			controlchange     : 0xb0,
+			programchange     : 0xc0,
+			channelaftertouch : 0xd0,
+			pitchwheel        : 0xe0
+		})[event] + channel - 1;
 	},
 
 	getChannelFromStatus : function(status) {
 		return (status % 0x10) + 1;
+	},
+
+	/**
+	 * Returns with the type of the given MIDI status byte.
+	 *
+	 * @param {number} status    MIDI status byte
+	 *
+	 * @returns {string} Event type
+	 */
+	getEventType : function(status) {
+		return ({
+			0x8 : 'noteoff',
+			0x9 : 'noteon',
+			0xa : 'polyaftertouch',
+			0xb : 'controlchange',
+			0xc : 'programchange',
+			0xd : 'channelaftertouch',
+			0xe : 'pitchwheel'
+		})[Utils.getHighNibble(status)];
 	},
 
 	/**

@@ -5,34 +5,29 @@ var MIDIUtils = require('./midiUtils'),
 /**
  * Binds an event listener to the device collection.
  *
- * @param {number} status        MIDI Status
+ * @param {string} event         MIDI Status
  * @param {function} callback    Callback function
  *
  * @returns {object} Reference of this for method chaining.
  */
-Nota.prototype.on = function(status, callback, options) {
-	if (Utils.isDefined(options)) {
-		Utils.defaultValue(options.matchHighNibble, true);
-		Utils.defaultValue(options.matchLowNibble, true);
-	}
-	else {
-		options = {
-			matchHighNibble : true,
-			matchLowNibble  : true
-		};
-	}
+Nota.prototype.on = function(event, callback) {
+	var match = event.match(/^(\w+)(?::ch([1-9][0-6]?)|)/);
+	var eventType = match[1];
+	var channel = parseInt(Utils.defaultValue(match[2], 1), 10);
+	var status = MIDIUtils.getStatusByte(eventType, channel);
 
 	var listener = {
-		midiStatus      : status,
-		matchHighNibble : options.matchHighNibble,
-		matchLowNibble  : options.matchLowNibble,
-		highNibble      : Utils.getHighNibble(status),
-		lowNibble       : Utils.getLowNibble(status),
-		callback        : callback
+		event        : event,
+		eventType    : eventType,
+		status       : status,
+		channel      : channel,
+		matchChannel : Utils.isDefined(match[2]),
+		highNibble   : Utils.getHighNibble(status),
+		lowNibble    : channel,
+		callback     : callback
 	};
 
 	this.eventListeners.push(listener);
-
 	return this;
 };
 
@@ -44,10 +39,10 @@ Nota.prototype.on = function(status, callback, options) {
  *
  * @returns {object} Reference of this for method chaining.
  */
-Nota.prototype.off = function(status, callback) {
+Nota.prototype.off = function(event, callback) {
 	this.eventListeners.forEach(function(eventListener) {
 		if (
-			eventListener[i].status === status &&
+			eventListener[i].event === event &&
 			eventListener[i].callback === callback
 		) {
 			eventListener.splice(i, 1);
@@ -82,31 +77,11 @@ Nota.prototype._onMIDIMessage = function(event) {
  * @returns {bool}
  */
 Nota.prototype._isThisTheEventWeAreLookingFor = function(listener, event) {
-	if (
-		listener.matchHighNibble === true &&
-		listener.matchLowNibble === true &&
-		listener.midiStatus === event.data[0]
-	) {
-		return true;
+	if (listener.matchChannel) {
+		return listener.status === event.data[0];
 	}
 
-	else if (
-		listener.matchHighNibble === true &&
-		listener.matchLowNibble === false &&
-		listener.highNibble === Utils.getHighNibble(event.data[0])
-	) {
-		return true;
-	}
-
-	else if (
-		listener.matchHighNibble === false &&
-		listener.matchLowNibble === true &&
-		listener.lowNibble === Utils.getLowNibble(event.data[0])
-	) {
-		return true;
-	}
-
-	return false;
+	return listener.highNibble === Utils.getHighNibble(event.data[0]);
 };
 
 /**
@@ -119,11 +94,10 @@ Nota.prototype._isThisTheEventWeAreLookingFor = function(listener, event) {
 Nota.prototype._extendEventObject = function(event) {
 	event.channel = MIDIUtils.getChannelFromStatus(event.data[0]);
 
-	if (MIDIUtils.isNoteOn(event.data)) {
-		event.note = event.data[1];
-		event.velocity = event.data[2];
-	}
-	else if (MIDIUtils.isNoteOff(event.data)) {
+	if (
+		MIDIUtils.isNoteOn(event.data) ||
+		MIDIUtils.isNoteOff(event.data)
+	) {
 		event.note = event.data[1];
 		event.velocity = event.data[2];
 	}

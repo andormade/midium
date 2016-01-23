@@ -1,7 +1,7 @@
 /**
  * Shorthand for nota static functions.
  *
- * @param {*} attr
+ * @param {array} devices
  *
  * @returns {*}
  */
