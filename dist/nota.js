@@ -45,8 +45,6 @@ Nota.prototype.on = function(event, callback) {
 		callback     : callback
 	};
 
-	console.log('on', listener);
-
 	this.eventListeners.push(listener);
 	return this;
 };
@@ -143,9 +141,18 @@ Nota.prototype._extendEventObject = function(event) {
 };
 
 },{"./midiUtils":6,"./nota":7,"./utils":12}],3:[function(require,module,exports){
-var MIDIStatus = require('./midiStatusEnum'),
-	Nota = require('./nota'),
-	Utils = require('./utils');
+var Nota = require('./nota');
+
+/**
+ * Registers an event listener for the note off events.
+ *
+ * @param {function} callback
+ *
+ * @returns {object} Reference of this for method chaining.
+ */
+Nota.prototype.onNoteOff = function(callback) {
+	return this.on('noteoff', callback);
+};
 
 /**
  * Registers an event listener for the note on events.
@@ -159,17 +166,61 @@ Nota.prototype.onNoteOn = function(callback) {
 };
 
 /**
- * Registers an event listener for the note off events.
+ * Registers an event listener for the polyphonic aftertouch events.
  *
  * @param {function} callback
  *
  * @returns {object} Reference of this for method chaining.
  */
-Nota.prototype.onNoteOff = function(callback) {
-	return this.on('noteoff', callback);
+Nota.prototype.onPolyAftertouch = function(callback) {
+	return this.on('polyaftertouch', callback);
 };
 
-},{"./midiStatusEnum":5,"./nota":7,"./utils":12}],4:[function(require,module,exports){
+/**
+ * Registers an event listener for the control change events.
+ *
+ * @param {function} callback
+ *
+ * @returns {object} Reference of this for method chaining.
+ */
+Nota.prototype.onControlChange = function(callback) {
+	return this.on('controlchange', callback);
+};
+
+/**
+ * Registers an event listener for the program change events.
+ *
+ * @param {function} callback
+ *
+ * @returns {object} Reference of this for method chaining.
+ */
+Nota.prototype.onProgramChange = function(callback) {
+	return this.on('programchange', callback);
+};
+
+/**
+ * Registers an event listener for the channel aftertouch events.
+ *
+ * @param {function} callback
+ *
+ * @returns {object} Reference of this for method chaining.
+ */
+Nota.prototype.onChannelAftertouch = function(callback) {
+	return this.on('channelaftertouch', callback);
+};
+
+/**
+ * Registers an event listener for the pitch wheel events.
+ *
+ * @param {function} callback
+ *
+ * @returns {object} Reference of this for method chaining.
+ */
+Nota.prototype.onPitchWheel = function(callback) {
+	return this.on('pitchwheel', callback);
+};
+
+},{"./nota":7}],4:[function(require,module,exports){
 module.exports = {
 	BANK_SELECT : 0x00,
 
@@ -901,7 +952,7 @@ var Nota = require('./nota.js'),
 /**
  * Initiializes the device collection object.
  *
- * @param {array} devices            Array of midi devices
+ * @param {array} devices    Array of midi devices
  *
  * @returns {void}
  */
