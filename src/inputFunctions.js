@@ -16,7 +16,7 @@ Nota.prototype.on = function(event, callback) {
 	var channel = parseInt(Utils.defaultValue(match[2], 1), 10);
 	var status = MIDIUtils.getStatusByte(eventType, channel);
 
-	var listener = {
+	this.addEventListener({
 		event        : event,
 		eventType    : eventType,
 		status       : status,
@@ -25,9 +25,20 @@ Nota.prototype.on = function(event, callback) {
 		highNibble   : Utils.getHighNibble(status),
 		lowNibble    : channel,
 		callback     : callback
-	};
+	});
 
-	this.eventListeners.push(listener);
+	return this;
+};
+
+/**
+ * Register an event listener.
+ *
+ * @param {object} options
+ *
+ * @returns {object} Reference of this for method chaining.
+ */
+Nota.prototype.addEventListener = function(options) {
+	this.eventListeners.push(options);
 	return this;
 };
 
