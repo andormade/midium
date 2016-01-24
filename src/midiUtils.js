@@ -12,6 +12,10 @@ module.exports = {
 	 * @returns {number}    Status byte.
 	 */
 	getStatusByte : function(event, channel) {
+		if (channel > 16 || channel < 1) {
+			channel = 1;
+		}
+
 		return ({
 			noteoff           : 0x80,
 			noteon            : 0x90,
