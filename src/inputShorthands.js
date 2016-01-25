@@ -9,12 +9,12 @@ var MIDIEvent = {
 /**
  * Registers an event listener for the note off events.
  *
- * @param {number} channel
  * @param {function} callback
+ * @param {number} [channel]
  *
  * @returns {object} Reference of the event listener for unbinding.
  */
-Nota.prototype.onNoteOff = function(channel, callback) {
+Nota.prototype.onNoteOff = function(callback, channel) {
 	return [
 		this.addEventListener({
 			listenTo       : MIDIEvent.STATUS_BYTE,
@@ -55,12 +55,12 @@ Nota.prototype.onNoteOff = function(channel, callback) {
 /**
  * Registers an event listener for the note on events.
  *
- * @param {number} channel
  * @param {function} callback
+ * @param {number} [channel]
  *
  * @returns {object} Reference of the event listener for unbinding.
  */
-Nota.prototype.onNoteOn = function(channel, callback) {
+Nota.prototype.onNoteOn = function(callback, channel) {
 	return this.addEventListener({
 		listenTo       : MIDIEvent.STATUS_BYTE,
 		matchIf        : MIDIUtils.getStatusByte('noteon', channel),
@@ -84,12 +84,12 @@ Nota.prototype.onNoteOn = function(channel, callback) {
 /**
  * Registers an event listener for the polyphonic aftertouch events.
  *
- * @param {number} channel
  * @param {function} callback
+ * @param {number} [channel]
  *
  * @returns {object} Reference of the event listener for unbinding.
  */
-Nota.prototype.onPolyAftertouch = function(channel, callback) {
+Nota.prototype.onPolyAftertouch = function(callback, channel) {
 	return this.addEventListener({
 		listenTo       : MIDIEvent.STATUS_BYTE,
 		matchIf        : MIDIUtils.getStatusByte('polyaftertouch', channel),
@@ -109,12 +109,12 @@ Nota.prototype.onPolyAftertouch = function(channel, callback) {
 /**
  * Registers an event listener for the control change events.
  *
- * @param {number} channel
  * @param {function} callback
+ * @param {number} [channel]
  *
  * @returns {object} Reference of the event listener for unbinding.
  */
-Nota.prototype.onControlChange = function(channel, callback) {
+Nota.prototype.onControlChange = function(callback, channel) {
 	return this.addEventListener({
 		listenTo       : MIDIEvent.STATUS_BYTE,
 		matchIf        : MIDIUtils.getStatusByte('controlchange', channel),
@@ -134,12 +134,12 @@ Nota.prototype.onControlChange = function(channel, callback) {
 /**
  * Registers an event listener for the program change events.
  *
- * @param {number} channel
  * @param {function} callback
+ * @param {number} [channel]
  *
  * @returns {object} Reference of the event listener for unbinding.
  */
-Nota.prototype.onProgramChange = function(channel, callback) {
+Nota.prototype.onProgramChange = function(callback, channel) {
 	return this.addEventListener({
 		listenTo       : MIDIEvent.STATUS_BYTE,
 		matchIf        : MIDIUtils.getStatusByte('programchange', channel),
@@ -158,12 +158,12 @@ Nota.prototype.onProgramChange = function(channel, callback) {
 /**
  * Registers an event listener for the channel aftertouch events.
  *
- * @param {number} channel
  * @param {function} callback
+ * @param {number} [channel]
  *
  * @returns {object} Reference of the event listener for unbinding.
  */
-Nota.prototype.onChannelAftertouch = function(channel, callback) {
+Nota.prototype.onChannelAftertouch = function(callback, channel) {
 	return this.addEventListener({
 		listenTo       : MIDIEvent.STATUS_BYTE,
 		matchIf        : MIDIUtils.getStatusByte('channelaftertouch', channel),
@@ -182,12 +182,12 @@ Nota.prototype.onChannelAftertouch = function(channel, callback) {
 /**
  * Registers an event listener for the pitch wheel events.
  *
- * @param {number} channel
  * @param {function} callback
+ * @param {number} [channel]
  *
  * @returns {object} Reference of the event listener for unbinding.
  */
-Nota.prototype.onPitchWheel = function(channel, callback) {
+Nota.prototype.onPitchWheel = function(callback, channel) {
 	return this.addEventListener({
 		listenTo       : MIDIEvent.STATUS_BYTE,
 		matchIf        : MIDIUtils.getStatusByte('pitchwheel', channel),
