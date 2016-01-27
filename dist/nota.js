@@ -1,77 +1,4 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-var Nota = require('./nota');
-
-require('./inputFunctions');
-require('./outputFunctions');
-require('./portCollection');
-
-module.exports = Nota;
-
-},{"./inputFunctions":2,"./nota":3,"./outputFunctions":4,"./portCollection":5}],2:[function(require,module,exports){
-var Nota = require('./nota');
-
-Nota.listenerCounter = 0;
-
-/**
- * Register an event listener.
- *
- * @param {object} options    Event listener options.
- *
- * @returns {object} Returns with the reference of the event listener.
- */
-Nota.prototype.addEventListener = function(options) {
-	options.highNibble = (options.matchIf >> 4) & 0x0f;
-	options.lowNibble = options.matchIf & 0x0F;
-	options.reference = Nota.listenerCounter++;
-
-	this.eventListeners.push(options);
-
-	return options.reference;
-};
-
-/**
- * Removes the given event listener or event listeners.
- *
- * @param {number|array} references    Event listener references.
- *
- * @returns {void}
- */
-Nota.prototype.removeEventListener = function(references) {
-	[].concat(references).forEach(function(reference) {
-		this.eventListeners.forEach(function(listener, index) {
-			if (listener.reference === reference) {
-				this.eventListeners.splice(index, 1);
-			}
-		}, this);
-	}, this);
-};
-
-/**
- * MIDI message event handler.
- *
- * @param {object} event    MIDI event data.
- *
- * @returns {void}
- */
-Nota.prototype._onMIDIMessage = function(event) {
-	this.eventListeners.forEach(function(listener) {
-		if (
-			(
-				listener.matchLowNibble === true &&
-				listener.matchIf === event.data[listener.listenTo]
-			) ||
-			(
-				listener.matchLowNibble === false &&
-				listener.highNibble ===
-					(event.data[listener.listenTo] >> 4) & 0x0f
-			)
-		) {
-			listener.callback(event);
-		}
-	}, this);
-};
-
-},{"./nota":3}],3:[function(require,module,exports){
 (function (global){
 /**
  * Shorthand for nota static functions.
@@ -186,32 +113,6 @@ Nota.select = function(selector) {
 	return new Nota(devices);
 };
 
-module.exports = Nota;
-
-}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],4:[function(require,module,exports){
-var Nota = require('./nota');
-
-/**
- * Sends raw MIDI data
- *
- * @param {array} midiData    Array of MIDI data
- *
- * @returns {object} Reference of this for method chaining.
- */
-Nota.prototype.send = function(midiData) {
-	this.each(function(device) {
-		if (device.type === 'output') {
-			device.send(midiData);
-		}
-	});
-
-	return this;
-};
-
-},{"./nota":3}],5:[function(require,module,exports){
-var Nota = require('./nota');
-
 /**
  * Initiializes the device collection object.
  *
@@ -281,9 +182,92 @@ Nota.prototype._onStateChange = function(event) {
 	console.log('state', event);
 };
 
-},{"./nota":3}],6:[function(require,module,exports){
+/**
+ * Sends raw MIDI data
+ *
+ * @param {array} midiData    Array of MIDI data
+ *
+ * @returns {object} Reference of this for method chaining.
+ */
+Nota.prototype.send = function(midiData) {
+	this.each(function(device) {
+		if (device.type === 'output') {
+			device.send(midiData);
+		}
+	});
+
+	return this;
+};
+
+Nota.listenerCounter = 0;
+
+/**
+ * Register an event listener.
+ *
+ * @param {object} options    Event listener options.
+ *
+ * @returns {object} Returns with the reference of the event listener.
+ */
+Nota.prototype.addEventListener = function(options) {
+	console.log('add', options);
+
+	options.highNibble = (options.matchIf >> 4) & 0x0f;
+	options.lowNibble = options.matchIf & 0x0f;
+	options.reference = Nota.listenerCounter++;
+
+	this.eventListeners.push(options);
+
+	return options.reference;
+};
+
+/**
+ * Removes the given event listener or event listeners.
+ *
+ * @param {number|array} references    Event listener references.
+ *
+ * @returns {void}
+ */
+Nota.prototype.removeEventListener = function(references) {
+	[].concat(references).forEach(function(reference) {
+		this.eventListeners.forEach(function(listener, index) {
+			if (listener.reference === reference) {
+				this.eventListeners.splice(index, 1);
+			}
+		}, this);
+	}, this);
+};
+
+/**
+ * MIDI message event handler.
+ *
+ * @param {object} event    MIDI event data.
+ *
+ * @returns {void}
+ */
+Nota.prototype._onMIDIMessage = function(event) {
+	this.eventListeners.forEach(function(listener) {
+		if (
+			(
+				listener.matchLowNibble === true &&
+				listener.matchIf === event.data[listener.listenTo]
+			) ||
+			(
+				listener.matchLowNibble === false &&
+				listener.highNibble ===
+					((event.data[listener.listenTo] >> 4) & 0x0f)
+			)
+		) {
+			listener.callback(event);
+		}
+	}, this);
+};
+
+module.exports = Nota;
+
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{}],2:[function(require,module,exports){
 (function (global){
-var Nota = require('./core/index');
+var Nota = require('nota');
 
 require('./inputShorthands');
 require('./outputShorthands');
@@ -295,9 +279,9 @@ module.exports = Nota;
 global.Nota = Nota;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./core/index":1,"./inputShorthands":7,"./midiStatusEnum":9,"./midiUtils":10,"./outputShorthands":12}],7:[function(require,module,exports){
+},{"./inputShorthands":3,"./midiStatusEnum":5,"./midiUtils":6,"./outputShorthands":8,"nota":1}],3:[function(require,module,exports){
 var MIDIUtils = require('./midiUtils'),
-	Nota = require('./core/nota'),
+	Nota = require('nota'),
 	Status = require('./midiStatusEnum');
 
 var MIDIEvent = {
@@ -307,12 +291,12 @@ var MIDIEvent = {
 /**
  * Registers an event listener for the note off events.
  *
- * @param {number} channel
  * @param {function} callback
+ * @param {number} [channel]
  *
  * @returns {object} Reference of the event listener for unbinding.
  */
-Nota.prototype.onNoteOff = function(channel, callback) {
+Nota.prototype.onNoteOff = function(callback, channel) {
 	return [
 		this.addEventListener({
 			listenTo       : MIDIEvent.STATUS_BYTE,
@@ -355,12 +339,12 @@ Nota.prototype.onNoteOff = function(channel, callback) {
 /**
  * Registers an event listener for the note on events.
  *
- * @param {number} channel
  * @param {function} callback
+ * @param {number} [channel]
  *
  * @returns {object} Reference of the event listener for unbinding.
  */
-Nota.prototype.onNoteOn = function(channel, callback) {
+Nota.prototype.onNoteOn = function(callback, channel) {
 	return this.addEventListener({
 		listenTo       : MIDIEvent.STATUS_BYTE,
 		matchIf        : MIDIUtils.getStatusByte('noteon', channel),
@@ -385,12 +369,12 @@ Nota.prototype.onNoteOn = function(channel, callback) {
 /**
  * Registers an event listener for the polyphonic aftertouch events.
  *
- * @param {number} channel
  * @param {function} callback
+ * @param {number} [channel]
  *
  * @returns {object} Reference of the event listener for unbinding.
  */
-Nota.prototype.onPolyAftertouch = function(channel, callback) {
+Nota.prototype.onPolyAftertouch = function(callback, channel) {
 	return this.addEventListener({
 		listenTo       : MIDIEvent.STATUS_BYTE,
 		matchIf        : MIDIUtils.getStatusByte('polyaftertouch', channel),
@@ -411,12 +395,12 @@ Nota.prototype.onPolyAftertouch = function(channel, callback) {
 /**
  * Registers an event listener for the control change events.
  *
- * @param {number} channel
  * @param {function} callback
+ * @param {number} [channel]
  *
  * @returns {object} Reference of the event listener for unbinding.
  */
-Nota.prototype.onControlChange = function(channel, callback) {
+Nota.prototype.onControlChange = function(callback, channel) {
 	return this.addEventListener({
 		listenTo       : MIDIEvent.STATUS_BYTE,
 		matchIf        : MIDIUtils.getStatusByte('controlchange', channel),
@@ -437,12 +421,12 @@ Nota.prototype.onControlChange = function(channel, callback) {
 /**
  * Registers an event listener for the program change events.
  *
- * @param {number} channel
  * @param {function} callback
+ * @param {number} [channel]
  *
  * @returns {object} Reference of the event listener for unbinding.
  */
-Nota.prototype.onProgramChange = function(channel, callback) {
+Nota.prototype.onProgramChange = function(callback, channel) {
 	return this.addEventListener({
 		listenTo       : MIDIEvent.STATUS_BYTE,
 		matchIf        : MIDIUtils.getStatusByte('programchange', channel),
@@ -462,12 +446,12 @@ Nota.prototype.onProgramChange = function(channel, callback) {
 /**
  * Registers an event listener for the channel aftertouch events.
  *
- * @param {number} channel
  * @param {function} callback
+ * @param {number} [channel]
  *
  * @returns {object} Reference of the event listener for unbinding.
  */
-Nota.prototype.onChannelAftertouch = function(channel, callback) {
+Nota.prototype.onChannelAftertouch = function(callback, channel) {
 	return this.addEventListener({
 		listenTo       : MIDIEvent.STATUS_BYTE,
 		matchIf        : MIDIUtils.getStatusByte('channelaftertouch', channel),
@@ -487,12 +471,12 @@ Nota.prototype.onChannelAftertouch = function(channel, callback) {
 /**
  * Registers an event listener for the pitch wheel events.
  *
- * @param {number} channel
  * @param {function} callback
+ * @param {number} [channel]
  *
  * @returns {object} Reference of the event listener for unbinding.
  */
-Nota.prototype.onPitchWheel = function(channel, callback) {
+Nota.prototype.onPitchWheel = function(callback, channel) {
 	return this.addEventListener({
 		listenTo       : MIDIEvent.STATUS_BYTE,
 		matchIf        : MIDIUtils.getStatusByte('pitchwheel', channel),
@@ -509,7 +493,7 @@ Nota.prototype.onPitchWheel = function(channel, callback) {
 	});
 };
 
-},{"./core/nota":3,"./midiStatusEnum":9,"./midiUtils":10}],8:[function(require,module,exports){
+},{"./midiStatusEnum":5,"./midiUtils":6,"nota":1}],4:[function(require,module,exports){
 module.exports = {
 	BANK_SELECT : 0x00,
 
@@ -618,7 +602,7 @@ module.exports = {
 	HIGH_RESOLUTION_VELOCITY_PREFIX : 0x58
 };
 
-},{}],9:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 module.exports = {
 	NOTE_OFF              : 0x80,
 	NOTE_ON               : 0x90,
@@ -784,7 +768,7 @@ module.exports = {
 	PITCH_WHEEL_CH16 : 0xef
 };
 
-},{}],10:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 var Note = require('./noteEnum.js'),
 	Status = require('./midiStatusEnum.js'),
 	Utils = require('./utils.js');
@@ -916,7 +900,7 @@ module.exports = {
 	}
 };
 
-},{"./midiStatusEnum.js":9,"./noteEnum.js":11,"./utils.js":13}],11:[function(require,module,exports){
+},{"./midiStatusEnum.js":5,"./noteEnum.js":7,"./utils.js":9}],7:[function(require,module,exports){
 module.exports = {
 	'C0'   : 0,
 	'C#0'  : 1,
@@ -1048,9 +1032,9 @@ module.exports = {
 	'G10'  : 127
 };
 
-},{}],12:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 var MIDIUtils = require('./midiUtils'),
-	Nota = require('./core/nota'),
+	Nota = require('nota'),
 	Status = require('./midiStatusEnum'),
 	Utils = require('./utils');
 
@@ -1100,7 +1084,7 @@ Nota.prototype.noteOff = function(note, channel, velocity) {
 	return this;
 };
 
-},{"./core/nota":3,"./midiStatusEnum":9,"./midiUtils":10,"./utils":13}],13:[function(require,module,exports){
+},{"./midiStatusEnum":5,"./midiUtils":6,"./utils":9,"nota":1}],9:[function(require,module,exports){
 module.exports = {
 	/**
 	 * Returns with the default value if the specified object is not available.
@@ -1163,4 +1147,4 @@ module.exports = {
 	}
 };
 
-},{}]},{},[6,7,8,9,10,11,12,13]);
+},{}]},{},[2,3,4,5,6,7,8,9]);

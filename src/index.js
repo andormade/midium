@@ -1,4 +1,4 @@
-var Nota = require('./core/nota');
+var Nota = require('nota');
 
 require('./inputShorthands');
 require('./outputShorthands');

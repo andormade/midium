@@ -20,11 +20,11 @@
   },
   "main": "src/index",
   "dependencies": {
-    "browserify": "^12.0.1"
+    "nota": "https://github.com/hngrhorace/nota-core.git"
   },
   "devDependencies": {
     "eslint": "^1.10.1",
-    "extend": "^3.0.0"
+    "browserify": "^12.0.1"
   },
   "scripts": {
     "bundle": "browserify src/*.js > dist/nota.js",

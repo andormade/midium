@@ -1,5 +1,5 @@
 var MIDIUtils = require('./midiUtils'),
-	Nota = require('./core/nota'),
+	Nota = require('nota'),
 	Status = require('./midiStatusEnum'),
 	Utils = require('./utils');
 
