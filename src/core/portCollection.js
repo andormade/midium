@@ -1,5 +1,4 @@
-var Nota = require('./nota.js'),
-	Utils = require('./utils.js');
+var Nota = require('./nota');
 
 /**
  * Initiializes the device collection object.
@@ -10,6 +9,7 @@ var Nota = require('./nota.js'),
  */
 Nota.prototype.initialize = function(devices) {
 	this.eventListeners = [];
+	this.devices = [];
 
 	for (var i = 0; i < devices.length; i++) {
 		this.add(devices[i]);
@@ -24,10 +24,6 @@ Nota.prototype.initialize = function(devices) {
  * @returns {object} Reference of this for method chaining.
  */
 Nota.prototype.add = function(device) {
-	if (Utils.isUndefined(this.devices)) {
-		this.devices = [];
-	}
-
 	device.onstatechange = this._onStateChange.bind(this);
 	device.onmidimessage = this._onMIDIMessage.bind(this);
 	this.devices.push(device);

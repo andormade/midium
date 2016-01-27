@@ -1,36 +1,27 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-(function (global){
 var Nota = require('./nota');
 
-require('./portCollection');
 require('./inputFunctions');
-require('./inputShorthands');
 require('./outputFunctions');
-require('./outputShorthands');
-
-Nota.Utils = require('./midiUtils');
-Nota.MIDIStatus = require('./midiStatusEnum');
+require('./portCollection');
 
 module.exports = Nota;
-global.Nota = Nota;
 
-}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./inputFunctions":2,"./inputShorthands":3,"./midiStatusEnum":5,"./midiUtils":6,"./nota":7,"./outputFunctions":9,"./outputShorthands":10,"./portCollection":11}],2:[function(require,module,exports){
-var Nota = require('./nota'),
-	Utils = require('./utils');
+},{"./inputFunctions":2,"./nota":3,"./outputFunctions":4,"./portCollection":5}],2:[function(require,module,exports){
+var Nota = require('./nota');
 
 Nota.listenerCounter = 0;
 
 /**
  * Register an event listener.
  *
- * @param {object} options
+ * @param {object} options    Event listener options.
  *
  * @returns {object} Returns with the reference of the event listener.
  */
 Nota.prototype.addEventListener = function(options) {
-	options.highNibble = Utils.getHighNibble(options.matchIf);
-	options.lowNibble = Utils.getLowNibble(options.matchIf);
+	options.highNibble = (options.matchIf >> 4) & 0x0f;
+	options.lowNibble = options.matchIf & 0x0F;
 	options.reference = Nota.listenerCounter++;
 
 	this.eventListeners.push(options);
@@ -41,7 +32,7 @@ Nota.prototype.addEventListener = function(options) {
 /**
  * Removes the given event listener or event listeners.
  *
- * @param {number|array}    Event listener references.
+ * @param {number|array} references    Event listener references.
  *
  * @returns {void}
  */
@@ -72,7 +63,7 @@ Nota.prototype._onMIDIMessage = function(event) {
 			(
 				listener.matchLowNibble === false &&
 				listener.highNibble ===
-					Utils.getHighNibble(event.data[listener.listenTo])
+					(event.data[listener.listenTo] >> 4) & 0x0f
 			)
 		) {
 			listener.callback(event);
@@ -80,9 +71,233 @@ Nota.prototype._onMIDIMessage = function(event) {
 	}, this);
 };
 
-},{"./nota":7,"./utils":12}],3:[function(require,module,exports){
+},{"./nota":3}],3:[function(require,module,exports){
+(function (global){
+/**
+ * Shorthand for nota static functions.
+ *
+ * @param {array} devices
+ *
+ * @returns {*}
+ */
+function Nota(devices) {
+	this.initialize(devices);
+}
+
+/** @type {object} Midi access object. */
+Nota.midiAccess = null;
+
+Nota.isReady = false;
+
+/**
+ * Calls back when the MIDI driver is ready.
+ *
+ * @param {function} callback    Calls when the MIDI connection is ready.
+ *
+ * @returns {void}
+ */
+Nota.ready = function(callback) {
+	if (global.Nota.isReady) {
+		callback();
+	}
+
+	navigator.requestMIDIAccess({
+		sysex : false
+	}).then(
+
+		/* MIDI access granted */
+		function(midiAccess) {
+			global.Nota.isReady = true;
+			global.Nota.midiAccess = midiAccess;
+			callback();
+		},
+
+		/* MIDI access denied */
+		function(error) {
+			global.Nota.isReady = false;
+			console.log(error);
+		}
+	);
+};
+
+/**
+ * Returns with an array of MIDI inputs and outputs.
+ *
+ * @param {object|number|string|array} selector    Selector
+ *
+ * @returns {array}
+ */
+Nota.select = function(selector) {
+	if (!global.Nota.isReady) {
+		return [];
+	}
+
+	var devices = [];
+
+	/* If the query is a MIDIInput or output. */
+	if (
+		selector instanceof window.MIDIOutput ||
+		selector instanceof window.MIDIInput
+	) {
+		devices[0] = selector;
+	}
+
+	else if (
+		typeof selector === 'number' &&
+		global.Nota.midiAccess.inputs.has(query)
+	) {
+		devices[0] = global.Nota.midiAccess.inputs.get(query);
+	}
+
+	else if (
+		typeof query === 'number' &&
+		global.Nota.midiAccess.outputs.has(query)
+	) {
+		devices[0] = global.Nota.midiAccess.outputs.get(query);
+	}
+
+	else if (selector instanceof Array) {
+		selector.forEach(function(item) {
+			devices.push(Nota.select(item)[0]);
+		});
+	}
+
+	else if (
+		typeof selector === 'string' ||
+		selector instanceof window.RegExp
+	) {
+		var name = '';
+
+		global.Nota.midiAccess.inputs.forEach(function each(device) {
+			name = device.name + ' ' + device.manufacturer;
+			if (new RegExp(selector, 'i').test(name)) {
+				devices.push(device);
+			}
+		});
+
+		global.Nota.midiAccess.outputs.forEach(function each(device) {
+			name = device.name + ' ' + device.manufacturer;
+			if (new RegExp(selector, 'i').test(name)) {
+				devices.push(device);
+			}
+		});
+	}
+
+	return new Nota(devices);
+};
+
+module.exports = Nota;
+
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{}],4:[function(require,module,exports){
+var Nota = require('./nota');
+
+/**
+ * Sends raw MIDI data
+ *
+ * @param {array} midiData    Array of MIDI data
+ *
+ * @returns {object} Reference of this for method chaining.
+ */
+Nota.prototype.send = function(midiData) {
+	this.each(function(device) {
+		if (device.type === 'output') {
+			device.send(midiData);
+		}
+	});
+
+	return this;
+};
+
+},{"./nota":3}],5:[function(require,module,exports){
+var Nota = require('./nota');
+
+/**
+ * Initiializes the device collection object.
+ *
+ * @param {array} devices    Array of midi devices
+ *
+ * @returns {void}
+ */
+Nota.prototype.initialize = function(devices) {
+	this.eventListeners = [];
+	this.devices = [];
+
+	for (var i = 0; i < devices.length; i++) {
+		this.add(devices[i]);
+	}
+};
+
+/**
+ * Adds MIDI device to the collection.
+ *
+ * @param {object} device    MIDI device
+ *
+ * @returns {object} Reference of this for method chaining.
+ */
+Nota.prototype.add = function(device) {
+	device.onstatechange = this._onStateChange.bind(this);
+	device.onmidimessage = this._onMIDIMessage.bind(this);
+	this.devices.push(device);
+
+	return this;
+};
+
+/**
+ * Removes the references from the selected MIDI devices.
+ *
+ * @returns {void}
+ */
+Nota.prototype.removeReferences = function() {
+	this.each(function(device) {
+		device.onmidimessage = null;
+		device.onstatechange = null;
+	});
+};
+
+/**
+ * Iterates through the devices in the collection.
+ *
+ * @param {function} callback   Callback function.
+ *
+ * @returns {object} Reference of this for method chaining.
+ */
+Nota.prototype.each = function(callback) {
+	for (var i = 0; i < this.devices.length; i++) {
+		callback(this.devices[i]);
+	}
+
+	return this;
+};
+
+/**
+ * State change event handler.
+ *
+ * @param {object} event    State change event data.
+ *
+ * @returns {void}
+ */
+Nota.prototype._onStateChange = function(event) {
+	console.log('state', event);
+};
+
+},{"./nota":3}],6:[function(require,module,exports){
+(function (global){
+var Nota = require('./core/index');
+
+require('./inputShorthands');
+require('./outputShorthands');
+
+Nota.Utils = require('./midiUtils');
+Nota.MIDIStatus = require('./midiStatusEnum');
+
+module.exports = Nota;
+global.Nota = Nota;
+
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{"./core/index":1,"./inputShorthands":7,"./midiStatusEnum":9,"./midiUtils":10,"./outputShorthands":12}],7:[function(require,module,exports){
 var MIDIUtils = require('./midiUtils'),
-	Nota = require('./nota'),
+	Nota = require('./core/nota'),
 	Status = require('./midiStatusEnum');
 
 var MIDIEvent = {
@@ -110,6 +325,7 @@ Nota.prototype.onNoteOff = function(channel, callback) {
 				event.channel = MIDIUtils.getChannelFromStatus(event.data[0]);
 				event.note = event.data[1];
 				event.velocity = event.data[2];
+
 				callback(event);
 			}
 		}),
@@ -129,6 +345,7 @@ Nota.prototype.onNoteOff = function(channel, callback) {
 				event.channel = MIDIUtils.getChannelFromStatus(event.data[0]);
 				event.note = event.data[1];
 				event.velocity = 0;
+
 				callback(event);
 			}
 		})
@@ -159,6 +376,7 @@ Nota.prototype.onNoteOn = function(channel, callback) {
 			event.channel = MIDIUtils.getChannelFromStatus(event.data[0]);
 			event.note = event.data[1];
 			event.velocity = event.data[2];
+
 			callback(event);
 		}
 	});
@@ -184,6 +402,7 @@ Nota.prototype.onPolyAftertouch = function(channel, callback) {
 			event.channel = MIDIUtils.getChannelFromStatus(event.data[0]);
 			event.note = event.data[1];
 			event.pressure = event.data[2];
+
 			callback(event);
 		}
 	});
@@ -209,6 +428,7 @@ Nota.prototype.onControlChange = function(channel, callback) {
 			event.channel = MIDIUtils.getChannelFromStatus(event.data[0]);
 			event.controller = event.data[1];
 			event.controllerValue = event.data[2];
+
 			callback(event);
 		}
 	});
@@ -233,6 +453,7 @@ Nota.prototype.onProgramChange = function(channel, callback) {
 			event.status = 'programchange';
 			event.channel = MIDIUtils.getChannelFromStatus(event.data[0]);
 			event.program = event.data[1];
+
 			callback(event);
 		}
 	});
@@ -257,6 +478,7 @@ Nota.prototype.onChannelAftertouch = function(channel, callback) {
 			event.status = 'channelaftertouch';
 			event.channel = MIDIUtils.getChannelFromStatus(event.data[0]);
 			event.pressure = event.data[1];
+
 			callback(event);
 		}
 	});
@@ -281,12 +503,13 @@ Nota.prototype.onPitchWheel = function(channel, callback) {
 			event.status = 'pitchwheel';
 			event.channel = MIDIUtils.getChannelFromStatus(event.data[0]);
 			event.pitchWheel = event.data[2];
+
 			callback(event);
 		}
 	});
 };
 
-},{"./midiStatusEnum":5,"./midiUtils":6,"./nota":7}],4:[function(require,module,exports){
+},{"./core/nota":3,"./midiStatusEnum":9,"./midiUtils":10}],8:[function(require,module,exports){
 module.exports = {
 	BANK_SELECT : 0x00,
 
@@ -395,7 +618,7 @@ module.exports = {
 	HIGH_RESOLUTION_VELOCITY_PREFIX : 0x58
 };
 
-},{}],5:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 module.exports = {
 	NOTE_OFF              : 0x80,
 	NOTE_ON               : 0x90,
@@ -561,7 +784,7 @@ module.exports = {
 	PITCH_WHEEL_CH16 : 0xef
 };
 
-},{}],6:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 var Note = require('./noteEnum.js'),
 	Status = require('./midiStatusEnum.js'),
 	Utils = require('./utils.js');
@@ -693,125 +916,7 @@ module.exports = {
 	}
 };
 
-},{"./midiStatusEnum.js":5,"./noteEnum.js":8,"./utils.js":12}],7:[function(require,module,exports){
-(function (global){
-/**
- * Shorthand for nota static functions.
- *
- * @param {array} devices
- *
- * @returns {*}
- */
-function Nota(devices) {
-	this.initialize(devices);
-}
-
-/** @type {object} Midi access object. */
-Nota.midiAccess = null;
-
-Nota.isReady = false;
-
-/**
- * Calls back when the MIDI driver is ready.
- *
- * @param {function} callback    Calls when the MIDI connection is ready.
- *
- * @returns {void}
- */
-Nota.ready = function(callback) {
-	if (global.Nota.isReady) {
-		callback();
-	}
-
-	navigator.requestMIDIAccess({
-		sysex : false
-	}).then(
-
-		/* MIDI access granted */
-		function(midiAccess) {
-			global.Nota.isReady = true;
-			global.Nota.midiAccess = midiAccess;
-			callback();
-		},
-
-		/* MIDI access denied */
-		function(error) {
-			global.Nota.isReady = false;
-			console.log(error);
-		}
-	);
-};
-
-/**
- * Returns with an array of MIDI inputs and outputs.
- *
- * @param {object|number|string|array} selector    Selector
- *
- * @returns {array}
- */
-Nota.select = function(selector) {
-	if (!global.Nota.isReady) {
-		return [];
-	}
-
-	var devices = [];
-
-	/* If the query is a MIDIInput or output. */
-	if (
-		selector instanceof window.MIDIOutput ||
-		selector instanceof window.MIDIInput
-	) {
-		devices[0] = selector;
-	}
-
-	else if (
-		typeof selector === 'number' &&
-		global.Nota.midiAccess.inputs.has(query)
-	) {
-		devices[0] = global.Nota.midiAccess.inputs.get(query);
-	}
-
-	else if (
-		typeof query === 'number' &&
-		global.Nota.midiAccess.outputs.has(query)
-	) {
-		devices[0] = global.Nota.midiAccess.outputs.get(query);
-	}
-
-	else if (selector instanceof Array) {
-		selector.forEach(function(item) {
-			devices.push(Nota.select(item)[0]);
-		});
-	}
-
-	else if (
-		typeof selector === 'string' ||
-		selector instanceof window.RegExp
-	) {
-		var name = '';
-
-		global.Nota.midiAccess.inputs.forEach(function each(device) {
-			name = device.name + ' ' + device.manufacturer;
-			if (new RegExp(selector, 'i').test(name)) {
-				devices.push(device);
-			}
-		});
-
-		global.Nota.midiAccess.outputs.forEach(function each(device) {
-			name = device.name + ' ' + device.manufacturer;
-			if (new RegExp(selector, 'i').test(name)) {
-				devices.push(device);
-			}
-		});
-	}
-
-	return new Nota(devices);
-};
-
-module.exports = Nota;
-
-}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],8:[function(require,module,exports){
+},{"./midiStatusEnum.js":9,"./noteEnum.js":11,"./utils.js":13}],11:[function(require,module,exports){
 module.exports = {
 	'C0'   : 0,
 	'C#0'  : 1,
@@ -943,29 +1048,9 @@ module.exports = {
 	'G10'  : 127
 };
 
-},{}],9:[function(require,module,exports){
-var Nota = require('./nota');
-
-/**
- * Sends raw MIDI data
- *
- * @param {array} midiData    Array of MIDI data
- *
- * @returns {object} Reference of this for method chaining.
- */
-Nota.prototype.send = function(midiData) {
-	this.each(function(device) {
-		if (device.type === 'output') {
-			device.send(midiData);
-		}
-	});
-
-	return this;
-};
-
-},{"./nota":7}],10:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 var MIDIUtils = require('./midiUtils'),
-	Nota = require('./nota'),
+	Nota = require('./core/nota'),
 	Status = require('./midiStatusEnum'),
 	Utils = require('./utils');
 
@@ -1015,83 +1100,7 @@ Nota.prototype.noteOff = function(note, channel, velocity) {
 	return this;
 };
 
-},{"./midiStatusEnum":5,"./midiUtils":6,"./nota":7,"./utils":12}],11:[function(require,module,exports){
-var Nota = require('./nota.js'),
-	Utils = require('./utils.js');
-
-/**
- * Initiializes the device collection object.
- *
- * @param {array} devices    Array of midi devices
- *
- * @returns {void}
- */
-Nota.prototype.initialize = function(devices) {
-	this.eventListeners = [];
-
-	for (var i = 0; i < devices.length; i++) {
-		this.add(devices[i]);
-	}
-};
-
-/**
- * Adds MIDI device to the collection.
- *
- * @param {object} device    MIDI device
- *
- * @returns {object} Reference of this for method chaining.
- */
-Nota.prototype.add = function(device) {
-	if (Utils.isUndefined(this.devices)) {
-		this.devices = [];
-	}
-
-	device.onstatechange = this._onStateChange.bind(this);
-	device.onmidimessage = this._onMIDIMessage.bind(this);
-	this.devices.push(device);
-
-	return this;
-};
-
-/**
- * Removes the references from the selected MIDI devices.
- *
- * @returns {void}
- */
-Nota.prototype.removeReferences = function() {
-	this.each(function(device) {
-		device.onmidimessage = null;
-		device.onstatechange = null;
-	});
-};
-
-/**
- * Iterates through the devices in the collection.
- *
- * @param {function} callback   Callback function.
- *
- * @returns {object} Reference of this for method chaining.
- */
-Nota.prototype.each = function(callback) {
-	for (var i = 0; i < this.devices.length; i++) {
-		callback(this.devices[i]);
-	}
-
-	return this;
-};
-
-/**
- * State change event handler.
- *
- * @param {object} event    State change event data.
- *
- * @returns {void}
- */
-Nota.prototype._onStateChange = function(event) {
-	console.log('state', event);
-};
-
-},{"./nota.js":7,"./utils.js":12}],12:[function(require,module,exports){
+},{"./core/nota":3,"./midiStatusEnum":9,"./midiUtils":10,"./utils":13}],13:[function(require,module,exports){
 module.exports = {
 	/**
 	 * Returns with the default value if the specified object is not available.
@@ -1154,4 +1163,4 @@ module.exports = {
 	}
 };
 
-},{}]},{},[1,2,3,4,5,6,7,8,9,10,11,12]);
+},{}]},{},[6,7,8,9,10,11,12,13]);

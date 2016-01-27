@@ -1,9 +1,6 @@
-var Nota = require('./nota');
+var Nota = require('./core/index');
 
-require('./portCollection');
-require('./inputFunctions');
 require('./inputShorthands');
-require('./outputFunctions');
 require('./outputShorthands');
 
 Nota.Utils = require('./midiUtils');

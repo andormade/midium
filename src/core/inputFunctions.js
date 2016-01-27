@@ -1,18 +1,17 @@
-var Nota = require('./nota'),
-	Utils = require('./utils');
+var Nota = require('./nota');
 
 Nota.listenerCounter = 0;
 
 /**
  * Register an event listener.
  *
- * @param {object} options
+ * @param {object} options    Event listener options.
  *
  * @returns {object} Returns with the reference of the event listener.
  */
 Nota.prototype.addEventListener = function(options) {
-	options.highNibble = Utils.getHighNibble(options.matchIf);
-	options.lowNibble = Utils.getLowNibble(options.matchIf);
+	options.highNibble = (options.matchIf >> 4) & 0x0f;
+	options.lowNibble = options.matchIf & 0x0F;
 	options.reference = Nota.listenerCounter++;
 
 	this.eventListeners.push(options);
@@ -23,7 +22,7 @@ Nota.prototype.addEventListener = function(options) {
 /**
  * Removes the given event listener or event listeners.
  *
- * @param {number|array}    Event listener references.
+ * @param {number|array} references    Event listener references.
  *
  * @returns {void}
  */
@@ -54,7 +53,7 @@ Nota.prototype._onMIDIMessage = function(event) {
 			(
 				listener.matchLowNibble === false &&
 				listener.highNibble ===
-					Utils.getHighNibble(event.data[listener.listenTo])
+					(event.data[listener.listenTo] >> 4) & 0x0f
 			)
 		) {
 			listener.callback(event);

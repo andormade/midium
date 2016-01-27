@@ -1,5 +1,5 @@
 var MIDIUtils = require('./midiUtils'),
-	Nota = require('./nota'),
+	Nota = require('./core/nota'),
 	Status = require('./midiStatusEnum');
 
 var MIDIEvent = {
@@ -27,6 +27,7 @@ Nota.prototype.onNoteOff = function(callback, channel) {
 				event.channel = MIDIUtils.getChannelFromStatus(event.data[0]);
 				event.note = event.data[1];
 				event.velocity = event.data[2];
+
 				callback(event);
 			}
 		}),
@@ -46,6 +47,7 @@ Nota.prototype.onNoteOff = function(callback, channel) {
 				event.channel = MIDIUtils.getChannelFromStatus(event.data[0]);
 				event.note = event.data[1];
 				event.velocity = 0;
+
 				callback(event);
 			}
 		})
@@ -76,6 +78,7 @@ Nota.prototype.onNoteOn = function(callback, channel) {
 			event.channel = MIDIUtils.getChannelFromStatus(event.data[0]);
 			event.note = event.data[1];
 			event.velocity = event.data[2];
+
 			callback(event);
 		}
 	});
@@ -101,6 +104,7 @@ Nota.prototype.onPolyAftertouch = function(callback, channel) {
 			event.channel = MIDIUtils.getChannelFromStatus(event.data[0]);
 			event.note = event.data[1];
 			event.pressure = event.data[2];
+
 			callback(event);
 		}
 	});
@@ -126,6 +130,7 @@ Nota.prototype.onControlChange = function(callback, channel) {
 			event.channel = MIDIUtils.getChannelFromStatus(event.data[0]);
 			event.controller = event.data[1];
 			event.controllerValue = event.data[2];
+
 			callback(event);
 		}
 	});
@@ -150,6 +155,7 @@ Nota.prototype.onProgramChange = function(callback, channel) {
 			event.status = 'programchange';
 			event.channel = MIDIUtils.getChannelFromStatus(event.data[0]);
 			event.program = event.data[1];
+
 			callback(event);
 		}
 	});
@@ -174,6 +180,7 @@ Nota.prototype.onChannelAftertouch = function(callback, channel) {
 			event.status = 'channelaftertouch';
 			event.channel = MIDIUtils.getChannelFromStatus(event.data[0]);
 			event.pressure = event.data[1];
+
 			callback(event);
 		}
 	});
@@ -198,6 +205,7 @@ Nota.prototype.onPitchWheel = function(callback, channel) {
 			event.status = 'pitchwheel';
 			event.channel = MIDIUtils.getChannelFromStatus(event.data[0]);
 			event.pitchWheel = event.data[2];
+
 			callback(event);
 		}
 	});
