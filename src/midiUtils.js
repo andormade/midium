@@ -126,5 +126,29 @@ module.exports = {
 			return note;
 		}
 		return 0;
+	},
+
+	/**
+	 *
+	 *
+	 * @returns {void}
+	 */
+	constuctMIDIMessage : function() {
+		return Nota.byteArrayToInt(
+			this.constuctMIDIMessageArray.apply(this, arguments)
+		);
+	},
+
+	/**
+	 *
+	 *
+	 *
+	 * @returns {void}
+	 */
+	constuctMIDIMessageArray : function(event, channel, data1, data2) {
+		channel = Utils.defaultValue(channel, 1);
+		data1 = Utils.defaultValue(data1, 0);
+		data2 = Utils.defaultValue(data2, 0);
+		return [(event & 0xf0) + (channel - 1), data1, data2];
 	}
 };
