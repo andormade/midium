@@ -1,7 +1,7 @@
 var Nota = require('nota');
 
-require('./inputShorthands');
-require('./outputShorthands');
+require('./input');
+require('./output');
 
 Nota.Utils = require('./midiUtils');
 Nota.MIDIStatus = require('./midiStatusEnum');

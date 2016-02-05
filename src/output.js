@@ -17,11 +17,9 @@ Nota.prototype.noteOn = function(note, channel, velocity) {
 	velocity = Utils.defaultValue(velocity, 127);
 	channel = Utils.defaultValue(channel, 1);
 
-	this.send([
-		MIDIUtils.getStatusByte(Status.NOTE_ON, channel),
-		note,
-		velocity
-	]);
+	this.send(MIDIUtils.constuctMIDIMessageArray(
+		Status.NOTE_ON, channel, note, velocity
+	));
 
 	return this;
 };
@@ -40,11 +38,9 @@ Nota.prototype.noteOff = function(note, channel, velocity) {
 	velocity = Utils.defaultValue(velocity, 127);
 	channel = Utils.defaultValue(channel, 1);
 
-	this.send([
-		MIDIUtils.getStatusByte(Status.NOTE_OFF, channel),
-		note,
-		velocity
-	]);
+	this.send(MIDIUtils.constuctMIDIMessageArray(
+		Status.NOTE_OFF, channel, note, velocity
+	));
 
 	return this;
 };
