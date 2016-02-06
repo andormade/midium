@@ -272,11 +272,27 @@ else {
 }
 
 },{}],2:[function(require,module,exports){
+var Nota = require('nota');
+
+/**
+ * Setter function for the default channel.
+ *
+ * @param {number} channel    MIDI channel 1-16.
+ *
+ * @returns {object}
+ */
+Nota.prototype.setDefaultChannel = function(channel) {
+	this.defaultChannel = channel;
+	return this;
+};
+
+},{"nota":1}],3:[function(require,module,exports){
 (function (global){
 var Nota = require('nota');
 
-require('./inputShorthands');
-require('./outputShorthands');
+require('./input');
+require('./output');
+require('./channel');
 
 Nota.Utils = require('./midiUtils');
 Nota.MIDIStatus = require('./midiStatusEnum');
@@ -285,7 +301,7 @@ module.exports = Nota;
 global.Nota = Nota;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./inputShorthands":3,"./midiStatusEnum":5,"./midiUtils":6,"./outputShorthands":8,"nota":1}],3:[function(require,module,exports){
+},{"./channel":2,"./input":4,"./midiStatusEnum":6,"./midiUtils":7,"./output":9,"nota":1}],4:[function(require,module,exports){
 var MIDIUtils = require('./midiUtils'),
 	Nota = require('nota'),
 	Utils = require('./utils');
@@ -463,7 +479,7 @@ Nota.prototype.onPitchWheel = function(callback, channel) {
 	});
 };
 
-},{"./midiUtils":6,"./utils":9,"nota":1}],4:[function(require,module,exports){
+},{"./midiUtils":7,"./utils":10,"nota":1}],5:[function(require,module,exports){
 module.exports = {
 	BANK_SELECT : 0x00,
 
@@ -572,7 +588,7 @@ module.exports = {
 	HIGH_RESOLUTION_VELOCITY_PREFIX : 0x58
 };
 
-},{}],5:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 module.exports = {
 	NOTE_OFF              : 0x80,
 	NOTE_ON               : 0x90,
@@ -738,7 +754,7 @@ module.exports = {
 	PITCH_WHEEL_CH16 : 0xef
 };
 
-},{}],6:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 var Note = require('./noteEnum.js'),
 	Status = require('./midiStatusEnum.js'),
 	Utils = require('./utils.js');
@@ -894,7 +910,7 @@ module.exports = {
 	}
 };
 
-},{"./midiStatusEnum.js":5,"./noteEnum.js":7,"./utils.js":9}],7:[function(require,module,exports){
+},{"./midiStatusEnum.js":6,"./noteEnum.js":8,"./utils.js":10}],8:[function(require,module,exports){
 module.exports = {
 	'C0'   : 0,
 	'C#0'  : 1,
@@ -1026,59 +1042,148 @@ module.exports = {
 	'G10'  : 127
 };
 
-},{}],8:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 var MIDIUtils = require('./midiUtils'),
 	Nota = require('nota'),
 	Status = require('./midiStatusEnum'),
 	Utils = require('./utils');
 
 /**
- * Sets the specified note on.
+ * Sets the specified note off.
  *
- * @param {note} note          MIDI note 0-127
- * @param {number} channel     Channel 1-16
- * @param {number} velocity    Velocity 0-127
+ * @param {string|number} note    MIDI note 0-127
+ * @param {number} [velocity]     Velocity 0-127
+ * @param {number} [channel]      Channel 1-16
  *
  * @returns {object}
  */
-Nota.prototype.noteOn = function(note, channel, velocity) {
+Nota.prototype.noteOff = function(note, velocity, channel) {
 	note = MIDIUtils.noteStringToMIDICode(note);
 	velocity = Utils.defaultValue(velocity, 127);
-	channel = Utils.defaultValue(channel, 1);
+	channel = Utils.defaultValue(channel, this.defaultChannel);
 
-	this.send([
-		MIDIUtils.getStatusByte(Status.NOTE_ON, channel),
-		note,
-		velocity
-	]);
+	this.send(MIDIUtils.constuctMIDIMessageArray(
+		Status.NOTE_OFF, channel, note, velocity
+	));
 
 	return this;
 };
 
 /**
- * Sets the specified note off.
+ * Sets the specified note on.
  *
- * @param {note} note            MIDI note 0-127
- * @param {number} [channel]     Channel 1-16
- * @param {number} [velocity]    Velocity 0-127
+ * @param {string|number} note    MIDI note 0-127
+ * @param {number} [velocity]     Velocity 0-127
+ * @param {number} [channel]      Channel 1-16
  *
  * @returns {object}
  */
-Nota.prototype.noteOff = function(note, channel, velocity) {
+Nota.prototype.noteOn = function(note, velocity, channel) {
 	note = MIDIUtils.noteStringToMIDICode(note);
 	velocity = Utils.defaultValue(velocity, 127);
-	channel = Utils.defaultValue(channel, 1);
+	channel = Utils.defaultValue(channel, this.defaultChannel);
 
-	this.send([
-		MIDIUtils.getStatusByte(Status.NOTE_OFF, channel),
-		note,
-		velocity
-	]);
+	this.send(MIDIUtils.constuctMIDIMessageArray(
+		Status.NOTE_ON, channel, note, velocity
+	));
 
 	return this;
 };
 
-},{"./midiStatusEnum":5,"./midiUtils":6,"./utils":9,"nota":1}],9:[function(require,module,exports){
+/**
+ * Sends a polyphonic aftertouch message.
+ *
+ * @param {string|number} note    MIDI note 0-127
+ * @param {number} pressure       Pressure 0-127
+ * @param {number} [channel]      Channel 1-16
+ *
+ * @returns {object}
+ */
+Nota.prototype.ployphonicAftertouch = function(note, pressure, channel) {
+	note = MIDIUtils.noteStringToMIDICode(note);
+	channel = Utils.defaultValue(channel, this.defaultChannel);
+
+	this.send(MIDIUtils.constuctMIDIMessageArray(
+		Status.POLYPHONIC_AFTERTOUCH, channel, note, pressure
+	));
+
+	return this;
+};
+
+/**
+ * Sets the value of the specified controller
+ *
+ * @param {note} controller      Controller number 0-127
+ * @param {number} pressure      Pressure 0-127
+ * @param {number} [channel]     Channel 1-16
+ *
+ * @returns {object}
+ */
+Nota.prototype.controlChange = function(controller, value, channel) {
+	channel = Utils.defaultValue(channel, this.defaultChannel);
+
+	this.send(MIDIUtils.constuctMIDIMessageArray(
+		Status.CONTROL_CHANGE, channel, controller, value
+	));
+
+	return this;
+};
+
+/**
+ * Sets the specified program.
+ *
+ * @param {note} program         Program number 0-127
+ * @param {number} [channel]     Channel 1-16
+ *
+ * @returns {object}
+ */
+Nota.prototype.programChange = function(program, channel) {
+	channel = Utils.defaultValue(channel, this.defaultChannel);
+
+	this.send(MIDIUtils.constuctMIDIMessageArray(
+		Status.PROGRAM_CHANGE, channel, program, 0
+	));
+
+	return this;
+};
+
+/**
+ * Send a channel aftertouch message.
+ *
+ * @param {number} pressure      Pressure 0-127
+ * @param {number} [channel]     Channel 1-16
+ *
+ * @returns {object}
+ */
+Nota.prototype.channelAftertouch = function(pressure, channel) {
+	channel = Utils.defaultValue(channel, this.defaultChannel);
+
+	this.send(MIDIUtils.constuctMIDIMessageArray(
+		Status.CHANNEL_AFTERTOUCH, channel, pressure, 0
+	));
+
+	return this;
+};
+
+/**
+ * Sets the value of the pitch wheel.
+ *
+ * @param {number} value         Value 0-127
+ * @param {number} [channel]     Channel 1-16
+ *
+ * @returns {object}
+ */
+Nota.prototype.pitchWheel = function(value, channel) {
+	channel = Utils.defaultValue(channel, this.defaultChannel);
+
+	this.send(MIDIUtils.constuctMIDIMessageArray(
+		Status.CHANNEL_AFTERTOUCH, channel, 0, value
+	));
+
+	return this;
+};
+
+},{"./midiStatusEnum":6,"./midiUtils":7,"./utils":10,"nota":1}],10:[function(require,module,exports){
 module.exports = {
 	/**
 	 * Returns with the default value if the specified object is not available.
@@ -1141,4 +1246,4 @@ module.exports = {
 	}
 };
 
-},{}]},{},[2,3,4,5,6,7,8,9]);
+},{}]},{},[2,3,4,5,6,7,8,9,10]);
