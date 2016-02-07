@@ -1,4 +1,4 @@
-var Nota = require('nota');
+var Midium = require('midium-core');
 
 /**
  * Setter function for the default channel.
@@ -7,7 +7,7 @@ var Nota = require('nota');
  *
  * @returns {object}
  */
-Nota.prototype.setDefaultChannel = function(channel) {
+Midium.prototype.setDefaultChannel = function(channel) {
 	this.defaultChannel = channel;
 	return this;
 };

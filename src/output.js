@@ -1,5 +1,5 @@
 var MIDIUtils = require('./midiUtils'),
-	Nota = require('nota'),
+	Midium = require('midium-core'),
 	Status = require('./midiStatusEnum'),
 	Utils = require('./utils');
 
@@ -12,7 +12,7 @@ var MIDIUtils = require('./midiUtils'),
  *
  * @returns {object}
  */
-Nota.prototype.noteOff = function(note, velocity, channel) {
+Midium.prototype.noteOff = function(note, velocity, channel) {
 	note = MIDIUtils.noteStringToMIDICode(note);
 	velocity = Utils.defaultValue(velocity, 127);
 	channel = Utils.defaultValue(channel, this.defaultChannel);
@@ -33,7 +33,7 @@ Nota.prototype.noteOff = function(note, velocity, channel) {
  *
  * @returns {object}
  */
-Nota.prototype.noteOn = function(note, velocity, channel) {
+Midium.prototype.noteOn = function(note, velocity, channel) {
 	note = MIDIUtils.noteStringToMIDICode(note);
 	velocity = Utils.defaultValue(velocity, 127);
 	channel = Utils.defaultValue(channel, this.defaultChannel);
@@ -54,7 +54,7 @@ Nota.prototype.noteOn = function(note, velocity, channel) {
  *
  * @returns {object}
  */
-Nota.prototype.ployphonicAftertouch = function(note, pressure, channel) {
+Midium.prototype.ployphonicAftertouch = function(note, pressure, channel) {
 	note = MIDIUtils.noteStringToMIDICode(note);
 	channel = Utils.defaultValue(channel, this.defaultChannel);
 
@@ -74,7 +74,7 @@ Nota.prototype.ployphonicAftertouch = function(note, pressure, channel) {
  *
  * @returns {object}
  */
-Nota.prototype.controlChange = function(controller, value, channel) {
+Midium.prototype.controlChange = function(controller, value, channel) {
 	channel = Utils.defaultValue(channel, this.defaultChannel);
 
 	this.send(MIDIUtils.constuctMIDIMessageArray(
@@ -92,7 +92,7 @@ Nota.prototype.controlChange = function(controller, value, channel) {
  *
  * @returns {object}
  */
-Nota.prototype.programChange = function(program, channel) {
+Midium.prototype.programChange = function(program, channel) {
 	channel = Utils.defaultValue(channel, this.defaultChannel);
 
 	this.send(MIDIUtils.constuctMIDIMessageArray(
@@ -110,7 +110,7 @@ Nota.prototype.programChange = function(program, channel) {
  *
  * @returns {object}
  */
-Nota.prototype.channelAftertouch = function(pressure, channel) {
+Midium.prototype.channelAftertouch = function(pressure, channel) {
 	channel = Utils.defaultValue(channel, this.defaultChannel);
 
 	this.send(MIDIUtils.constuctMIDIMessageArray(
@@ -128,7 +128,7 @@ Nota.prototype.channelAftertouch = function(pressure, channel) {
  *
  * @returns {object}
  */
-Nota.prototype.pitchWheel = function(value, channel) {
+Midium.prototype.pitchWheel = function(value, channel) {
 	channel = Utils.defaultValue(channel, this.defaultChannel);
 
 	this.send(MIDIUtils.constuctMIDIMessageArray(

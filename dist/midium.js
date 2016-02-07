@@ -6,7 +6,7 @@
  *
  * @returns {*}
  */
-function Nota(ports) {
+function Midium(ports) {
 	this.eventListeners = [];
 	this.ports = [];
 
@@ -16,11 +16,11 @@ function Nota(ports) {
 }
 
 /** @type {object} Midi access object. */
-Nota.midiAccess = null;
+Midium.midiAccess = null;
 
-Nota.isReady = false;
+Midium.isReady = false;
 
-Nota.listenerCounter = 0;
+Midium.listenerCounter = 0;
 
 /**
  * Calls back when the MIDI driver is ready.
@@ -30,8 +30,8 @@ Nota.listenerCounter = 0;
  *
  * @returns {void}
  */
-Nota.ready = function(callback, errorCallback) {
-	if (Nota.isReady) {
+Midium.ready = function(callback, errorCallback) {
+	if (Midium.isReady) {
 		callback();
 	}
 
@@ -41,14 +41,14 @@ Nota.ready = function(callback, errorCallback) {
 
 		/* MIDI access granted */
 		function(midiAccess) {
-			Nota.isReady = true;
-			Nota.midiAccess = midiAccess;
+			Midium.isReady = true;
+			Midium.midiAccess = midiAccess;
 			callback();
 		},
 
 		/* MIDI access denied */
 		function(error) {
-			Nota.isReady = false;
+			Midium.isReady = false;
 			if (errorCallback) {
 				errorCallback(error);
 			}
@@ -63,8 +63,8 @@ Nota.ready = function(callback, errorCallback) {
  *
  * @returns {array}
  */
-Nota.select = function(selector) {
-	if (!Nota.isReady) {
+Midium.select = function(selector) {
+	if (!Midium.isReady) {
 		return [];
 	}
 
@@ -80,21 +80,21 @@ Nota.select = function(selector) {
 
 	else if (
 		typeof selector === 'number' &&
-		Nota.midiAccess.inputs.has(query)
+		Midium.midiAccess.inputs.has(query)
 	) {
-		ports[0] = Nota.midiAccess.inputs.get(query);
+		ports[0] = Midium.midiAccess.inputs.get(query);
 	}
 
 	else if (
 		typeof query === 'number' &&
-		Nota.midiAccess.outputs.has(query)
+		Midium.midiAccess.outputs.has(query)
 	) {
-		ports[0] = Nota.midiAccess.outputs.get(query);
+		ports[0] = Midium.midiAccess.outputs.get(query);
 	}
 
 	else if (selector instanceof Array) {
 		selector.forEach(function(item) {
-			ports.push(Nota.select(item)[0]);
+			ports.push(Midium.select(item)[0]);
 		});
 	}
 
@@ -104,14 +104,14 @@ Nota.select = function(selector) {
 	) {
 		var name = '';
 
-		Nota.midiAccess.inputs.forEach(function each(port) {
+		Midium.midiAccess.inputs.forEach(function each(port) {
 			name = port.name + ' ' + port.manufacturer;
 			if (new RegExp(selector, 'i').test(name)) {
 				ports.push(port);
 			}
 		});
 
-		Nota.midiAccess.outputs.forEach(function each(port) {
+		Midium.midiAccess.outputs.forEach(function each(port) {
 			name = port.name + ' ' + port.manufacturer;
 			if (new RegExp(selector, 'i').test(name)) {
 				ports.push(port);
@@ -119,7 +119,7 @@ Nota.select = function(selector) {
 		});
 	}
 
-	return new Nota(ports);
+	return new Midium(ports);
 };
 
 /**
@@ -129,7 +129,7 @@ Nota.select = function(selector) {
  *
  * @returns {void}
  */
-Nota.byteArrayToInt = function(byteArray) {
+Midium.byteArrayToInt = function(byteArray) {
 	if (typeof byteArray === 'number') {
 		return byteArray;
 	}
@@ -144,7 +144,7 @@ Nota.byteArrayToInt = function(byteArray) {
  *
  * @returns {void}
  */
-Nota.intToByteArray = function(int) {
+Midium.intToByteArray = function(int) {
 	if (typeof int === 'array') {
 		return int;
 	}
@@ -152,7 +152,7 @@ Nota.intToByteArray = function(int) {
 	return [int >> 16, (int >> 8) & 0x00ff,	int & 0x0000ff];
 };
 
-Nota.prototype = {
+Midium.prototype = {
 	/**
 	 * Adds MIDI port to the collection.
 	 *
@@ -188,7 +188,7 @@ Nota.prototype = {
 	 * @returns {object} Reference of this for method chaining.
 	 */
 	send : function (message) {
-		message = Nota.intToByteArray(message);
+		message = Midium.intToByteArray(message);
 
 		this.ports.forEach(function (port) {
 			if (port.type === 'output') {
@@ -210,13 +210,13 @@ Nota.prototype = {
 	 */
 	addEventListener : function (event, mask, callback) {
 		this.eventListeners.push({
-			event     : Nota.byteArrayToInt(event),
-			mask      : Nota.byteArrayToInt(mask),
-			reference : Nota.listenerCounter,
+			event     : Midium.byteArrayToInt(event),
+			mask      : Midium.byteArrayToInt(mask),
+			reference : Midium.listenerCounter,
 			callback  : callback
 		});
 
-		return Nota.listenerCounter++;
+		return Midium.listenerCounter++;
 	},
 
 	/**
@@ -244,7 +244,7 @@ Nota.prototype = {
 	 * @returns {void}
 	 */
 	_onMIDIMessage : function(event) {
-		var data = Nota.byteArrayToInt(event.data);
+		var data = Midium.byteArrayToInt(event.data);
 		this.eventListeners.forEach(function (listener) {
 			if ((data & listener.mask) === listener.event) {
 				listener.callback(event);
@@ -265,14 +265,14 @@ Nota.prototype = {
 };
 
 if (typeof module !== 'undefined') {
-	module.exports = Nota;
+	module.exports = Midium;
 }
 else {
-	window.Nota = Nota;
+	window.Midium = Midium;
 }
 
 },{}],2:[function(require,module,exports){
-var Nota = require('nota');
+var Midium = require('midium-core');
 
 /**
  * Setter function for the default channel.
@@ -281,29 +281,29 @@ var Nota = require('nota');
  *
  * @returns {object}
  */
-Nota.prototype.setDefaultChannel = function(channel) {
+Midium.prototype.setDefaultChannel = function(channel) {
 	this.defaultChannel = channel;
 	return this;
 };
 
-},{"nota":1}],3:[function(require,module,exports){
+},{"midium-core":1}],3:[function(require,module,exports){
 (function (global){
-var Nota = require('nota');
+var Midium = require('midium-core');
 
 require('./input');
 require('./output');
 require('./channel');
 
-Nota.Utils = require('./midiUtils');
-Nota.MIDIStatus = require('./midiStatusEnum');
+Midium.Utils = require('./midiUtils');
+Midium.MIDIStatus = require('./midiStatusEnum');
 
-module.exports = Nota;
-global.Nota = Nota;
+module.exports = Midium;
+global.Midium = Midium;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./channel":2,"./input":4,"./midiStatusEnum":6,"./midiUtils":7,"./output":9,"nota":1}],4:[function(require,module,exports){
+},{"./channel":2,"./input":4,"./midiStatusEnum":6,"./midiUtils":7,"./output":9,"midium-core":1}],4:[function(require,module,exports){
 var MIDIUtils = require('./midiUtils'),
-	Nota = require('nota'),
+	Midium = require('midium-core'),
 	Utils = require('./utils');
 
 const NOTE_OFF = 0x80;
@@ -324,7 +324,7 @@ const EVENT_AND_CHANNEL = 0xff0000;
  * @param {number} [channel]
  * @returns {object} Reference of the event listener for unbinding.
  */
-Nota.prototype.onNoteOff = function(callback, channel) {
+Midium.prototype.onNoteOff = function(callback, channel) {
 	var mask = Utils.isDefined(channel) ? EVENT_AND_CHANNEL : EVENT_ONLY,
 		message1 = MIDIUtils.constuctMIDIMessage(NOTE_OFF, channel),
 		message2 = MIDIUtils.constuctMIDIMessage(NOTE_ON, channel);
@@ -360,7 +360,7 @@ Nota.prototype.onNoteOff = function(callback, channel) {
  * @param {number} [channel]
  * @returns {object} Reference of the event listener for unbinding.
  */
-Nota.prototype.onNoteOn = function(callback, channel) {
+Midium.prototype.onNoteOn = function(callback, channel) {
 	var mask = Utils.isDefined(channel) ? EVENT_AND_CHANNEL : EVENT_ONLY,
 		message = MIDIUtils.constuctMIDIMessage(NOTE_ON, channel);
 
@@ -384,7 +384,7 @@ Nota.prototype.onNoteOn = function(callback, channel) {
  * @param {number} [channel]
  * @returns {object} Reference of the event listener for unbinding.
  */
-Nota.prototype.onPolyAftertouch = function(callback, channel) {
+Midium.prototype.onPolyAftertouch = function(callback, channel) {
 	var mask = Utils.isDefined(channel) ? EVENT_AND_CHANNEL : EVENT_ONLY,
 		message = MIDIUtils.constuctMIDIMessage(POLYPHONIC_AFTERTOUCH, channel);
 
@@ -405,7 +405,7 @@ Nota.prototype.onPolyAftertouch = function(callback, channel) {
  * @param {number} [channel]
  * @returns {object} Reference of the event listener for unbinding.
  */
-Nota.prototype.onControlChange = function(callback, channel) {
+Midium.prototype.onControlChange = function(callback, channel) {
 	var mask = Utils.isDefined(channel) ? EVENT_AND_CHANNEL : EVENT_ONLY,
 		message = MIDIUtils.constuctMIDIMessage(CONTROL_CHANGE, channel);
 
@@ -426,7 +426,7 @@ Nota.prototype.onControlChange = function(callback, channel) {
  * @param {number} [channel]
  * @returns {object} Reference of the event listener for unbinding.
  */
-Nota.prototype.onProgramChange = function(callback, channel) {
+Midium.prototype.onProgramChange = function(callback, channel) {
 	var mask = Utils.isDefined(channel) ? EVENT_AND_CHANNEL : EVENT_ONLY,
 		message = MIDIUtils.constuctMIDIMessage(PROGRAM_CHANGE, channel);
 
@@ -446,7 +446,7 @@ Nota.prototype.onProgramChange = function(callback, channel) {
  * @param {number} [channel]
  * @returns {object} Reference of the event listener for unbinding.
  */
-Nota.prototype.onChannelAftertouch = function(callback, channel) {
+Midium.prototype.onChannelAftertouch = function(callback, channel) {
 	var mask = Utils.isDefined(channel) ? EVENT_AND_CHANNEL : EVENT_ONLY,
 		message = MIDIUtils.constuctMIDIMessage(CHANNEL_AFTERTOUCH, channel);
 
@@ -466,7 +466,7 @@ Nota.prototype.onChannelAftertouch = function(callback, channel) {
  * @param {number} [channel]
  * @returns {object} Reference of the event listener for unbinding.
  */
-Nota.prototype.onPitchWheel = function(callback, channel) {
+Midium.prototype.onPitchWheel = function(callback, channel) {
 	var mask = Utils.isDefined(channel) ? EVENT_AND_CHANNEL : EVENT_ONLY,
 		message = MIDIUtils.constuctMIDIMessage(PITCH_WHEEL, channel);
 
@@ -479,7 +479,7 @@ Nota.prototype.onPitchWheel = function(callback, channel) {
 	});
 };
 
-},{"./midiUtils":7,"./utils":10,"nota":1}],5:[function(require,module,exports){
+},{"./midiUtils":7,"./utils":10,"midium-core":1}],5:[function(require,module,exports){
 module.exports = {
 	BANK_SELECT : 0x00,
 
@@ -755,7 +755,8 @@ module.exports = {
 };
 
 },{}],7:[function(require,module,exports){
-var Note = require('./noteEnum.js'),
+var Midium = require('midium-core'),
+	Note = require('./noteEnum.js'),
 	Status = require('./midiStatusEnum.js'),
 	Utils = require('./utils.js');
 
@@ -891,7 +892,7 @@ module.exports = {
 	 * @returns {void}
 	 */
 	constuctMIDIMessage : function() {
-		return Nota.byteArrayToInt(
+		return Midium.byteArrayToInt(
 			this.constuctMIDIMessageArray.apply(this, arguments)
 		);
 	},
@@ -910,7 +911,7 @@ module.exports = {
 	}
 };
 
-},{"./midiStatusEnum.js":6,"./noteEnum.js":8,"./utils.js":10}],8:[function(require,module,exports){
+},{"./midiStatusEnum.js":6,"./noteEnum.js":8,"./utils.js":10,"midium-core":1}],8:[function(require,module,exports){
 module.exports = {
 	'C0'   : 0,
 	'C#0'  : 1,
@@ -1044,7 +1045,7 @@ module.exports = {
 
 },{}],9:[function(require,module,exports){
 var MIDIUtils = require('./midiUtils'),
-	Nota = require('nota'),
+	Midium = require('midium-core'),
 	Status = require('./midiStatusEnum'),
 	Utils = require('./utils');
 
@@ -1057,7 +1058,7 @@ var MIDIUtils = require('./midiUtils'),
  *
  * @returns {object}
  */
-Nota.prototype.noteOff = function(note, velocity, channel) {
+Midium.prototype.noteOff = function(note, velocity, channel) {
 	note = MIDIUtils.noteStringToMIDICode(note);
 	velocity = Utils.defaultValue(velocity, 127);
 	channel = Utils.defaultValue(channel, this.defaultChannel);
@@ -1078,7 +1079,7 @@ Nota.prototype.noteOff = function(note, velocity, channel) {
  *
  * @returns {object}
  */
-Nota.prototype.noteOn = function(note, velocity, channel) {
+Midium.prototype.noteOn = function(note, velocity, channel) {
 	note = MIDIUtils.noteStringToMIDICode(note);
 	velocity = Utils.defaultValue(velocity, 127);
 	channel = Utils.defaultValue(channel, this.defaultChannel);
@@ -1099,7 +1100,7 @@ Nota.prototype.noteOn = function(note, velocity, channel) {
  *
  * @returns {object}
  */
-Nota.prototype.ployphonicAftertouch = function(note, pressure, channel) {
+Midium.prototype.ployphonicAftertouch = function(note, pressure, channel) {
 	note = MIDIUtils.noteStringToMIDICode(note);
 	channel = Utils.defaultValue(channel, this.defaultChannel);
 
@@ -1119,7 +1120,7 @@ Nota.prototype.ployphonicAftertouch = function(note, pressure, channel) {
  *
  * @returns {object}
  */
-Nota.prototype.controlChange = function(controller, value, channel) {
+Midium.prototype.controlChange = function(controller, value, channel) {
 	channel = Utils.defaultValue(channel, this.defaultChannel);
 
 	this.send(MIDIUtils.constuctMIDIMessageArray(
@@ -1137,7 +1138,7 @@ Nota.prototype.controlChange = function(controller, value, channel) {
  *
  * @returns {object}
  */
-Nota.prototype.programChange = function(program, channel) {
+Midium.prototype.programChange = function(program, channel) {
 	channel = Utils.defaultValue(channel, this.defaultChannel);
 
 	this.send(MIDIUtils.constuctMIDIMessageArray(
@@ -1155,7 +1156,7 @@ Nota.prototype.programChange = function(program, channel) {
  *
  * @returns {object}
  */
-Nota.prototype.channelAftertouch = function(pressure, channel) {
+Midium.prototype.channelAftertouch = function(pressure, channel) {
 	channel = Utils.defaultValue(channel, this.defaultChannel);
 
 	this.send(MIDIUtils.constuctMIDIMessageArray(
@@ -1173,7 +1174,7 @@ Nota.prototype.channelAftertouch = function(pressure, channel) {
  *
  * @returns {object}
  */
-Nota.prototype.pitchWheel = function(value, channel) {
+Midium.prototype.pitchWheel = function(value, channel) {
 	channel = Utils.defaultValue(channel, this.defaultChannel);
 
 	this.send(MIDIUtils.constuctMIDIMessageArray(
@@ -1183,7 +1184,7 @@ Nota.prototype.pitchWheel = function(value, channel) {
 	return this;
 };
 
-},{"./midiStatusEnum":6,"./midiUtils":7,"./utils":10,"nota":1}],10:[function(require,module,exports){
+},{"./midiStatusEnum":6,"./midiUtils":7,"./utils":10,"midium-core":1}],10:[function(require,module,exports){
 module.exports = {
 	/**
 	 * Returns with the default value if the specified object is not available.

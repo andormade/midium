@@ -1,4 +1,5 @@
-var Note = require('./noteEnum.js'),
+var Midium = require('midium-core'),
+	Note = require('./noteEnum.js'),
 	Status = require('./midiStatusEnum.js'),
 	Utils = require('./utils.js');
 
@@ -134,7 +135,7 @@ module.exports = {
 	 * @returns {void}
 	 */
 	constuctMIDIMessage : function() {
-		return Nota.byteArrayToInt(
+		return Midium.byteArrayToInt(
 			this.constuctMIDIMessageArray.apply(this, arguments)
 		);
 	},

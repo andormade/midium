@@ -1,5 +1,5 @@
 {
-  "name": "nota",
+  "name": "midium",
   "author": {
     "name": "Andor Polgar",
     "email": "hngrhorace@gmail.com",
@@ -9,25 +9,26 @@
   "description": "Device oriented Web MIDI API wrapper",
   "keywords": [
     "midi",
+	"web",
     "api"
   ],
   "bugs": {
-    "url": "https://github.com/hngrhorace/nota/issues"
+    "url": "https://github.com/hngrhorace/midium/issues"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/hngrhorace/nota.git"
+    "url": "https://github.com/hngrhorace/midium.git"
   },
   "main": "src/index",
   "dependencies": {
-    "nota": "https://github.com/hngrhorace/nota-core.git"
+    "midium-core": "^1.0.0"
   },
   "devDependencies": {
     "eslint": "^1.10.1",
     "browserify": "^12.0.1"
   },
   "scripts": {
-    "bundle": "browserify src/*.js > dist/nota.js",
+    "bundle": "browserify src/*.js > dist/midium.js",
     "eslint": "eslint src/*.js"
   }
 }

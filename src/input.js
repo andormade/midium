@@ -1,5 +1,5 @@
 var MIDIUtils = require('./midiUtils'),
-	Nota = require('nota'),
+	Midium = require('midium-core'),
 	Utils = require('./utils');
 
 const NOTE_OFF = 0x80;
@@ -20,7 +20,7 @@ const EVENT_AND_CHANNEL = 0xff0000;
  * @param {number} [channel]
  * @returns {object} Reference of the event listener for unbinding.
  */
-Nota.prototype.onNoteOff = function(callback, channel) {
+Midium.prototype.onNoteOff = function(callback, channel) {
 	var mask = Utils.isDefined(channel) ? EVENT_AND_CHANNEL : EVENT_ONLY,
 		message1 = MIDIUtils.constuctMIDIMessage(NOTE_OFF, channel),
 		message2 = MIDIUtils.constuctMIDIMessage(NOTE_ON, channel);
@@ -56,7 +56,7 @@ Nota.prototype.onNoteOff = function(callback, channel) {
  * @param {number} [channel]
  * @returns {object} Reference of the event listener for unbinding.
  */
-Nota.prototype.onNoteOn = function(callback, channel) {
+Midium.prototype.onNoteOn = function(callback, channel) {
 	var mask = Utils.isDefined(channel) ? EVENT_AND_CHANNEL : EVENT_ONLY,
 		message = MIDIUtils.constuctMIDIMessage(NOTE_ON, channel);
 
@@ -80,7 +80,7 @@ Nota.prototype.onNoteOn = function(callback, channel) {
  * @param {number} [channel]
  * @returns {object} Reference of the event listener for unbinding.
  */
-Nota.prototype.onPolyAftertouch = function(callback, channel) {
+Midium.prototype.onPolyAftertouch = function(callback, channel) {
 	var mask = Utils.isDefined(channel) ? EVENT_AND_CHANNEL : EVENT_ONLY,
 		message = MIDIUtils.constuctMIDIMessage(POLYPHONIC_AFTERTOUCH, channel);
 
@@ -101,7 +101,7 @@ Nota.prototype.onPolyAftertouch = function(callback, channel) {
  * @param {number} [channel]
  * @returns {object} Reference of the event listener for unbinding.
  */
-Nota.prototype.onControlChange = function(callback, channel) {
+Midium.prototype.onControlChange = function(callback, channel) {
 	var mask = Utils.isDefined(channel) ? EVENT_AND_CHANNEL : EVENT_ONLY,
 		message = MIDIUtils.constuctMIDIMessage(CONTROL_CHANGE, channel);
 
@@ -122,7 +122,7 @@ Nota.prototype.onControlChange = function(callback, channel) {
  * @param {number} [channel]
  * @returns {object} Reference of the event listener for unbinding.
  */
-Nota.prototype.onProgramChange = function(callback, channel) {
+Midium.prototype.onProgramChange = function(callback, channel) {
 	var mask = Utils.isDefined(channel) ? EVENT_AND_CHANNEL : EVENT_ONLY,
 		message = MIDIUtils.constuctMIDIMessage(PROGRAM_CHANGE, channel);
 
@@ -142,7 +142,7 @@ Nota.prototype.onProgramChange = function(callback, channel) {
  * @param {number} [channel]
  * @returns {object} Reference of the event listener for unbinding.
  */
-Nota.prototype.onChannelAftertouch = function(callback, channel) {
+Midium.prototype.onChannelAftertouch = function(callback, channel) {
 	var mask = Utils.isDefined(channel) ? EVENT_AND_CHANNEL : EVENT_ONLY,
 		message = MIDIUtils.constuctMIDIMessage(CHANNEL_AFTERTOUCH, channel);
 
@@ -162,7 +162,7 @@ Nota.prototype.onChannelAftertouch = function(callback, channel) {
  * @param {number} [channel]
  * @returns {object} Reference of the event listener for unbinding.
  */
-Nota.prototype.onPitchWheel = function(callback, channel) {
+Midium.prototype.onPitchWheel = function(callback, channel) {
 	var mask = Utils.isDefined(channel) ? EVENT_AND_CHANNEL : EVENT_ONLY,
 		message = MIDIUtils.constuctMIDIMessage(PITCH_WHEEL, channel);
 

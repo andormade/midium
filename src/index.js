@@ -1,11 +1,11 @@
-var Nota = require('nota');
+var Midium = require('midium-core');
 
 require('./input');
 require('./output');
 require('./channel');
 
-Nota.Utils = require('./midiUtils');
-Nota.MIDIStatus = require('./midiStatusEnum');
+Midium.Utils = require('./midiUtils');
+Midium.MIDIStatus = require('./midiStatusEnum');
 
-module.exports = Nota;
-global.Nota = Nota;
+module.exports = Midium;
+global.Midium = Midium;
