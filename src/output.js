@@ -1,7 +1,4 @@
-var MIDIUtils = require('./midiUtils'),
-	Midium = require('midium-core'),
-	Status = require('./midiStatusEnum'),
-	Utils = require('./utils');
+var Midium = require('midium-core');
 
 /**
  * Sets the specified note off.
@@ -13,12 +10,12 @@ var MIDIUtils = require('./midiUtils'),
  * @returns {object}
  */
 Midium.prototype.noteOff = function(note, velocity, channel) {
-	note = MIDIUtils.noteStringToMIDICode(note);
-	velocity = Utils.defaultValue(velocity, 127);
-	channel = Utils.defaultValue(channel, this.defaultChannel);
+	note = Midium.noteStringToMIDICode(note);
+	velocity = _.isUndefined(velocity) ? 127 : velocity;
+	channel = _.isUndefined(channel) ? this.defaultChannel : channel;
 
-	this.send(MIDIUtils.constuctMIDIMessageArray(
-		Status.NOTE_OFF, channel, note, velocity
+	this.send(Midium.constuctMIDIMessageArray(
+		Midium.NOTE_OFF, channel, note, velocity
 	));
 
 	return this;
@@ -34,12 +31,12 @@ Midium.prototype.noteOff = function(note, velocity, channel) {
  * @returns {object}
  */
 Midium.prototype.noteOn = function(note, velocity, channel) {
-	note = MIDIUtils.noteStringToMIDICode(note);
-	velocity = Utils.defaultValue(velocity, 127);
-	channel = Utils.defaultValue(channel, this.defaultChannel);
+	note = Midium.noteStringToMIDICode(note);
+	velocity = _.isUndefined(velocity) ? 127 : velocity;
+	channel = _.isUndefined(channel) ? this.defaultChannel : channel;
 
-	this.send(MIDIUtils.constuctMIDIMessageArray(
-		Status.NOTE_ON, channel, note, velocity
+	this.send(Midium.constuctMIDIMessageArray(
+		Midium.NOTE_ON, channel, note, velocity
 	));
 
 	return this;
@@ -55,11 +52,11 @@ Midium.prototype.noteOn = function(note, velocity, channel) {
  * @returns {object}
  */
 Midium.prototype.ployphonicAftertouch = function(note, pressure, channel) {
-	note = MIDIUtils.noteStringToMIDICode(note);
-	channel = Utils.defaultValue(channel, this.defaultChannel);
+	note = Midium.noteStringToMIDICode(note);
+	channel = _.isUndefined(channel) ? this.defaultChannel : channel;
 
-	this.send(MIDIUtils.constuctMIDIMessageArray(
-		Status.POLYPHONIC_AFTERTOUCH, channel, note, pressure
+	this.send(Midium.constuctMIDIMessageArray(
+		Midium.POLYPHONIC_AFTERTOUCH, channel, note, pressure
 	));
 
 	return this;
@@ -75,10 +72,10 @@ Midium.prototype.ployphonicAftertouch = function(note, pressure, channel) {
  * @returns {object}
  */
 Midium.prototype.controlChange = function(controller, value, channel) {
-	channel = Utils.defaultValue(channel, this.defaultChannel);
+	channel = _.isUndefined(channel) ? this.defaultChannel : channel;
 
-	this.send(MIDIUtils.constuctMIDIMessageArray(
-		Status.CONTROL_CHANGE, channel, controller, value
+	this.send(Midium.constuctMIDIMessageArray(
+		Midium.CONTROL_CHANGE, channel, controller, value
 	));
 
 	return this;
@@ -93,10 +90,10 @@ Midium.prototype.controlChange = function(controller, value, channel) {
  * @returns {object}
  */
 Midium.prototype.programChange = function(program, channel) {
-	channel = Utils.defaultValue(channel, this.defaultChannel);
+	channel = _.isUndefined(channel) ? this.defaultChannel : channel;
 
-	this.send(MIDIUtils.constuctMIDIMessageArray(
-		Status.PROGRAM_CHANGE, channel, program, 0
+	this.send(Midium.constuctMIDIMessageArray(
+		Midium.PROGRAM_CHANGE, channel, program, 0
 	));
 
 	return this;
@@ -111,10 +108,10 @@ Midium.prototype.programChange = function(program, channel) {
  * @returns {object}
  */
 Midium.prototype.channelAftertouch = function(pressure, channel) {
-	channel = Utils.defaultValue(channel, this.defaultChannel);
+	channel = _.isUndefined(channel) ? this.defaultChannel : channel;
 
-	this.send(MIDIUtils.constuctMIDIMessageArray(
-		Status.CHANNEL_AFTERTOUCH, channel, pressure, 0
+	this.send(Midium.constuctMIDIMessageArray(
+		Midium.CHANNEL_AFTERTOUCH, channel, pressure, 0
 	));
 
 	return this;
@@ -129,10 +126,10 @@ Midium.prototype.channelAftertouch = function(pressure, channel) {
  * @returns {object}
  */
 Midium.prototype.pitchWheel = function(value, channel) {
-	channel = Utils.defaultValue(channel, this.defaultChannel);
+	channel = _.isUndefined(channel) ? this.defaultChannel : channel;
 
-	this.send(MIDIUtils.constuctMIDIMessageArray(
-		Status.CHANNEL_AFTERTOUCH, channel, 0, value
+	this.send(Midium.constuctMIDIMessageArray(
+		Midium.CHANNEL_AFTERTOUCH, channel, 0, value
 	));
 
 	return this;

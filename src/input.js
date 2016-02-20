@@ -1,6 +1,5 @@
-var MIDIUtils = require('./midiUtils'),
-	Midium = require('midium-core'),
-	Utils = require('./utils');
+var Midium = require('midium-core'),
+	_ = require('lodash');
 
 const NOTE_OFF = 0x80;
 const NOTE_ON  = 0x90;
@@ -21,15 +20,16 @@ const EVENT_AND_CHANNEL = 0xff0000;
  * @returns {object} Reference of the event listener for unbinding.
  */
 Midium.prototype.onNoteOff = function(callback, channel) {
-	var mask = Utils.isDefined(channel) ? EVENT_AND_CHANNEL : EVENT_ONLY,
-		message1 = MIDIUtils.constuctMIDIMessage(NOTE_OFF, channel),
-		message2 = MIDIUtils.constuctMIDIMessage(NOTE_ON, channel);
+	var channel = _.isUndefined(channel) ? 1 : channel,
+		mask = _.isUndefined(channel) ? EVENT_ONLY : EVENT_AND_CHANNEL,
+		message1 = Midium.constructMIDIMessage(NOTE_OFF, channel, 0, 0),
+		message2 = Midium.constructMIDIMessage(NOTE_ON, channel, 0, 0);
 
 	return [
 		this.addEventListener(message1, mask, function(event) {
 			/* Extending the MIDI event with useful infos. */
 			event.status = 'noteoff';
-			event.channel = MIDIUtils.getChannelFromStatus(event.data[0]);
+			event.channel = Midium.getChannelFromStatus(event.data[0]);
 			event.note = event.data[1];
 			event.velocity = event.data[2];
 			callback(event);
@@ -41,7 +41,7 @@ Midium.prototype.onNoteOff = function(callback, channel) {
 			}
 			/* Extending the MIDI event with useful infos. */
 			event.status = 'noteoff';
-			event.channel = MIDIUtils.getChannelFromStatus(event.data[0]);
+			event.channel = Midium.getChannelFromStatus(event.data[0]);
 			event.note = event.data[1];
 			event.velocity = 0;
 			callback(event);
@@ -57,8 +57,9 @@ Midium.prototype.onNoteOff = function(callback, channel) {
  * @returns {object} Reference of the event listener for unbinding.
  */
 Midium.prototype.onNoteOn = function(callback, channel) {
-	var mask = Utils.isDefined(channel) ? EVENT_AND_CHANNEL : EVENT_ONLY,
-		message = MIDIUtils.constuctMIDIMessage(NOTE_ON, channel);
+	var channel = _.isUndefined(channel) ? 1 : channel,
+		mask = _.isUndefined(channel) ? EVENT_ONLY : EVENT_AND_CHANNEL,
+		message = Midium.constructMIDIMessage(NOTE_ON, channel, 0, 0);
 
 	return this.addEventListener(message, mask, function(event) {
 		if (event.data[2] === 0) {
@@ -66,7 +67,7 @@ Midium.prototype.onNoteOn = function(callback, channel) {
 		}
 		/* Extending the MIDI event with useful infos. */
 		event.status = 'noteon';
-		event.channel = MIDIUtils.getChannelFromStatus(event.data[0]);
+		event.channel = Midium.getChannelFromStatus(event.data[0]);
 		event.note = event.data[1];
 		event.velocity = event.data[2];
 		callback(event);
@@ -81,13 +82,16 @@ Midium.prototype.onNoteOn = function(callback, channel) {
  * @returns {object} Reference of the event listener for unbinding.
  */
 Midium.prototype.onPolyAftertouch = function(callback, channel) {
-	var mask = Utils.isDefined(channel) ? EVENT_AND_CHANNEL : EVENT_ONLY,
-		message = MIDIUtils.constuctMIDIMessage(POLYPHONIC_AFTERTOUCH, channel);
+	var channel = _.isUndefined(channel) ? 1 : channel,
+		mask = _.isUndefined(channel) ? EVENT_ONLY : EVENT_AND_CHANNEL,
+		message = Midium.constructMIDIMessage(
+			POLYPHONIC_AFTERTOUCH, channel, 0, 0
+		);
 
 	return this.addEventListener(message, mask, function(event) {
 		/* Extending the MIDI event with useful infos. */
 		event.status = 'polyaftertouch';
-		event.channel = MIDIUtils.getChannelFromStatus(event.data[0]);
+		event.channel = Midium.getChannelFromStatus(event.data[0]);
 		event.note = event.data[1];
 		event.pressure = event.data[2];
 		callback(event);
@@ -102,13 +106,14 @@ Midium.prototype.onPolyAftertouch = function(callback, channel) {
  * @returns {object} Reference of the event listener for unbinding.
  */
 Midium.prototype.onControlChange = function(callback, channel) {
-	var mask = Utils.isDefined(channel) ? EVENT_AND_CHANNEL : EVENT_ONLY,
-		message = MIDIUtils.constuctMIDIMessage(CONTROL_CHANGE, channel);
+	var channel = _.isUndefined(channel) ? 1 : channel,
+		mask = _.isUndefined(channel) ? EVENT_ONLY : EVENT_AND_CHANNEL,
+		message = Midium.constructMIDIMessage(CONTROL_CHANGE, channel, 0, 0);
 
 	return this.addEventListener(message, mask, function(event) {
 		/* Extending the MIDI event with useful infos. */
 		event.status = 'controlchange';
-		event.channel = MIDIUtils.getChannelFromStatus(event.data[0]);
+		event.channel = Midium.getChannelFromStatus(event.data[0]);
 		event.controller = event.data[1];
 		event.controllerValue = event.data[2];
 		callback(event);
@@ -123,13 +128,14 @@ Midium.prototype.onControlChange = function(callback, channel) {
  * @returns {object} Reference of the event listener for unbinding.
  */
 Midium.prototype.onProgramChange = function(callback, channel) {
-	var mask = Utils.isDefined(channel) ? EVENT_AND_CHANNEL : EVENT_ONLY,
-		message = MIDIUtils.constuctMIDIMessage(PROGRAM_CHANGE, channel);
+	var channel = _.isUndefined(channel) ? 1 : channel,
+		mask = _.isUndefined(channel) ? EVENT_ONLY : EVENT_AND_CHANNEL,
+		message = Midium.constructMIDIMessage(PROGRAM_CHANGE, channel, 0, 0);
 
 	return this.addEventListener(message, mask, function(event) {
 		/* Extending the MIDI event with useful infos. */
 		event.status = 'programchange';
-		event.channel = MIDIUtils.getChannelFromStatus(event.data[0]);
+		event.channel = Midium.getChannelFromStatus(event.data[0]);
 		event.program = event.data[1];
 		callback(event);
 	});
@@ -143,13 +149,16 @@ Midium.prototype.onProgramChange = function(callback, channel) {
  * @returns {object} Reference of the event listener for unbinding.
  */
 Midium.prototype.onChannelAftertouch = function(callback, channel) {
-	var mask = Utils.isDefined(channel) ? EVENT_AND_CHANNEL : EVENT_ONLY,
-		message = MIDIUtils.constuctMIDIMessage(CHANNEL_AFTERTOUCH, channel);
+	var channel = _.isUndefined(channel) ? 1 : channel,
+		mask = _.isUndefined(channel) ? EVENT_ONLY : EVENT_AND_CHANNEL,
+		message = Midium.constructMIDIMessage(
+			CHANNEL_AFTERTOUCH, channel, 0, 0
+		);
 
 	return this.addEventListener(message, mask, function(event) {
 		/* Extending the MIDI event with useful infos. */
 		event.status = 'channelaftertouch';
-		event.channel = MIDIUtils.getChannelFromStatus(event.data[0]);
+		event.channel = Midium.getChannelFromStatus(event.data[0]);
 		event.pressure = event.data[1];
 		callback(event);
 	});
@@ -163,13 +172,14 @@ Midium.prototype.onChannelAftertouch = function(callback, channel) {
  * @returns {object} Reference of the event listener for unbinding.
  */
 Midium.prototype.onPitchWheel = function(callback, channel) {
-	var mask = Utils.isDefined(channel) ? EVENT_AND_CHANNEL : EVENT_ONLY,
-		message = MIDIUtils.constuctMIDIMessage(PITCH_WHEEL, channel);
+	var channel = _.isUndefined(channel) ? 1 : channel,
+		mask = _.isUndefined(channel) ? EVENT_ONLY : EVENT_AND_CHANNEL,
+		message = Midium.constructMIDIMessage(PITCH_WHEEL, channel, 0, 0);
 
 	return this.addEventListener(message, mask, function(event) {
 		/* Extending the MIDI event with useful infos. */
 		event.status = 'pitchwheel';
-		event.channel = MIDIUtils.getChannelFromStatus(event.data[0]);
+		event.channel = Midium.getChannelFromStatus(event.data[0]);
 		event.pitchWheel = event.data[2];
 		callback(event);
 	});
