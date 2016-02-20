@@ -15557,21 +15557,24 @@ else {
 }
 
 },{}],4:[function(require,module,exports){
-var Midium = require('midium-core');
+var Midium = require('midium-core'),
+	_ = require('lodash');
 
-/**
- * Setter function for the default channel.
- *
- * @param {number} channel    MIDI channel 1-16.
- *
- * @returns {object}
- */
-Midium.prototype.setDefaultChannel = function(channel) {
-	this.defaultChannel = channel;
-	return this;
-};
+_.assignIn(Midium.prototype, {
+	/**
+	 * Setter function for the default channel.
+	 *
+	 * @param {number} channel    MIDI channel 1-16.
+	 *
+	 * @returns {object}
+	 */
+	setDefaultChannel : function(channel) {
+		this.defaultChannel = channel;
+		return this;
+	}
+});
 
-},{"midium-core":3}],5:[function(require,module,exports){
+},{"lodash":1,"midium-core":3}],5:[function(require,module,exports){
 (function (global){
 var Midinette = require('midinette'),
 	Midium = require('midium-core'),
@@ -15598,319 +15601,325 @@ const CONTROL_CHANGE = 0xb0;
 const PROGRAM_CHANGE = 0xc0;
 const CHANNEL_AFTERTOUCH = 0xd0;
 const PITCH_WHEEL = 0xe0;
-
 const EVENT_ONLY = 0xf00000;
 const EVENT_AND_CHANNEL = 0xff0000;
 
-/**
- * Registers an event listener for the note off events.
- *
- * @param {function} callback
- * @param {number} [channel]
- * @returns {object} Reference of the event listener for unbinding.
- */
-Midium.prototype.onNoteOff = function(callback, channel) {
-	var channel = _.isUndefined(channel) ? 1 : channel,
-		mask = _.isUndefined(channel) ? EVENT_ONLY : EVENT_AND_CHANNEL,
-		message1 = Midium.constructMIDIMessage(NOTE_OFF, channel, 0, 0),
-		message2 = Midium.constructMIDIMessage(NOTE_ON, channel, 0, 0);
+_.assignIn(Midium.prototype, {
+	/**
+	 * Registers an event listener for the note off events.
+	 *
+	 * @param {function} callback
+	 * @param {number} [channel]
+	 * @returns {object} Reference of the event listener for unbinding.
+	 */
+	onNoteOff : function(callback, channel) {
+		var channel = _.isUndefined(channel) ? 1 : channel,
+			mask = _.isUndefined(channel) ? EVENT_ONLY : EVENT_AND_CHANNEL,
+			message1 = Midium.constructMIDIMessage(NOTE_OFF, channel, 0, 0),
+			message2 = Midium.constructMIDIMessage(NOTE_ON, channel, 0, 0);
 
-	return [
-		this.addEventListener(message1, mask, function(event) {
+		return [
+			this.addEventListener(message1, mask, function(event) {
+				/* Extending the MIDI event with useful infos. */
+				event.status = 'noteoff';
+				event.channel = Midium.getChannelFromStatus(event.data[0]);
+				event.note = event.data[1];
+				event.velocity = event.data[2];
+				callback(event);
+			}),
+			this.addEventListener(message2, mask, function(event) {
+				/* By note on event, velocity 0 means note off. */
+				if (event.data[2] !== 0) {
+					return;
+				}
+				/* Extending the MIDI event with useful infos. */
+				event.status = 'noteoff';
+				event.channel = Midium.getChannelFromStatus(event.data[0]);
+				event.note = event.data[1];
+				event.velocity = 0;
+				callback(event);
+			})
+		];
+	},
+
+	/**
+	 * Registers an event listener for the note on events.
+	 *
+	 * @param {function} callback
+	 * @param {number} [channel]
+	 * @returns {object} Reference of the event listener for unbinding.
+	 */
+	onNoteOn : function(callback, channel) {
+		var channel = _.isUndefined(channel) ? 1 : channel,
+			mask = _.isUndefined(channel) ? EVENT_ONLY : EVENT_AND_CHANNEL,
+			message = Midium.constructMIDIMessage(NOTE_ON, channel, 0, 0);
+
+		return this.addEventListener(message, mask, function(event) {
+			if (event.data[2] === 0) {
+				return;
+			}
 			/* Extending the MIDI event with useful infos. */
-			event.status = 'noteoff';
+			event.status = 'noteon';
 			event.channel = Midium.getChannelFromStatus(event.data[0]);
 			event.note = event.data[1];
 			event.velocity = event.data[2];
 			callback(event);
-		}),
-		this.addEventListener(message2, mask, function(event) {
-			/* By note on event, velocity 0 means note off. */
-			if (event.data[2] !== 0) {
-				return;
-			}
+		});
+	},
+
+	/**
+	 * Registers an event listener for the polyphonic aftertouch events.
+	 *
+	 * @param {function} callback
+	 * @param {number} [channel]
+	 * @returns {object} Reference of the event listener for unbinding.
+	 */
+	onPolyAftertouch : function(callback, channel) {
+		var channel = _.isUndefined(channel) ? 1 : channel,
+			mask = _.isUndefined(channel) ? EVENT_ONLY : EVENT_AND_CHANNEL,
+			message = Midium.constructMIDIMessage(
+				POLYPHONIC_AFTERTOUCH, channel, 0, 0
+			);
+
+		return this.addEventListener(message, mask, function(event) {
 			/* Extending the MIDI event with useful infos. */
-			event.status = 'noteoff';
+			event.status = 'polyaftertouch';
 			event.channel = Midium.getChannelFromStatus(event.data[0]);
 			event.note = event.data[1];
-			event.velocity = 0;
+			event.pressure = event.data[2];
 			callback(event);
-		})
-	];
-};
+		});
+	},
 
-/**
- * Registers an event listener for the note on events.
- *
- * @param {function} callback
- * @param {number} [channel]
- * @returns {object} Reference of the event listener for unbinding.
- */
-Midium.prototype.onNoteOn = function(callback, channel) {
-	var channel = _.isUndefined(channel) ? 1 : channel,
-		mask = _.isUndefined(channel) ? EVENT_ONLY : EVENT_AND_CHANNEL,
-		message = Midium.constructMIDIMessage(NOTE_ON, channel, 0, 0);
+	/**
+	 * Registers an event listener for the control change events.
+	 *
+	 * @param {function} callback
+	 * @param {number} [channel]
+	 * @returns {object} Reference of the event listener for unbinding.
+	 */
+	onControlChange : function(callback, channel) {
+		var channel = _.isUndefined(channel) ? 1 : channel,
+			mask = _.isUndefined(channel) ? EVENT_ONLY : EVENT_AND_CHANNEL,
+			message = Midium.constructMIDIMessage(
+				CONTROL_CHANGE, channel, 0, 0
+			);
 
-	return this.addEventListener(message, mask, function(event) {
-		if (event.data[2] === 0) {
-			return;
-		}
-		/* Extending the MIDI event with useful infos. */
-		event.status = 'noteon';
-		event.channel = Midium.getChannelFromStatus(event.data[0]);
-		event.note = event.data[1];
-		event.velocity = event.data[2];
-		callback(event);
-	});
-};
+		return this.addEventListener(message, mask, function(event) {
+			/* Extending the MIDI event with useful infos. */
+			event.status = 'controlchange';
+			event.channel = Midium.getChannelFromStatus(event.data[0]);
+			event.controller = event.data[1];
+			event.controllerValue = event.data[2];
+			callback(event);
+		});
+	},
 
-/**
- * Registers an event listener for the polyphonic aftertouch events.
- *
- * @param {function} callback
- * @param {number} [channel]
- * @returns {object} Reference of the event listener for unbinding.
- */
-Midium.prototype.onPolyAftertouch = function(callback, channel) {
-	var channel = _.isUndefined(channel) ? 1 : channel,
-		mask = _.isUndefined(channel) ? EVENT_ONLY : EVENT_AND_CHANNEL,
-		message = Midium.constructMIDIMessage(
-			POLYPHONIC_AFTERTOUCH, channel, 0, 0
-		);
+	/**
+	 * Registers an event listener for the program change events.
+	 *
+	 * @param {function} callback
+	 * @param {number} [channel]
+	 * @returns {object} Reference of the event listener for unbinding.
+	 */
+	onProgramChange : function(callback, channel) {
+		var channel = _.isUndefined(channel) ? 1 : channel,
+			mask = _.isUndefined(channel) ? EVENT_ONLY : EVENT_AND_CHANNEL,
+			message = Midium.constructMIDIMessage(PROGRAM_CHANGE, channel, 0, 0);
 
-	return this.addEventListener(message, mask, function(event) {
-		/* Extending the MIDI event with useful infos. */
-		event.status = 'polyaftertouch';
-		event.channel = Midium.getChannelFromStatus(event.data[0]);
-		event.note = event.data[1];
-		event.pressure = event.data[2];
-		callback(event);
-	});
-};
+		return this.addEventListener(message, mask, function(event) {
+			/* Extending the MIDI event with useful infos. */
+			event.status = 'programchange';
+			event.channel = Midium.getChannelFromStatus(event.data[0]);
+			event.program = event.data[1];
+			callback(event);
+		});
+	},
 
-/**
- * Registers an event listener for the control change events.
- *
- * @param {function} callback
- * @param {number} [channel]
- * @returns {object} Reference of the event listener for unbinding.
- */
-Midium.prototype.onControlChange = function(callback, channel) {
-	var channel = _.isUndefined(channel) ? 1 : channel,
-		mask = _.isUndefined(channel) ? EVENT_ONLY : EVENT_AND_CHANNEL,
-		message = Midium.constructMIDIMessage(CONTROL_CHANGE, channel, 0, 0);
+	/**
+	 * Registers an event listener for the channel aftertouch events.
+	 *
+	 * @param {function} callback
+	 * @param {number} [channel]
+	 * @returns {object} Reference of the event listener for unbinding.
+	 */
+	onChannelAftertouch : function(callback, channel) {
+		var channel = _.isUndefined(channel) ? 1 : channel,
+			mask = _.isUndefined(channel) ? EVENT_ONLY : EVENT_AND_CHANNEL,
+			message = Midium.constructMIDIMessage(
+				CHANNEL_AFTERTOUCH, channel, 0, 0
+			);
 
-	return this.addEventListener(message, mask, function(event) {
-		/* Extending the MIDI event with useful infos. */
-		event.status = 'controlchange';
-		event.channel = Midium.getChannelFromStatus(event.data[0]);
-		event.controller = event.data[1];
-		event.controllerValue = event.data[2];
-		callback(event);
-	});
-};
+		return this.addEventListener(message, mask, function(event) {
+			/* Extending the MIDI event with useful infos. */
+			event.status = 'channelaftertouch';
+			event.channel = Midium.getChannelFromStatus(event.data[0]);
+			event.pressure = event.data[1];
+			callback(event);
+		});
+	},
 
-/**
- * Registers an event listener for the program change events.
- *
- * @param {function} callback
- * @param {number} [channel]
- * @returns {object} Reference of the event listener for unbinding.
- */
-Midium.prototype.onProgramChange = function(callback, channel) {
-	var channel = _.isUndefined(channel) ? 1 : channel,
-		mask = _.isUndefined(channel) ? EVENT_ONLY : EVENT_AND_CHANNEL,
-		message = Midium.constructMIDIMessage(PROGRAM_CHANGE, channel, 0, 0);
+	/**
+	 * Registers an event listener for the pitch wheel events.
+	 *
+	 * @param {function} callback
+	 * @param {number} [channel]
+	 * @returns {object} Reference of the event listener for unbinding.
+	 */
+	onPitchWheel : function(callback, channel) {
+		var channel = _.isUndefined(channel) ? 1 : channel,
+			mask = _.isUndefined(channel) ? EVENT_ONLY : EVENT_AND_CHANNEL,
+			message = Midium.constructMIDIMessage(PITCH_WHEEL, channel, 0, 0);
 
-	return this.addEventListener(message, mask, function(event) {
-		/* Extending the MIDI event with useful infos. */
-		event.status = 'programchange';
-		event.channel = Midium.getChannelFromStatus(event.data[0]);
-		event.program = event.data[1];
-		callback(event);
-	});
-};
-
-/**
- * Registers an event listener for the channel aftertouch events.
- *
- * @param {function} callback
- * @param {number} [channel]
- * @returns {object} Reference of the event listener for unbinding.
- */
-Midium.prototype.onChannelAftertouch = function(callback, channel) {
-	var channel = _.isUndefined(channel) ? 1 : channel,
-		mask = _.isUndefined(channel) ? EVENT_ONLY : EVENT_AND_CHANNEL,
-		message = Midium.constructMIDIMessage(
-			CHANNEL_AFTERTOUCH, channel, 0, 0
-		);
-
-	return this.addEventListener(message, mask, function(event) {
-		/* Extending the MIDI event with useful infos. */
-		event.status = 'channelaftertouch';
-		event.channel = Midium.getChannelFromStatus(event.data[0]);
-		event.pressure = event.data[1];
-		callback(event);
-	});
-};
-
-/**
- * Registers an event listener for the pitch wheel events.
- *
- * @param {function} callback
- * @param {number} [channel]
- * @returns {object} Reference of the event listener for unbinding.
- */
-Midium.prototype.onPitchWheel = function(callback, channel) {
-	var channel = _.isUndefined(channel) ? 1 : channel,
-		mask = _.isUndefined(channel) ? EVENT_ONLY : EVENT_AND_CHANNEL,
-		message = Midium.constructMIDIMessage(PITCH_WHEEL, channel, 0, 0);
-
-	return this.addEventListener(message, mask, function(event) {
-		/* Extending the MIDI event with useful infos. */
-		event.status = 'pitchwheel';
-		event.channel = Midium.getChannelFromStatus(event.data[0]);
-		event.pitchWheel = event.data[2];
-		callback(event);
-	});
-};
+		return this.addEventListener(message, mask, function(event) {
+			/* Extending the MIDI event with useful infos. */
+			event.status = 'pitchwheel';
+			event.channel = Midium.getChannelFromStatus(event.data[0]);
+			event.pitchWheel = event.data[2];
+			callback(event);
+		});
+	}
+});
 
 },{"lodash":1,"midium-core":3}],7:[function(require,module,exports){
-var Midium = require('midium-core');
+var Midium = require('midium-core'),
+	_ = require('lodash');
 
-/**
- * Sets the specified note off.
- *
- * @param {string|number} note    MIDI note 0-127
- * @param {number} [velocity]     Velocity 0-127
- * @param {number} [channel]      Channel 1-16
- *
- * @returns {object}
- */
-Midium.prototype.noteOff = function(note, velocity, channel) {
-	note = Midium.noteStringToMIDICode(note);
-	velocity = _.isUndefined(velocity) ? 127 : velocity;
-	channel = _.isUndefined(channel) ? this.defaultChannel : channel;
+_.assignIn(Midium.prototype, {
+	/**
+	 * Sets the specified note off.
+	 *
+	 * @param {string|number} note    MIDI note 0-127
+	 * @param {number} [velocity]     Velocity 0-127
+	 * @param {number} [channel]      Channel 1-16
+	 *
+	 * @returns {object}
+	 */
+	noteOff : function(note, velocity, channel) {
+		note = Midium.noteStringToMIDICode(note);
+		velocity = _.isUndefined(velocity) ? 127 : velocity;
+		channel = _.isUndefined(channel) ? this.defaultChannel : channel;
 
-	this.send(Midium.constuctMIDIMessageArray(
-		Midium.NOTE_OFF, channel, note, velocity
-	));
+		this.send(Midium.constuctMIDIMessageArray(
+			Midium.NOTE_OFF, channel, note, velocity
+		));
 
-	return this;
-};
+		return this;
+	},
 
-/**
- * Sets the specified note on.
- *
- * @param {string|number} note    MIDI note 0-127
- * @param {number} [velocity]     Velocity 0-127
- * @param {number} [channel]      Channel 1-16
- *
- * @returns {object}
- */
-Midium.prototype.noteOn = function(note, velocity, channel) {
-	note = Midium.noteStringToMIDICode(note);
-	velocity = _.isUndefined(velocity) ? 127 : velocity;
-	channel = _.isUndefined(channel) ? this.defaultChannel : channel;
+	/**
+	 * Sets the specified note on.
+	 *
+	 * @param {string|number} note    MIDI note 0-127
+	 * @param {number} [velocity]     Velocity 0-127
+	 * @param {number} [channel]      Channel 1-16
+	 *
+	 * @returns {object}
+	 */
+	noteOn : function(note, velocity, channel) {
+		note = Midium.noteStringToMIDICode(note);
+		velocity = _.isUndefined(velocity) ? 127 : velocity;
+		channel = _.isUndefined(channel) ? this.defaultChannel : channel;
 
-	this.send(Midium.constuctMIDIMessageArray(
-		Midium.NOTE_ON, channel, note, velocity
-	));
+		this.send(Midium.constuctMIDIMessageArray(
+			Midium.NOTE_ON, channel, note, velocity
+		));
 
-	return this;
-};
+		return this;
+	},
 
-/**
- * Sends a polyphonic aftertouch message.
- *
- * @param {string|number} note    MIDI note 0-127
- * @param {number} pressure       Pressure 0-127
- * @param {number} [channel]      Channel 1-16
- *
- * @returns {object}
- */
-Midium.prototype.ployphonicAftertouch = function(note, pressure, channel) {
-	note = Midium.noteStringToMIDICode(note);
-	channel = _.isUndefined(channel) ? this.defaultChannel : channel;
+	/**
+	 * Sends a polyphonic aftertouch message.
+	 *
+	 * @param {string|number} note    MIDI note 0-127
+	 * @param {number} pressure       Pressure 0-127
+	 * @param {number} [channel]      Channel 1-16
+	 *
+	 * @returns {object}
+	 */
+	ployphonicAftertouch : function(note, pressure, channel) {
+		note = Midium.noteStringToMIDICode(note);
+		channel = _.isUndefined(channel) ? this.defaultChannel : channel;
 
-	this.send(Midium.constuctMIDIMessageArray(
-		Midium.POLYPHONIC_AFTERTOUCH, channel, note, pressure
-	));
+		this.send(Midium.constuctMIDIMessageArray(
+			Midium.POLYPHONIC_AFTERTOUCH, channel, note, pressure
+		));
 
-	return this;
-};
+		return this;
+	},
 
-/**
- * Sets the value of the specified controller
- *
- * @param {note} controller      Controller number 0-127
- * @param {number} pressure      Pressure 0-127
- * @param {number} [channel]     Channel 1-16
- *
- * @returns {object}
- */
-Midium.prototype.controlChange = function(controller, value, channel) {
-	channel = _.isUndefined(channel) ? this.defaultChannel : channel;
+	/**
+	 * Sets the value of the specified controller
+	 *
+	 * @param {note} controller      Controller number 0-127
+	 * @param {number} pressure      Pressure 0-127
+	 * @param {number} [channel]     Channel 1-16
+	 *
+	 * @returns {object}
+	 */
+	controlChange : function(controller, value, channel) {
+		channel = _.isUndefined(channel) ? this.defaultChannel : channel;
 
-	this.send(Midium.constuctMIDIMessageArray(
-		Midium.CONTROL_CHANGE, channel, controller, value
-	));
+		this.send(Midium.constuctMIDIMessageArray(
+			Midium.CONTROL_CHANGE, channel, controller, value
+		));
 
-	return this;
-};
+		return this;
+	},
 
-/**
- * Sets the specified program.
- *
- * @param {note} program         Program number 0-127
- * @param {number} [channel]     Channel 1-16
- *
- * @returns {object}
- */
-Midium.prototype.programChange = function(program, channel) {
-	channel = _.isUndefined(channel) ? this.defaultChannel : channel;
+	/**
+	 * Sets the specified program.
+	 *
+	 * @param {note} program         Program number 0-127
+	 * @param {number} [channel]     Channel 1-16
+	 *
+	 * @returns {object}
+	 */
+	programChange : function(program, channel) {
+		channel = _.isUndefined(channel) ? this.defaultChannel : channel;
 
-	this.send(Midium.constuctMIDIMessageArray(
-		Midium.PROGRAM_CHANGE, channel, program, 0
-	));
+		this.send(Midium.constuctMIDIMessageArray(
+			Midium.PROGRAM_CHANGE, channel, program, 0
+		));
 
-	return this;
-};
+		return this;
+	},
 
-/**
- * Send a channel aftertouch message.
- *
- * @param {number} pressure      Pressure 0-127
- * @param {number} [channel]     Channel 1-16
- *
- * @returns {object}
- */
-Midium.prototype.channelAftertouch = function(pressure, channel) {
-	channel = _.isUndefined(channel) ? this.defaultChannel : channel;
+	/**
+	 * Send a channel aftertouch message.
+	 *
+	 * @param {number} pressure      Pressure 0-127
+	 * @param {number} [channel]     Channel 1-16
+	 *
+	 * @returns {object}
+	 */
+	channelAftertouch : function(pressure, channel) {
+		channel = _.isUndefined(channel) ? this.defaultChannel : channel;
 
-	this.send(Midium.constuctMIDIMessageArray(
-		Midium.CHANNEL_AFTERTOUCH, channel, pressure, 0
-	));
+		this.send(Midium.constuctMIDIMessageArray(
+			Midium.CHANNEL_AFTERTOUCH, channel, pressure, 0
+		));
 
-	return this;
-};
+		return this;
+	},
 
-/**
- * Sets the value of the pitch wheel.
- *
- * @param {number} value         Value 0-127
- * @param {number} [channel]     Channel 1-16
- *
- * @returns {object}
- */
-Midium.prototype.pitchWheel = function(value, channel) {
-	channel = _.isUndefined(channel) ? this.defaultChannel : channel;
+	/**
+	 * Sets the value of the pitch wheel.
+	 *
+	 * @param {number} value         Value 0-127
+	 * @param {number} [channel]     Channel 1-16
+	 *
+	 * @returns {object}
+	 */
+	pitchWheel : function(value, channel) {
+		channel = _.isUndefined(channel) ? this.defaultChannel : channel;
 
-	this.send(Midium.constuctMIDIMessageArray(
-		Midium.CHANNEL_AFTERTOUCH, channel, 0, value
-	));
+		this.send(Midium.constuctMIDIMessageArray(
+			Midium.CHANNEL_AFTERTOUCH, channel, 0, value
+		));
 
-	return this;
-};
+		return this;
+	}
+});
 
-},{"midium-core":3}]},{},[4,5,6,7]);
+},{"lodash":1,"midium-core":3}]},{},[4,5,6,7]);

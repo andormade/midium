@@ -1,13 +1,16 @@
-var Midium = require('midium-core');
+var Midium = require('midium-core'),
+	_ = require('lodash');
 
-/**
- * Setter function for the default channel.
- *
- * @param {number} channel    MIDI channel 1-16.
- *
- * @returns {object}
- */
-Midium.prototype.setDefaultChannel = function(channel) {
-	this.defaultChannel = channel;
-	return this;
-};
+_.assignIn(Midium.prototype, {
+	/**
+	 * Setter function for the default channel.
+	 *
+	 * @param {number} channel    MIDI channel 1-16.
+	 *
+	 * @returns {object}
+	 */
+	setDefaultChannel : function(channel) {
+		this.defaultChannel = channel;
+		return this;
+	}
+});
