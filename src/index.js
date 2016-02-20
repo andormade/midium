@@ -1,8 +1,8 @@
 var Midinette = require('midinette'),
 	Midium = require('midium-core'),
-	_ = require('lodash');
+	assignIn = require('lodash.assignin');
 
-_.assignIn(Midium, Midinette);
+assignIn(Midium, Midinette);
 
 require('./input');
 require('./output');

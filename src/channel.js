@@ -1,7 +1,7 @@
 var Midium = require('midium-core'),
-	_ = require('lodash');
+	assignIn = require('lodash.assignin');
 
-_.assignIn(Midium.prototype, {
+assignIn(Midium.prototype, {
 	/**
 	 * Setter function for the default channel.
 	 *

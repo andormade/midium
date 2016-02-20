@@ -1,12 +1,13 @@
 var Midium = require('midium-core'),
-	_ = require('lodash');
+	assignIn = require('lodash.assignin'),
+	isUndefined = require('lodash.isundefined');
 
-_.assignIn(Midium, {
+assignIn(Midium, {
 	MASK_EVENT_ONLY        : 0xf00000,
 	MASK_EVENT_AND_CHANNEL : 0xff0000
 });
 
-_.assignIn(Midium.prototype, {
+assignIn(Midium.prototype, {
 	/**
 	 * Registers an event listener for the note off events.
 	 *
@@ -15,8 +16,8 @@ _.assignIn(Midium.prototype, {
 	 * @returns {object} Reference of the event listener for unbinding.
 	 */
 	onNoteOff : function(callback, channel) {
-		var channel = _.isUndefined(channel) ? 1 : channel,
-			mask = _.isUndefined(channel) ?
+		var channel = isUndefined(channel) ? 1 : channel,
+			mask = isUndefined(channel) ?
 				Midium.MASK_EVENT_ONLY : Midium.MASK_EVENT_AND_CHANNEL,
 			message1 = Midium.constructMIDIMessage(
 				Midium.NOTE_OFF, channel, 0, 0
@@ -57,8 +58,8 @@ _.assignIn(Midium.prototype, {
 	 * @returns {object} Reference of the event listener for unbinding.
 	 */
 	onNoteOn : function(callback, channel) {
-		var channel = _.isUndefined(channel) ? 1 : channel,
-			mask = _.isUndefined(channel) ?
+		var channel = isUndefined(channel) ? 1 : channel,
+			mask = isUndefined(channel) ?
 				Midium.MASK_EVENT_ONLY : Midium.MASK_EVENT_AND_CHANNEL,
 			message = Midium.constructMIDIMessage(
 				Midium.NOTE_ON, channel, 0, 0
@@ -85,8 +86,8 @@ _.assignIn(Midium.prototype, {
 	 * @returns {object} Reference of the event listener for unbinding.
 	 */
 	onPolyAftertouch : function(callback, channel) {
-		var channel = _.isUndefined(channel) ? 1 : channel,
-			mask = _.isUndefined(channel) ?
+		var channel = isUndefined(channel) ? 1 : channel,
+			mask = isUndefined(channel) ?
 				Midium.MASK_EVENT_ONLY : Midium.MASK_EVENT_AND_CHANNEL,
 			message = Midium.constructMIDIMessage(
 				Midium.POLYPHONIC_AFTERTOUCH, channel, 0, 0
@@ -110,8 +111,8 @@ _.assignIn(Midium.prototype, {
 	 * @returns {object} Reference of the event listener for unbinding.
 	 */
 	onControlChange : function(callback, channel) {
-		var channel = _.isUndefined(channel) ? 1 : channel,
-			mask = _.isUndefined(channel) ?
+		var channel = isUndefined(channel) ? 1 : channel,
+			mask = isUndefined(channel) ?
 				Midium.MASK_EVENT_ONLY : Midium.MASK_EVENT_AND_CHANNEL,
 			message = Midium.constructMIDIMessage(
 				Midium.CONTROL_CHANGE, channel, 0, 0
@@ -135,8 +136,8 @@ _.assignIn(Midium.prototype, {
 	 * @returns {object} Reference of the event listener for unbinding.
 	 */
 	onProgramChange : function(callback, channel) {
-		var channel = _.isUndefined(channel) ? 1 : channel,
-			mask = _.isUndefined(channel) ?
+		var channel = isUndefined(channel) ? 1 : channel,
+			mask = isUndefined(channel) ?
 				Midium.MASK_EVENT_ONLY : Midium.MASK_EVENT_AND_CHANNEL,
 			message = Midium.constructMIDIMessage(
 				Midium.PROGRAM_CHANGE, channel, 0, 0
@@ -159,8 +160,8 @@ _.assignIn(Midium.prototype, {
 	 * @returns {object} Reference of the event listener for unbinding.
 	 */
 	onChannelAftertouch : function(callback, channel) {
-		var channel = _.isUndefined(channel) ? 1 : channel,
-			mask = _.isUndefined(channel) ?
+		var channel = isUndefined(channel) ? 1 : channel,
+			mask = isUndefined(channel) ?
 				Midium.MASK_EVENT_ONLY : Midium.MASK_EVENT_AND_CHANNEL,
 			message = Midium.constructMIDIMessage(
 				Midium.CHANNEL_AFTERTOUCH, channel, 0, 0
@@ -183,8 +184,8 @@ _.assignIn(Midium.prototype, {
 	 * @returns {object} Reference of the event listener for unbinding.
 	 */
 	onPitchWheel : function(callback, channel) {
-		var channel = _.isUndefined(channel) ? 1 : channel,
-			mask = _.isUndefined(channel) ?
+		var channel = isUndefined(channel) ? 1 : channel,
+			mask = isUndefined(channel) ?
 				Midium.MASK_EVENT_ONLY : Midium.MASK_EVENT_AND_CHANNEL,
 			message = Midium.constructMIDIMessage(
 				Midium.PITCH_WHEEL, channel, 0, 0

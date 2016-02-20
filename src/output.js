@@ -1,7 +1,8 @@
 var Midium = require('midium-core'),
-	_ = require('lodash');
+	assignIn = require('lodash.assignin'),
+	isUndefined = require('lodash.isundefined');
 
-_.assignIn(Midium.prototype, {
+assignIn(Midium.prototype, {
 	/**
 	 * Sets the specified note off.
 	 *
@@ -13,8 +14,8 @@ _.assignIn(Midium.prototype, {
 	 */
 	noteOff : function(note, velocity, channel) {
 		note = Midium.noteStringToMIDICode(note);
-		velocity = _.isUndefined(velocity) ? 127 : velocity;
-		channel = _.isUndefined(channel) ? this.defaultChannel : channel;
+		velocity = isUndefined(velocity) ? 127 : velocity;
+		channel = isUndefined(channel) ? this.defaultChannel : channel;
 
 		this.send(Midium.constuctMIDIMessageArray(
 			Midium.NOTE_OFF, channel, note, velocity
@@ -34,8 +35,8 @@ _.assignIn(Midium.prototype, {
 	 */
 	noteOn : function(note, velocity, channel) {
 		note = Midium.noteStringToMIDICode(note);
-		velocity = _.isUndefined(velocity) ? 127 : velocity;
-		channel = _.isUndefined(channel) ? this.defaultChannel : channel;
+		velocity = isUndefined(velocity) ? 127 : velocity;
+		channel = isUndefined(channel) ? this.defaultChannel : channel;
 
 		this.send(Midium.constuctMIDIMessageArray(
 			Midium.NOTE_ON, channel, note, velocity
@@ -55,7 +56,7 @@ _.assignIn(Midium.prototype, {
 	 */
 	ployphonicAftertouch : function(note, pressure, channel) {
 		note = Midium.noteStringToMIDICode(note);
-		channel = _.isUndefined(channel) ? this.defaultChannel : channel;
+		channel = isUndefined(channel) ? this.defaultChannel : channel;
 
 		this.send(Midium.constuctMIDIMessageArray(
 			Midium.POLYPHONIC_AFTERTOUCH, channel, note, pressure
@@ -74,7 +75,7 @@ _.assignIn(Midium.prototype, {
 	 * @returns {object}
 	 */
 	controlChange : function(controller, value, channel) {
-		channel = _.isUndefined(channel) ? this.defaultChannel : channel;
+		channel = isUndefined(channel) ? this.defaultChannel : channel;
 
 		this.send(Midium.constuctMIDIMessageArray(
 			Midium.CONTROL_CHANGE, channel, controller, value
@@ -92,7 +93,7 @@ _.assignIn(Midium.prototype, {
 	 * @returns {object}
 	 */
 	programChange : function(program, channel) {
-		channel = _.isUndefined(channel) ? this.defaultChannel : channel;
+		channel = isUndefined(channel) ? this.defaultChannel : channel;
 
 		this.send(Midium.constuctMIDIMessageArray(
 			Midium.PROGRAM_CHANGE, channel, program, 0
@@ -110,7 +111,7 @@ _.assignIn(Midium.prototype, {
 	 * @returns {object}
 	 */
 	channelAftertouch : function(pressure, channel) {
-		channel = _.isUndefined(channel) ? this.defaultChannel : channel;
+		channel = isUndefined(channel) ? this.defaultChannel : channel;
 
 		this.send(Midium.constuctMIDIMessageArray(
 			Midium.CHANNEL_AFTERTOUCH, channel, pressure, 0
@@ -128,7 +129,7 @@ _.assignIn(Midium.prototype, {
 	 * @returns {object}
 	 */
 	pitchWheel : function(value, channel) {
-		channel = _.isUndefined(channel) ? this.defaultChannel : channel;
+		channel = isUndefined(channel) ? this.defaultChannel : channel;
 
 		this.send(Midium.constuctMIDIMessageArray(
 			Midium.CHANNEL_AFTERTOUCH, channel, 0, value
