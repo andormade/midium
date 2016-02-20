@@ -1,13 +1,13 @@
-var Midium = require('midium-core'),
-	assignIn = require('lodash.assignin'),
-	isUndefined = require('lodash.isundefined');
+import Midium from 'midium-core';
+import assignIn from 'lodash.assignin';
+import isUndefined from 'lodash.isUndefined';
 
 assignIn(Midium, {
 	MASK_EVENT_ONLY        : 0xf00000,
 	MASK_EVENT_AND_CHANNEL : 0xff0000
 });
 
-assignIn(Midium.prototype, {
+export default {
 	/**
 	 * Registers an event listener for the note off events.
 	 *
@@ -199,4 +199,4 @@ assignIn(Midium.prototype, {
 			callback(event);
 		});
 	}
-});
+};

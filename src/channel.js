@@ -1,5 +1,5 @@
-var Midium = require('midium-core'),
-	assignIn = require('lodash.assignin');
+import Midium from 'midium-core';
+import assignIn from 'lodash.assignin';
 
 assignIn(Midium.prototype, {
 	/**

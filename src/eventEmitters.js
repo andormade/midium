@@ -1,8 +1,8 @@
-var Midium = require('midium-core'),
-	assignIn = require('lodash.assignin'),
-	isUndefined = require('lodash.isundefined');
+import Midium from 'midium-core';
+import assignIn from 'lodash.assignin';
+import isUndefined from 'lodash.isUndefined';
 
-assignIn(Midium.prototype, {
+export default {
 	/**
 	 * Sets the specified note off.
 	 *
@@ -137,4 +137,4 @@ assignIn(Midium.prototype, {
 
 		return this;
 	}
-});
+};
