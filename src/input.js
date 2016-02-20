@@ -1,15 +1,10 @@
 var Midium = require('midium-core'),
 	_ = require('lodash');
 
-const NOTE_OFF = 0x80;
-const NOTE_ON  = 0x90;
-const POLYPHONIC_AFTERTOUCH = 0xa0;
-const CONTROL_CHANGE = 0xb0;
-const PROGRAM_CHANGE = 0xc0;
-const CHANNEL_AFTERTOUCH = 0xd0;
-const PITCH_WHEEL = 0xe0;
-const EVENT_ONLY = 0xf00000;
-const EVENT_AND_CHANNEL = 0xff0000;
+_.assignIn(Midium, {
+	MASK_EVENT_ONLY        : 0xf00000,
+	MASK_EVENT_AND_CHANNEL : 0xff0000
+});
 
 _.assignIn(Midium.prototype, {
 	/**
@@ -21,9 +16,14 @@ _.assignIn(Midium.prototype, {
 	 */
 	onNoteOff : function(callback, channel) {
 		var channel = _.isUndefined(channel) ? 1 : channel,
-			mask = _.isUndefined(channel) ? EVENT_ONLY : EVENT_AND_CHANNEL,
-			message1 = Midium.constructMIDIMessage(NOTE_OFF, channel, 0, 0),
-			message2 = Midium.constructMIDIMessage(NOTE_ON, channel, 0, 0);
+			mask = _.isUndefined(channel) ?
+				Midium.MASK_EVENT_ONLY : Midium.MASK_EVENT_AND_CHANNEL,
+			message1 = Midium.constructMIDIMessage(
+				Midium.NOTE_OFF, channel, 0, 0
+			),
+			message2 = Midium.constructMIDIMessage(
+				Midium.NOTE_ON, channel, 0, 0
+			);
 
 		return [
 			this.addEventListener(message1, mask, function(event) {
@@ -58,8 +58,11 @@ _.assignIn(Midium.prototype, {
 	 */
 	onNoteOn : function(callback, channel) {
 		var channel = _.isUndefined(channel) ? 1 : channel,
-			mask = _.isUndefined(channel) ? EVENT_ONLY : EVENT_AND_CHANNEL,
-			message = Midium.constructMIDIMessage(NOTE_ON, channel, 0, 0);
+			mask = _.isUndefined(channel) ?
+				Midium.MASK_EVENT_ONLY : Midium.MASK_EVENT_AND_CHANNEL,
+			message = Midium.constructMIDIMessage(
+				Midium.NOTE_ON, channel, 0, 0
+			);
 
 		return this.addEventListener(message, mask, function(event) {
 			if (event.data[2] === 0) {
@@ -83,9 +86,10 @@ _.assignIn(Midium.prototype, {
 	 */
 	onPolyAftertouch : function(callback, channel) {
 		var channel = _.isUndefined(channel) ? 1 : channel,
-			mask = _.isUndefined(channel) ? EVENT_ONLY : EVENT_AND_CHANNEL,
+			mask = _.isUndefined(channel) ?
+				Midium.MASK_EVENT_ONLY : Midium.MASK_EVENT_AND_CHANNEL,
 			message = Midium.constructMIDIMessage(
-				POLYPHONIC_AFTERTOUCH, channel, 0, 0
+				Midium.POLYPHONIC_AFTERTOUCH, channel, 0, 0
 			);
 
 		return this.addEventListener(message, mask, function(event) {
@@ -107,9 +111,10 @@ _.assignIn(Midium.prototype, {
 	 */
 	onControlChange : function(callback, channel) {
 		var channel = _.isUndefined(channel) ? 1 : channel,
-			mask = _.isUndefined(channel) ? EVENT_ONLY : EVENT_AND_CHANNEL,
+			mask = _.isUndefined(channel) ?
+				Midium.MASK_EVENT_ONLY : Midium.MASK_EVENT_AND_CHANNEL,
 			message = Midium.constructMIDIMessage(
-				CONTROL_CHANGE, channel, 0, 0
+				Midium.CONTROL_CHANGE, channel, 0, 0
 			);
 
 		return this.addEventListener(message, mask, function(event) {
@@ -131,8 +136,11 @@ _.assignIn(Midium.prototype, {
 	 */
 	onProgramChange : function(callback, channel) {
 		var channel = _.isUndefined(channel) ? 1 : channel,
-			mask = _.isUndefined(channel) ? EVENT_ONLY : EVENT_AND_CHANNEL,
-			message = Midium.constructMIDIMessage(PROGRAM_CHANGE, channel, 0, 0);
+			mask = _.isUndefined(channel) ?
+				Midium.MASK_EVENT_ONLY : Midium.MASK_EVENT_AND_CHANNEL,
+			message = Midium.constructMIDIMessage(
+				Midium.PROGRAM_CHANGE, channel, 0, 0
+			);
 
 		return this.addEventListener(message, mask, function(event) {
 			/* Extending the MIDI event with useful infos. */
@@ -152,9 +160,10 @@ _.assignIn(Midium.prototype, {
 	 */
 	onChannelAftertouch : function(callback, channel) {
 		var channel = _.isUndefined(channel) ? 1 : channel,
-			mask = _.isUndefined(channel) ? EVENT_ONLY : EVENT_AND_CHANNEL,
+			mask = _.isUndefined(channel) ?
+				Midium.MASK_EVENT_ONLY : Midium.MASK_EVENT_AND_CHANNEL,
 			message = Midium.constructMIDIMessage(
-				CHANNEL_AFTERTOUCH, channel, 0, 0
+				Midium.CHANNEL_AFTERTOUCH, channel, 0, 0
 			);
 
 		return this.addEventListener(message, mask, function(event) {
@@ -175,8 +184,11 @@ _.assignIn(Midium.prototype, {
 	 */
 	onPitchWheel : function(callback, channel) {
 		var channel = _.isUndefined(channel) ? 1 : channel,
-			mask = _.isUndefined(channel) ? EVENT_ONLY : EVENT_AND_CHANNEL,
-			message = Midium.constructMIDIMessage(PITCH_WHEEL, channel, 0, 0);
+			mask = _.isUndefined(channel) ?
+				Midium.MASK_EVENT_ONLY : Midium.MASK_EVENT_AND_CHANNEL,
+			message = Midium.constructMIDIMessage(
+				Midium.PITCH_WHEEL, channel, 0, 0
+			);
 
 		return this.addEventListener(message, mask, function(event) {
 			/* Extending the MIDI event with useful infos. */
