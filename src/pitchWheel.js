@@ -1,8 +1,11 @@
 import Midium from 'midium-core';
 import isUndefined from 'lodash.isUndefined';
 
-const MASK_EVENT_ONLY = 0xf00000;
-const MASK_EVENT_AND_CHANNEL = 0xff0000;
+const EVENT_ONLY = 0xf00000;
+const EVENT_AND_CHANNEL = 0xff0000;
+const PITCH_WHEEL = 0xe0;
+const STATUS_STRING = 'pitchwheel';
+const ALL_CHANNEL = 0;
 
 /**
  * Sets the value of the pitch wheel.
@@ -12,11 +15,9 @@ const MASK_EVENT_AND_CHANNEL = 0xff0000;
  *
  * @returns {object}
  */
-export function pitchWheel(value, channel) {
-	channel = isUndefined(channel) ? this.defaultChannel : channel;
-
+export function pitchWheel(value, channel = this.defaultChannel) {
 	this.send(Midium.constuctMIDIMessageArray(
-		Midium.CHANNEL_AFTERTOUCH, channel, 0, value
+		PITCH_WHEEL, channel, 0, value
 	));
 
 	return this;
@@ -30,16 +31,16 @@ export function pitchWheel(value, channel) {
  *
  * @returns {object} Reference of the event listener for unbinding.
  */
-export function onPitchWheel(callback, channel) {
-	var channel = isUndefined(channel) ? 1 : channel,
-		mask = isUndefined(channel) ? MASK_EVENT_ONLY : MASK_EVENT_AND_CHANNEL,
+export function onPitchWheel(callback, channel = ALL_CHANNEL) {
+	var mask = channel === ALL_CHANNEL ? EVENT_ONLY : EVENT_AND_CHANNEL,
+		channel = channel === ALL_CHANNEL ? 1 : channel,
 		message = Midium.constructMIDIMessage(
-			Midium.PITCH_WHEEL, channel, 0, 0
+			PITCH_WHEEL, channel, 0, 0
 		);
 
 	return this.addEventListener(message, mask, function(event) {
 		/* Extending the MIDI event with useful infos. */
-		event.status = 'pitchwheel';
+		event.status = STATUS_STRING;
 		event.channel = Midium.getChannelFromStatus(event.data[0]);
 		event.pitchWheel = event.data[2];
 		callback(event);

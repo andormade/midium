@@ -9,25 +9,23 @@ import {pitchWheel, onPitchWheel} from './pitchWheel';
 import {polyAftertouch, onPolyAftertouch} from './polyAftertouch';
 import {programChange, onProgramChange} from './programChange';
 
-Object.assign(
-	Midium, Midinette
-);
+Object.assign(Midium, Midinette);
 
 Object.assign(Midium.prototype, {
 	onChannelAftertouch : onChannelAftertouch,
-	onControlChange : onControlChange,
-	onNoteOff : onNoteOff,
-	onNoteOn : onNoteOn,
-	onPitchWheel : onPitchWheel,
-	onPolyAftertouch : onPolyAftertouch,
-	onProgramChange : onProgramChange,
-	channelAftertouch : channelAftertouch,
-	controlChange : controlChange,
-	noteOff : noteOff,
-	noteOn : noteOn,
-	pitchWheel : pitchWheel,
-	polyAftertouch : polyAftertouch,
-	programChange : programChange
+	onControlChange     : onControlChange,
+	onNoteOff           : onNoteOff,
+	onNoteOn            : onNoteOn,
+	onPitchWheel        : onPitchWheel,
+	onPolyAftertouch    : onPolyAftertouch,
+	onProgramChange     : onProgramChange,
+	channelAftertouch   : channelAftertouch,
+	controlChange       : controlChange,
+	noteOff             : noteOff,
+	noteOn              : noteOn,
+	pitchWheel          : pitchWheel,
+	polyAftertouch      : polyAftertouch,
+	programChange       : programChange
 });
 
 global.Midium = Midium;

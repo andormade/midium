@@ -1,8 +1,11 @@
 import Midium from 'midium-core';
 import isUndefined from 'lodash.isUndefined';
 
-const MASK_EVENT_ONLY = 0xf00000;
-const MASK_EVENT_AND_CHANNEL = 0xff0000;
+const EVENT_ONLY = 0xf00000;
+const EVENT_AND_CHANNEL = 0xff0000;
+const CONTROL_CHANGE = 0xb0;
+const STATUS_STRING = 'controlchange';
+const ALL_CHANNEL = 0;
 
 /**
  * Sets the value of the specified controller
@@ -13,11 +16,11 @@ const MASK_EVENT_AND_CHANNEL = 0xff0000;
  *
  * @returns {object}
  */
-export function controlChange(controller, value, channel) {
-	channel = isUndefined(channel) ? this.defaultChannel : channel;
-
+export function controlChange(
+	controller, value, channel = this.defaultChannel
+) {
 	this.send(Midium.constuctMIDIMessageArray(
-		Midium.CONTROL_CHANGE, channel, controller, value
+		CONTROL_CHANGE, channel, controller, value
 	));
 
 	return this;
@@ -31,16 +34,14 @@ export function controlChange(controller, value, channel) {
  *
  * @returns {object} Reference of the event listener for unbinding.
  */
-export function onControlChange(callback, channel) {
-	var channel = isUndefined(channel) ? 1 : channel,
-		mask = isUndefined(channel) ? MASK_EVENT_ONLY : MASK_EVENT_AND_CHANNEL,
-		message = Midium.constructMIDIMessage(
-			Midium.CONTROL_CHANGE, channel, 0, 0
-		);
+export function onControlChange(callback, channel = ALL_CHANNEL) {
+	var mask = channel === ALL_CHANNEL ? EVENT_ONLY : EVENT_AND_CHANNEL,
+		channel = channel === ALL_CHANNEL ? 1 : channel,
+		message = Midium.constructMIDIMessage(CONTROL_CHANGE, channel, 0, 0);
 
 	return this.addEventListener(message, mask, function(event) {
 		/* Extending the MIDI event with useful infos. */
-		event.status = 'controlchange';
+		event.status = STATUS_STRING;
 		event.channel = Midium.getChannelFromStatus(event.data[0]);
 		event.controller = event.data[1];
 		event.controllerValue = event.data[2];

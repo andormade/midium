@@ -1,8 +1,11 @@
 import Midium from 'midium-core';
 import isUndefined from 'lodash.isUndefined';
 
-const MASK_EVENT_ONLY = 0xf00000;
-const MASK_EVENT_AND_CHANNEL = 0xff0000;
+const EVENT_ONLY = 0xf00000;
+const EVENT_AND_CHANNEL = 0xff0000;
+const POLYPHONIC_AFTERTOUCH = 0xa0;
+const STATUS_STRING = 'polyaftertouch';
+const ALL_CHANNEL = 0;
 
 /**
  * Sends a polyphonic aftertouch message.
@@ -13,12 +16,11 @@ const MASK_EVENT_AND_CHANNEL = 0xff0000;
  *
  * @returns {object}
  */
-export function polyAftertouch(note, pressure, channel) {
+export function polyAftertouch(note, pressure, channel = this.defaultChannel) {
 	note = Midium.noteStringToMIDICode(note);
-	channel = isUndefined(channel) ? this.defaultChannel : channel;
 
 	this.send(Midium.constuctMIDIMessageArray(
-		Midium.POLYPHONIC_AFTERTOUCH, channel, note, pressure
+		POLYPHONIC_AFTERTOUCH, channel, note, pressure
 	));
 
 	return this;
@@ -32,16 +34,16 @@ export function polyAftertouch(note, pressure, channel) {
  *
  * @returns {object} Reference of the event listener for unbinding.
  */
-export function onPolyAftertouch(callback, channel) {
-	var channel = isUndefined(channel) ? 1 : channel,
-		mask = isUndefined(channel) ? MASK_EVENT_ONLY : MASK_EVENT_AND_CHANNEL,
+export function onPolyAftertouch(callback, channel = ALL_CHANNEL) {
+	var mask = channel === ALL_CHANNEL ? EVENT_ONLY : EVENT_AND_CHANNEL,
+		channel = channel === ALL_CHANNEL ? 1 : channel,
 		message = Midium.constructMIDIMessage(
-			Midium.POLYPHONIC_AFTERTOUCH, channel, 0, 0
+			POLYPHONIC_AFTERTOUCH, channel, 0, 0
 		);
 
 	return this.addEventListener(message, mask, function(event) {
 		/* Extending the MIDI event with useful infos. */
-		event.status = 'polyaftertouch';
+		event.status = STATUS_STRING;
 		event.channel = Midium.getChannelFromStatus(event.data[0]);
 		event.note = event.data[1];
 		event.pressure = event.data[2];
