@@ -1852,9 +1852,10 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
-  value: true
+	value: true
 });
-exports.default = channelAftertouch;
+exports.channelAftertouch = channelAftertouch;
+exports.onChannelAftertouch = onChannelAftertouch;
 
 var _midiumCore = require('midium-core');
 
@@ -1865,6 +1866,9 @@ var _lodash = require('lodash.isUndefined');
 var _lodash2 = _interopRequireDefault(_lodash);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var MASK_EVENT_ONLY = 0xf00000;
+var MASK_EVENT_AND_CHANNEL = 0xff0000;
 
 /**
  * Send a channel aftertouch message.
@@ -1875,20 +1879,43 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * @returns {object}
  */
 function channelAftertouch(pressure, channel) {
-  channel = (0, _lodash2.default)(channel) ? this.defaultChannel : channel;
+	channel = (0, _lodash2.default)(channel) ? this.defaultChannel : channel;
 
-  this.send(_midiumCore2.default.constuctMIDIMessageArray(_midiumCore2.default.CHANNEL_AFTERTOUCH, channel, pressure, 0));
+	this.send(_midiumCore2.default.constuctMIDIMessageArray(_midiumCore2.default.CHANNEL_AFTERTOUCH, channel, pressure, 0));
 
-  return this;
+	return this;
+};
+
+/**
+ * Registers an event listener for the channel aftertouch events.
+ *
+ * @param {function} callback
+ * @param {number} [channel]
+ *
+ * @returns {object} Reference of the event listener for unbinding.
+ */
+function onChannelAftertouch(callback, channel) {
+	var channel = (0, _lodash2.default)(channel) ? 1 : channel,
+	    mask = (0, _lodash2.default)(channel) ? MASK_EVENT_ONLY : MASK_EVENT_AND_CHANNEL,
+	    message = _midiumCore2.default.constructMIDIMessage(_midiumCore2.default.CHANNEL_AFTERTOUCH, channel, 0, 0);
+
+	return this.addEventListener(message, mask, function (event) {
+		/* Extending the MIDI event with useful infos. */
+		event.status = 'channelaftertouch';
+		event.channel = _midiumCore2.default.getChannelFromStatus(event.data[0]);
+		event.pressure = event.data[1];
+		callback(event);
+	});
 };
 
 },{"lodash.isUndefined":5,"midium-core":7}],10:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
-  value: true
+	value: true
 });
-exports.default = controlChange;
+exports.controlChange = controlChange;
+exports.onControlChange = onControlChange;
 
 var _midiumCore = require('midium-core');
 
@@ -1899,6 +1926,9 @@ var _lodash = require('lodash.isUndefined');
 var _lodash2 = _interopRequireDefault(_lodash);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var MASK_EVENT_ONLY = 0xf00000;
+var MASK_EVENT_AND_CHANNEL = 0xff0000;
 
 /**
  * Sets the value of the specified controller
@@ -1910,11 +1940,34 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * @returns {object}
  */
 function controlChange(controller, value, channel) {
-  channel = (0, _lodash2.default)(channel) ? this.defaultChannel : channel;
+	channel = (0, _lodash2.default)(channel) ? this.defaultChannel : channel;
 
-  this.send(_midiumCore2.default.constuctMIDIMessageArray(_midiumCore2.default.CONTROL_CHANGE, channel, controller, value));
+	this.send(_midiumCore2.default.constuctMIDIMessageArray(_midiumCore2.default.CONTROL_CHANGE, channel, controller, value));
 
-  return this;
+	return this;
+};
+
+/**
+ * Registers an event listener for the control change events.
+ *
+ * @param {function} callback
+ * @param {number} [channel]
+ *
+ * @returns {object} Reference of the event listener for unbinding.
+ */
+function onControlChange(callback, channel) {
+	var channel = (0, _lodash2.default)(channel) ? 1 : channel,
+	    mask = (0, _lodash2.default)(channel) ? MASK_EVENT_ONLY : MASK_EVENT_AND_CHANNEL,
+	    message = _midiumCore2.default.constructMIDIMessage(_midiumCore2.default.CONTROL_CHANGE, channel, 0, 0);
+
+	return this.addEventListener(message, mask, function (event) {
+		/* Extending the MIDI event with useful infos. */
+		event.status = 'controlchange';
+		event.channel = _midiumCore2.default.getChannelFromStatus(event.data[0]);
+		event.controller = event.data[1];
+		event.controllerValue = event.data[2];
+		callback(event);
+	});
 };
 
 },{"lodash.isUndefined":5,"midium-core":7}],11:[function(require,module,exports){
@@ -1937,94 +1990,53 @@ var _channel = require('./channel');
 
 var _channel2 = _interopRequireDefault(_channel);
 
-var _onNoteOff = require('./onNoteOff');
-
-var _onNoteOff2 = _interopRequireDefault(_onNoteOff);
-
-var _onNoteOn = require('./onNoteOn');
-
-var _onNoteOn2 = _interopRequireDefault(_onNoteOn);
-
-var _onChannelAftertouch = require('./onChannelAftertouch');
-
-var _onChannelAftertouch2 = _interopRequireDefault(_onChannelAftertouch);
-
-var _onControlChange = require('./onControlChange');
-
-var _onControlChange2 = _interopRequireDefault(_onControlChange);
-
-var _onPitchWheel = require('./onPitchWheel');
-
-var _onPitchWheel2 = _interopRequireDefault(_onPitchWheel);
-
-var _onPolyAftertouch = require('./onPolyAftertouch');
-
-var _onPolyAftertouch2 = _interopRequireDefault(_onPolyAftertouch);
-
-var _onProgramChange = require('./onProgramChange');
-
-var _onProgramChange2 = _interopRequireDefault(_onProgramChange);
-
 var _channelAftertouch = require('./channelAftertouch');
-
-var _channelAftertouch2 = _interopRequireDefault(_channelAftertouch);
 
 var _controlChange = require('./controlChange');
 
-var _controlChange2 = _interopRequireDefault(_controlChange);
-
 var _noteOff = require('./noteOff');
-
-var _noteOff2 = _interopRequireDefault(_noteOff);
 
 var _noteOn = require('./noteOn');
 
-var _noteOn2 = _interopRequireDefault(_noteOn);
-
 var _pitchWheel = require('./pitchWheel');
-
-var _pitchWheel2 = _interopRequireDefault(_pitchWheel);
 
 var _polyAftertouch = require('./polyAftertouch');
 
-var _polyAftertouch2 = _interopRequireDefault(_polyAftertouch);
-
 var _programChange = require('./programChange');
-
-var _programChange2 = _interopRequireDefault(_programChange);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 Object.assign(_midiumCore2.default, _midinette2.default);
 
 Object.assign(_midiumCore2.default.prototype, {
-	onChannelAftertouch: _onChannelAftertouch2.default,
-	onControlChange: _onControlChange2.default,
-	onNoteOff: _onNoteOff2.default,
-	onNoteOn: _onNoteOn2.default,
-	onPitchWheel: _onPitchWheel2.default,
-	onPolyAftertouch: _onPolyAftertouch2.default,
-	onProgramChange: _onProgramChange2.default,
-	channelAftertouch: _channelAftertouch2.default,
-	controlChange: _controlChange2.default,
-	noteOff: _noteOff2.default,
-	noteOn: _noteOn2.default,
-	pitchWheel: _pitchWheel2.default,
-	polyAftertouch: _polyAftertouch2.default,
-	programChange: _programChange2.default
+	onChannelAftertouch: _channelAftertouch.onChannelAftertouch,
+	onControlChange: _controlChange.onControlChange,
+	onNoteOff: _noteOff.onNoteOff,
+	onNoteOn: _noteOn.onNoteOn,
+	onPitchWheel: _pitchWheel.onPitchWheel,
+	onPolyAftertouch: _polyAftertouch.onPolyAftertouch,
+	onProgramChange: _programChange.onProgramChange,
+	channelAftertouch: _channelAftertouch.channelAftertouch,
+	controlChange: _controlChange.controlChange,
+	noteOff: _noteOff.noteOff,
+	noteOn: _noteOn.noteOn,
+	pitchWheel: _pitchWheel.pitchWheel,
+	polyAftertouch: _polyAftertouch.polyAftertouch,
+	programChange: _programChange.programChange
 });
 
 global.Midium = _midiumCore2.default;
 exports.default = _midiumCore2.default;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./channel":8,"./channelAftertouch":9,"./controlChange":10,"./noteOff":12,"./noteOn":13,"./onChannelAftertouch":14,"./onControlChange":15,"./onNoteOff":16,"./onNoteOn":17,"./onPitchWheel":18,"./onPolyAftertouch":19,"./onProgramChange":20,"./pitchWheel":21,"./polyAftertouch":22,"./programChange":23,"midinette":6,"midium-core":7}],12:[function(require,module,exports){
+},{"./channel":8,"./channelAftertouch":9,"./controlChange":10,"./noteOff":12,"./noteOn":13,"./pitchWheel":21,"./polyAftertouch":22,"./programChange":23,"midinette":6,"midium-core":7}],12:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
-  value: true
+	value: true
 });
-exports.default = noteOff;
+exports.noteOff = noteOff;
+exports.onNoteOff = onNoteOff;
 
 var _midiumCore = require('midium-core');
 
@@ -2035,6 +2047,9 @@ var _lodash = require('lodash.isUndefined');
 var _lodash2 = _interopRequireDefault(_lodash);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var MASK_EVENT_ONLY = 0xf00000;
+var MASK_EVENT_AND_CHANNEL = 0xff0000;
 
 /**
  * Sets the specified note off.
@@ -2046,22 +2061,57 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * @returns {object}
  */
 function noteOff(note, velocity, channel) {
-  note = _midiumCore2.default.noteStringToMIDICode(note);
-  velocity = (0, _lodash2.default)(velocity) ? 127 : velocity;
-  channel = (0, _lodash2.default)(channel) ? this.defaultChannel : channel;
+	note = _midiumCore2.default.noteStringToMIDICode(note);
+	velocity = (0, _lodash2.default)(velocity) ? 127 : velocity;
+	channel = (0, _lodash2.default)(channel) ? this.defaultChannel : channel;
 
-  this.send(_midiumCore2.default.constuctMIDIMessageArray(_midiumCore2.default.NOTE_OFF, channel, note, velocity));
+	this.send(_midiumCore2.default.constuctMIDIMessageArray(_midiumCore2.default.NOTE_OFF, channel, note, velocity));
 
-  return this;
+	return this;
+};
+
+/**
+ * Registers an event listener for the note off events.
+ *
+ * @param {function} callback
+ * @param {number} [channel]
+ * @returns {object} Reference of the event listener for unbinding.
+ */
+function onNoteOff(callback, channel) {
+	var channel = (0, _lodash2.default)(channel) ? 1 : channel,
+	    mask = (0, _lodash2.default)(channel) ? MASK_EVENT_ONLY : MASK_EVENT_AND_CHANNEL,
+	    message1 = _midiumCore2.default.constructMIDIMessage(_midiumCore2.default.NOTE_OFF, channel, 0, 0),
+	    message2 = _midiumCore2.default.constructMIDIMessage(_midiumCore2.default.NOTE_ON, channel, 0, 0);
+
+	return [this.addEventListener(message1, mask, function (event) {
+		/* Extending the MIDI event with useful infos. */
+		event.status = 'noteoff';
+		event.channel = _midiumCore2.default.getChannelFromStatus(event.data[0]);
+		event.note = event.data[1];
+		event.velocity = event.data[2];
+		callback(event);
+	}), this.addEventListener(message2, mask, function (event) {
+		/* By note on event, velocity 0 means note off. */
+		if (event.data[2] !== 0) {
+			return;
+		}
+		/* Extending the MIDI event with useful infos. */
+		event.status = 'noteoff';
+		event.channel = _midiumCore2.default.getChannelFromStatus(event.data[0]);
+		event.note = event.data[1];
+		event.velocity = 0;
+		callback(event);
+	})];
 };
 
 },{"lodash.isUndefined":5,"midium-core":7}],13:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
-  value: true
+	value: true
 });
-exports.default = noteOn;
+exports.noteOn = noteOn;
+exports.onNoteOn = onNoteOn;
 
 var _midiumCore = require('midium-core');
 
@@ -2073,6 +2123,9 @@ var _lodash2 = _interopRequireDefault(_lodash);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+var MASK_EVENT_ONLY = 0xf00000;
+var MASK_EVENT_AND_CHANNEL = 0xff0000;
+
 /**
  * Sets the specified note on.
  *
@@ -2083,13 +2136,39 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * @returns {object}
  */
 function noteOn(note, velocity, channel) {
-  note = _midiumCore2.default.noteStringToMIDICode(note);
-  velocity = (0, _lodash2.default)(velocity) ? 127 : velocity;
-  channel = (0, _lodash2.default)(channel) ? this.defaultChannel : channel;
+	note = _midiumCore2.default.noteStringToMIDICode(note);
+	velocity = (0, _lodash2.default)(velocity) ? 127 : velocity;
+	channel = (0, _lodash2.default)(channel) ? this.defaultChannel : channel;
 
-  this.send(_midiumCore2.default.constuctMIDIMessageArray(_midiumCore2.default.NOTE_ON, channel, note, velocity));
+	this.send(_midiumCore2.default.constuctMIDIMessageArray(_midiumCore2.default.NOTE_ON, channel, note, velocity));
 
-  return this;
+	return this;
+};
+
+/**
+ * Registers an event listener for the note on events.
+ *
+ * @param {function} callback
+ * @param {number} [channel]
+ *
+ * @returns {object} Reference of the event listener for unbinding.
+ */
+function onNoteOn(callback, channel) {
+	var channel = (0, _lodash2.default)(channel) ? 1 : channel,
+	    mask = (0, _lodash2.default)(channel) ? MASK_EVENT_ONLY : MASK_EVENT_AND_CHANNEL,
+	    message = _midiumCore2.default.constructMIDIMessage(_midiumCore2.default.NOTE_ON, channel, 0, 0);
+
+	return this.addEventListener(message, mask, function (event) {
+		if (event.data[2] === 0) {
+			return;
+		}
+		/* Extending the MIDI event with useful infos. */
+		event.status = 'noteon';
+		event.channel = _midiumCore2.default.getChannelFromStatus(event.data[0]);
+		event.note = event.data[1];
+		event.velocity = event.data[2];
+		callback(event);
+	});
 };
 
 },{"lodash.isUndefined":5,"midium-core":7}],14:[function(require,module,exports){
@@ -2415,9 +2494,10 @@ function onProgramChange(callback, channel) {
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
-  value: true
+	value: true
 });
-exports.default = pitchWheel;
+exports.pitchWheel = pitchWheel;
+exports.onPitchWheel = onPitchWheel;
 
 var _midiumCore = require('midium-core');
 
@@ -2428,6 +2508,9 @@ var _lodash = require('lodash.isUndefined');
 var _lodash2 = _interopRequireDefault(_lodash);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var MASK_EVENT_ONLY = 0xf00000;
+var MASK_EVENT_AND_CHANNEL = 0xff0000;
 
 /**
  * Sets the value of the pitch wheel.
@@ -2438,20 +2521,43 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * @returns {object}
  */
 function pitchWheel(value, channel) {
-  channel = (0, _lodash2.default)(channel) ? this.defaultChannel : channel;
+	channel = (0, _lodash2.default)(channel) ? this.defaultChannel : channel;
 
-  this.send(_midiumCore2.default.constuctMIDIMessageArray(_midiumCore2.default.CHANNEL_AFTERTOUCH, channel, 0, value));
+	this.send(_midiumCore2.default.constuctMIDIMessageArray(_midiumCore2.default.CHANNEL_AFTERTOUCH, channel, 0, value));
 
-  return this;
+	return this;
+};
+
+/**
+ * Registers an event listener for the pitch wheel events.
+ *
+ * @param {function} callback
+ * @param {number} [channel]
+ *
+ * @returns {object} Reference of the event listener for unbinding.
+ */
+function onPitchWheel(callback, channel) {
+	var channel = (0, _lodash2.default)(channel) ? 1 : channel,
+	    mask = (0, _lodash2.default)(channel) ? MASK_EVENT_ONLY : MASK_EVENT_AND_CHANNEL,
+	    message = _midiumCore2.default.constructMIDIMessage(_midiumCore2.default.PITCH_WHEEL, channel, 0, 0);
+
+	return this.addEventListener(message, mask, function (event) {
+		/* Extending the MIDI event with useful infos. */
+		event.status = 'pitchwheel';
+		event.channel = _midiumCore2.default.getChannelFromStatus(event.data[0]);
+		event.pitchWheel = event.data[2];
+		callback(event);
+	});
 };
 
 },{"lodash.isUndefined":5,"midium-core":7}],22:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
-  value: true
+	value: true
 });
-exports.default = polyAftertouch;
+exports.polyAftertouch = polyAftertouch;
+exports.onPolyAftertouch = onPolyAftertouch;
 
 var _midiumCore = require('midium-core');
 
@@ -2462,6 +2568,9 @@ var _lodash = require('lodash.isUndefined');
 var _lodash2 = _interopRequireDefault(_lodash);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var MASK_EVENT_ONLY = 0xf00000;
+var MASK_EVENT_AND_CHANNEL = 0xff0000;
 
 /**
  * Sends a polyphonic aftertouch message.
@@ -2473,21 +2582,45 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * @returns {object}
  */
 function polyAftertouch(note, pressure, channel) {
-  note = _midiumCore2.default.noteStringToMIDICode(note);
-  channel = (0, _lodash2.default)(channel) ? this.defaultChannel : channel;
+	note = _midiumCore2.default.noteStringToMIDICode(note);
+	channel = (0, _lodash2.default)(channel) ? this.defaultChannel : channel;
 
-  this.send(_midiumCore2.default.constuctMIDIMessageArray(_midiumCore2.default.POLYPHONIC_AFTERTOUCH, channel, note, pressure));
+	this.send(_midiumCore2.default.constuctMIDIMessageArray(_midiumCore2.default.POLYPHONIC_AFTERTOUCH, channel, note, pressure));
 
-  return this;
+	return this;
+};
+
+/**
+ * Registers an event listener for the polyphonic aftertouch events.
+ *
+ * @param {function} callback
+ * @param {number} [channel]
+ *
+ * @returns {object} Reference of the event listener for unbinding.
+ */
+function onPolyAftertouch(callback, channel) {
+	var channel = (0, _lodash2.default)(channel) ? 1 : channel,
+	    mask = (0, _lodash2.default)(channel) ? MASK_EVENT_ONLY : MASK_EVENT_AND_CHANNEL,
+	    message = _midiumCore2.default.constructMIDIMessage(_midiumCore2.default.POLYPHONIC_AFTERTOUCH, channel, 0, 0);
+
+	return this.addEventListener(message, mask, function (event) {
+		/* Extending the MIDI event with useful infos. */
+		event.status = 'polyaftertouch';
+		event.channel = _midiumCore2.default.getChannelFromStatus(event.data[0]);
+		event.note = event.data[1];
+		event.pressure = event.data[2];
+		callback(event);
+	});
 };
 
 },{"lodash.isUndefined":5,"midium-core":7}],23:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
-  value: true
+	value: true
 });
-exports.default = programChange;
+exports.programChange = programChange;
+exports.onProgramChange = onProgramChange;
 
 var _midiumCore = require('midium-core');
 
@@ -2499,6 +2632,9 @@ var _lodash2 = _interopRequireDefault(_lodash);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+var MASK_EVENT_ONLY = 0xf00000;
+var MASK_EVENT_AND_CHANNEL = 0xff0000;
+
 /**
  * Sets the specified program.
  *
@@ -2508,11 +2644,33 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * @returns {object}
  */
 function programChange(program, channel) {
-  channel = (0, _lodash2.default)(channel) ? this.defaultChannel : channel;
+	channel = (0, _lodash2.default)(channel) ? this.defaultChannel : channel;
 
-  this.send(_midiumCore2.default.constuctMIDIMessageArray(_midiumCore2.default.PROGRAM_CHANGE, channel, program, 0));
+	this.send(_midiumCore2.default.constuctMIDIMessageArray(_midiumCore2.default.PROGRAM_CHANGE, channel, program, 0));
 
-  return this;
+	return this;
+};
+
+/**
+ * Registers an event listener for the program change events.
+ *
+ * @param {function} callback
+ * @param {number} [channel]
+ *
+ * @returns {object} Reference of the event listener for unbinding.
+ */
+function onProgramChange(callback, channel) {
+	var channel = (0, _lodash2.default)(channel) ? 1 : channel,
+	    mask = (0, _lodash2.default)(channel) ? MASK_EVENT_ONLY : MASK_EVENT_AND_CHANNEL,
+	    message = _midiumCore2.default.constructMIDIMessage(_midiumCore2.default.PROGRAM_CHANGE, channel, 0, 0);
+
+	return this.addEventListener(message, mask, function (event) {
+		/* Extending the MIDI event with useful infos. */
+		event.status = 'programchange';
+		event.channel = _midiumCore2.default.getChannelFromStatus(event.data[0]);
+		event.program = event.data[1];
+		callback(event);
+	});
 };
 
 },{"lodash.isUndefined":5,"midium-core":7}]},{},[8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23]);

@@ -1,20 +1,13 @@
 import Midinette from 'midinette';
 import Midium from 'midium-core';
 import channel from './channel';
-import onNoteOff from './onNoteOff';
-import onNoteOn from './onNoteOn';
-import onChannelAftertouch from './onChannelAftertouch';
-import onControlChange from './onControlChange';
-import onPitchWheel from './onPitchWheel';
-import onPolyAftertouch from './onPolyAftertouch';
-import onProgramChange from './onProgramChange';
-import channelAftertouch from './channelAftertouch';
-import controlChange from './controlChange';
-import noteOff from './noteOff';
-import noteOn from './noteOn';
-import pitchWheel from './pitchWheel';
-import polyAftertouch from './polyAftertouch';
-import programChange from './programChange';
+import {channelAftertouch, onChannelAftertouch} from './channelAftertouch';
+import {controlChange, onControlChange} from './controlChange';
+import {noteOff, onNoteOff} from './noteOff';
+import {noteOn, onNoteOn} from './noteOn';
+import {pitchWheel, onPitchWheel} from './pitchWheel';
+import {polyAftertouch, onPolyAftertouch} from './polyAftertouch';
+import {programChange, onProgramChange} from './programChange';
 
 Object.assign(
 	Midium, Midinette
