@@ -1,5 +1,4 @@
 import Midium from 'midium-core';
-import isUndefined from 'lodash.isUndefined';
 
 const EVENT_ONLY = 0xf00000;
 const EVENT_AND_CHANNEL = 0xff0000;

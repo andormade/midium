@@ -1,6 +1,6 @@
 import Midinette from 'midinette';
 import Midium from 'midium-core';
-import channel from './channel';
+import {setDefaultChannel} from './channel';
 import {channelAftertouch, onChannelAftertouch} from './channelAftertouch';
 import {controlChange, onControlChange} from './controlChange';
 import {noteOff, onNoteOff} from './noteOff';
@@ -25,7 +25,8 @@ Object.assign(Midium.prototype, {
 	noteOn              : noteOn,
 	pitchWheel          : pitchWheel,
 	polyAftertouch      : polyAftertouch,
-	programChange       : programChange
+	programChange       : programChange,
+	setDefaultChannel   : setDefaultChannel
 });
 
 global.Midium = Midium;
