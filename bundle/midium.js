@@ -201,6 +201,7 @@ Object.assign(_midiumCore2.default.prototype, {
 
 global.Midium = _midiumCore2.default;
 exports.default = _midiumCore2.default;
+module.exports = exports['default'];
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"./channel":1,"./channelAftertouch":2,"./controlChange":3,"./noteOff":5,"./noteOn":6,"./pitchWheel":7,"./polyAftertouch":8,"./programChange":9,"midinette":12,"midium-core":15}],5:[function(require,module,exports){
 'use strict';

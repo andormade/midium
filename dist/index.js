@@ -52,3 +52,4 @@ Object.assign(_midiumCore2.default.prototype, {
 
 global.Midium = _midiumCore2.default;
 exports.default = _midiumCore2.default;
+module.exports = exports['default'];
