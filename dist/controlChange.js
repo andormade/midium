@@ -30,7 +30,7 @@ var ALL_CHANNEL = 0;
 function controlChange(controller, value) {
 	var channel = arguments.length <= 2 || arguments[2] === undefined ? this.defaultChannel : arguments[2];
 
-	this.send(_midiumCore2.default.constuctMIDIMessageArray(CONTROL_CHANGE, channel, controller, value));
+	this.send(_midiumCore2.default.constructMIDIMessage(CONTROL_CHANGE, channel, controller, value));
 
 	return this;
 };

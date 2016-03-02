@@ -5,7 +5,7 @@ const EVENT_AND_CHANNEL = 0xff0000;
 const NOTE_ON = 0x90;
 const NOTE_OFF = 0x80;
 const STATUS_STRING = 'noteoff';
-const DEFAULT_VELOCITY = 127;
+const DEFAULT_VELOCITY = 0;
 const ALL_CHANNEL = 0;
 
 /**
@@ -22,7 +22,7 @@ export function noteOff(
 ) {
 	note = Midium.noteStringToMIDICode(note);
 
-	this.send(Midium.constuctMIDIMessageArray(
+	this.send(Midium.constructMIDIMessage(
 		NOTE_OFF, channel, note, velocity
 	));
 

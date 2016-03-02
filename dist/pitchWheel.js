@@ -29,7 +29,7 @@ var ALL_CHANNEL = 0;
 function pitchWheel(value) {
 	var channel = arguments.length <= 1 || arguments[1] === undefined ? this.defaultChannel : arguments[1];
 
-	this.send(_midiumCore2.default.constuctMIDIMessageArray(PITCH_WHEEL, channel, 0, value));
+	this.send(_midiumCore2.default.constructMIDIMessage(PITCH_WHEEL, channel, 0, value));
 
 	return this;
 };

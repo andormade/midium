@@ -29,7 +29,7 @@ var ALL_CHANNEL = 0;
 function channelAftertouch(pressure) {
 	var channel = arguments.length <= 1 || arguments[1] === undefined ? this.defaultChannel : arguments[1];
 
-	this.send(_midiumCore2.default.constuctMIDIMessageArray(CHANNEL_AFTERTOUCH, channel, pressure, 0));
+	this.send(_midiumCore2.default.constructMIDIMessage(CHANNEL_AFTERTOUCH, channel, pressure, 0));
 
 	return this;
 };

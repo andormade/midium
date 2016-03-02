@@ -23,7 +23,7 @@ export function noteOn(
 ) {
 	note = Midium.noteStringToMIDICode(note);
 
-	this.send(Midium.constuctMIDIMessageArray(
+	this.send(Midium.constructMIDIMessage(
 		NOTE_ON, channel, note, velocity
 	));
 

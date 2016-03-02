@@ -34,7 +34,7 @@ function noteOn(note) {
 
 	note = _midiumCore2.default.noteStringToMIDICode(note);
 
-	this.send(_midiumCore2.default.constuctMIDIMessageArray(NOTE_ON, channel, note, velocity));
+	this.send(_midiumCore2.default.constructMIDIMessage(NOTE_ON, channel, note, velocity));
 
 	return this;
 };

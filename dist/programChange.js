@@ -29,7 +29,7 @@ var ALL_CHANNEL = 0;
 function programChange(program) {
 	var channel = arguments.length <= 1 || arguments[1] === undefined ? this.defaultChannel : arguments[1];
 
-	this.send(_midiumCore2.default.constuctMIDIMessageArray(PROGRAM_CHANGE, channel, program, 0));
+	this.send(_midiumCore2.default.constructMIDIMessage(PROGRAM_CHANGE, channel, program, 0));
 
 	return this;
 };

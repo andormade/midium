@@ -15,7 +15,7 @@ const ALL_CHANNEL = 0;
  * @returns {object}
  */
 export function programChange(program, channel = this.defaultChannel) {
-	this.send(Midium.constuctMIDIMessageArray(
+	this.send(Midium.constructMIDIMessage(
 		PROGRAM_CHANGE, channel, program, 0
 	));
 

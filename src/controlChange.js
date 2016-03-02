@@ -18,7 +18,7 @@ const ALL_CHANNEL = 0;
 export function controlChange(
 	controller, value, channel = this.defaultChannel
 ) {
-	this.send(Midium.constuctMIDIMessageArray(
+	this.send(Midium.constructMIDIMessage(
 		CONTROL_CHANGE, channel, controller, value
 	));
 

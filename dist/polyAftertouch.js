@@ -32,7 +32,7 @@ function polyAftertouch(note, pressure) {
 
 	note = _midiumCore2.default.noteStringToMIDICode(note);
 
-	this.send(_midiumCore2.default.constuctMIDIMessageArray(POLYPHONIC_AFTERTOUCH, channel, note, pressure));
+	this.send(_midiumCore2.default.constructMIDIMessage(POLYPHONIC_AFTERTOUCH, channel, note, pressure));
 
 	return this;
 };

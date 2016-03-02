@@ -15,7 +15,7 @@ const ALL_CHANNEL = 0;
  * @returns {object}
  */
 export function pitchWheel(value, channel = this.defaultChannel) {
-	this.send(Midium.constuctMIDIMessageArray(
+	this.send(Midium.constructMIDIMessage(
 		PITCH_WHEEL, channel, 0, value
 	));
 

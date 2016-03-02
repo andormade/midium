@@ -17,7 +17,7 @@ var EVENT_AND_CHANNEL = 0xff0000;
 var NOTE_ON = 0x90;
 var NOTE_OFF = 0x80;
 var STATUS_STRING = 'noteoff';
-var DEFAULT_VELOCITY = 127;
+var DEFAULT_VELOCITY = 0;
 var ALL_CHANNEL = 0;
 
 /**
@@ -35,7 +35,7 @@ function noteOff(note) {
 
 	note = _midiumCore2.default.noteStringToMIDICode(note);
 
-	this.send(_midiumCore2.default.constuctMIDIMessageArray(NOTE_OFF, channel, note, velocity));
+	this.send(_midiumCore2.default.constructMIDIMessage(NOTE_OFF, channel, note, velocity));
 
 	return this;
 };

@@ -18,7 +18,7 @@ const ALL_CHANNEL = 0;
 export function polyAftertouch(note, pressure, channel = this.defaultChannel) {
 	note = Midium.noteStringToMIDICode(note);
 
-	this.send(Midium.constuctMIDIMessageArray(
+	this.send(Midium.constructMIDIMessage(
 		POLYPHONIC_AFTERTOUCH, channel, note, pressure
 	));
 

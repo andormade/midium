@@ -55,7 +55,7 @@ var ALL_CHANNEL = 0;
 function channelAftertouch(pressure) {
 	var channel = arguments.length <= 1 || arguments[1] === undefined ? this.defaultChannel : arguments[1];
 
-	this.send(_midiumCore2.default.constuctMIDIMessageArray(CHANNEL_AFTERTOUCH, channel, pressure, 0));
+	this.send(_midiumCore2.default.constructMIDIMessage(CHANNEL_AFTERTOUCH, channel, pressure, 0));
 
 	return this;
 };
@@ -116,7 +116,7 @@ var ALL_CHANNEL = 0;
 function controlChange(controller, value) {
 	var channel = arguments.length <= 2 || arguments[2] === undefined ? this.defaultChannel : arguments[2];
 
-	this.send(_midiumCore2.default.constuctMIDIMessageArray(CONTROL_CHANGE, channel, controller, value));
+	this.send(_midiumCore2.default.constructMIDIMessage(CONTROL_CHANGE, channel, controller, value));
 
 	return this;
 };
@@ -220,7 +220,7 @@ var EVENT_AND_CHANNEL = 0xff0000;
 var NOTE_ON = 0x90;
 var NOTE_OFF = 0x80;
 var STATUS_STRING = 'noteoff';
-var DEFAULT_VELOCITY = 127;
+var DEFAULT_VELOCITY = 0;
 var ALL_CHANNEL = 0;
 
 /**
@@ -238,7 +238,7 @@ function noteOff(note) {
 
 	note = _midiumCore2.default.noteStringToMIDICode(note);
 
-	this.send(_midiumCore2.default.constuctMIDIMessageArray(NOTE_OFF, channel, note, velocity));
+	this.send(_midiumCore2.default.constructMIDIMessage(NOTE_OFF, channel, note, velocity));
 
 	return this;
 };
@@ -316,7 +316,7 @@ function noteOn(note) {
 
 	note = _midiumCore2.default.noteStringToMIDICode(note);
 
-	this.send(_midiumCore2.default.constuctMIDIMessageArray(NOTE_ON, channel, note, velocity));
+	this.send(_midiumCore2.default.constructMIDIMessage(NOTE_ON, channel, note, velocity));
 
 	return this;
 };
@@ -380,7 +380,7 @@ var ALL_CHANNEL = 0;
 function pitchWheel(value) {
 	var channel = arguments.length <= 1 || arguments[1] === undefined ? this.defaultChannel : arguments[1];
 
-	this.send(_midiumCore2.default.constuctMIDIMessageArray(PITCH_WHEEL, channel, 0, value));
+	this.send(_midiumCore2.default.constructMIDIMessage(PITCH_WHEEL, channel, 0, value));
 
 	return this;
 };
@@ -443,7 +443,7 @@ function polyAftertouch(note, pressure) {
 
 	note = _midiumCore2.default.noteStringToMIDICode(note);
 
-	this.send(_midiumCore2.default.constuctMIDIMessageArray(POLYPHONIC_AFTERTOUCH, channel, note, pressure));
+	this.send(_midiumCore2.default.constructMIDIMessage(POLYPHONIC_AFTERTOUCH, channel, note, pressure));
 
 	return this;
 };
@@ -504,7 +504,7 @@ var ALL_CHANNEL = 0;
 function programChange(program) {
 	var channel = arguments.length <= 1 || arguments[1] === undefined ? this.defaultChannel : arguments[1];
 
-	this.send(_midiumCore2.default.constuctMIDIMessageArray(PROGRAM_CHANGE, channel, program, 0));
+	this.send(_midiumCore2.default.constructMIDIMessage(PROGRAM_CHANGE, channel, program, 0));
 
 	return this;
 };
@@ -1048,6 +1048,7 @@ var Midium = function () {
 
 			this.ports.forEach(function (port) {
 				if (port.type === 'output') {
+					console.log('send', message);
 					port.send(message);
 				}
 			});
@@ -1206,6 +1207,7 @@ Midium.isReady = false;
 Midium.listenerCounter = 0;
 
 exports.default = Midium;
+
 },{}],17:[function(require,module,exports){
 'use strict';
 

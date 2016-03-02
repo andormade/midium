@@ -15,7 +15,7 @@ const ALL_CHANNEL = 0;
  * @returns {object}
  */
 export function channelAftertouch(pressure, channel = this.defaultChannel) {
-	this.send(Midium.constuctMIDIMessageArray(
+	this.send(Midium.constructMIDIMessage(
 		CHANNEL_AFTERTOUCH, channel, pressure, 0
 	));
 
