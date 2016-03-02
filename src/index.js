@@ -29,5 +29,4 @@ Object.assign(Midium.prototype, {
 	setDefaultChannel   : setDefaultChannel
 });
 
-global.Midium = Midium;
 export default Midium;

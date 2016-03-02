@@ -33,7 +33,7 @@
   },
   "scripts": {
     "build:babel": "babel src --out-dir dist",
-    "build:browserify": "browserify dist/*.js --outfile bundle/midium.js",
+    "build:browserify": "browserify dist/index.js --standalone Midium > bundle/midium.js",
     "build": "npm run build:babel && npm run build:browserify",
     "eslint": "eslint src/*.js"
   }
