@@ -20,7 +20,6 @@
     "url": "https://github.com/hngrhorace/midium.git"
   },
   "main": "dist/index.js",
-  "jsnext:main": "src/index.js",
   "dependencies": {},
   "devDependencies": {
     "babel-cli": "^6.5.1",
@@ -33,7 +32,7 @@
   },
   "scripts": {
     "build:babel": "babel src --out-dir dist",
-    "build:browserify": "browserify dist/index.js --standalone Midium > bundle/midium.js",
+    "build:browserify": "mkdir -p browser && browserify dist/index.js --standalone Midium > browser/midium.js",
     "build": "npm run build:babel && npm run build:browserify",
     "eslint": "eslint src/*.js"
   }
