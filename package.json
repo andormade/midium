@@ -5,7 +5,7 @@
     "email": "hngrhorace@gmail.com",
     "url": "http://polgarand.org"
   },
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "Web MIDI API wrapper designed for humans and MIDI instruments",
   "keywords": [
     "midi",
@@ -31,7 +31,7 @@
     "midium-core": "^1.0.3"
   },
   "scripts": {
-    "build:babel": "babel src --out-dir dist",
+    "build:babel": "babel src -d dist",
     "build:browserify": "mkdir -p browser && browserify dist/index.js --standalone Midium > browser/midium.js",
     "build": "npm run build:babel && npm run build:browserify",
     "eslint": "eslint src/*.js"
