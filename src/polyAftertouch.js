@@ -34,11 +34,11 @@ export function polyAftertouch(note, pressure, channel = this.defaultChannel) {
  * @returns {object} Reference of the event listener for unbinding.
  */
 export function onPolyAftertouch(callback, channel = ALL_CHANNEL) {
-	var mask = channel === ALL_CHANNEL ? EVENT_ONLY : EVENT_AND_CHANNEL,
-		channel = channel === ALL_CHANNEL ? 1 : channel,
-		message = Midium.constructMIDIMessage(
-			POLYPHONIC_AFTERTOUCH, channel, 0, 0
-		);
+	var mask = channel === ALL_CHANNEL ? EVENT_ONLY : EVENT_AND_CHANNEL;
+	var channel = channel === ALL_CHANNEL ? 1 : channel;
+	var message = Midium.constructMIDIMessage(
+		POLYPHONIC_AFTERTOUCH, channel, 0, 0
+	);
 
 	return this.addEventListener(message, mask, function(event) {
 		/* Extending the MIDI event with useful infos. */
