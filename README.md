@@ -4,12 +4,8 @@ Midium is a very simple, device oriented Web MIDI API wrapper. It makes you able
 TODO: write documentation
 
 ```javascript
-var moog = Midium.select('moog');
-moog.noteOn('c#4');
-
-setTimeout(function() {
-    moog.noteOff('c#4');
-}, 1000);
+var moog = Midium('moog');
+moog.notePress('c#4', 1000);
 ```
 
 ```javascript

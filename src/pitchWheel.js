@@ -1,4 +1,4 @@
-import Midium from 'midium-core';
+import Utils from 'midinette';
 
 const EVENT_ONLY = 0xf00000;
 const EVENT_AND_CHANNEL = 0xff0000;
@@ -15,7 +15,7 @@ const ALL_CHANNEL = 0;
  * @returns {object}
  */
 export function pitchWheel(value, channel = this.defaultChannel) {
-	this.send(Midium.constructMIDIMessage(
+	this.send(Utils.constructMIDIMessage(
 		PITCH_WHEEL, channel, 0, value
 	));
 
@@ -33,14 +33,14 @@ export function pitchWheel(value, channel = this.defaultChannel) {
 export function onPitchWheel(callback, channel = ALL_CHANNEL) {
 	var mask = channel === ALL_CHANNEL ? EVENT_ONLY : EVENT_AND_CHANNEL;
 	var channel = channel === ALL_CHANNEL ? 1 : channel;
-	var message = Midium.constructMIDIMessage(
+	var message = Utils.constructMIDIMessage(
 		PITCH_WHEEL, channel, 0, 0
 	);
 
 	return this.addEventListener(message, mask, function(event) {
 		/* Extending the MIDI event with useful infos. */
 		event.status = STATUS_STRING;
-		event.channel = Midium.getChannelFromStatus(event.data[0]);
+		event.channel = Utils.getChannelFromStatus(event.data[0]);
 		event.pitchWheel = event.data[2];
 		callback(event);
 	});

@@ -1,4 +1,4 @@
-import Midium from 'midium-core';
+import Utils from 'midinette';
 
 const EVENT_ONLY = 0xf00000;
 const EVENT_AND_CHANNEL = 0xff0000;
@@ -20,9 +20,9 @@ const ALL_CHANNEL = 0;
 export function noteOff(
 	note, velocity = DEFAULT_VELOCITY, channel = this.defaultChannel
 ) {
-	note = Midium.noteStringToMIDICode(note);
+	note = Midinette.noteStringToMIDICode(note);
 
-	this.send(Midium.constructMIDIMessage(
+	this.send(Midinette.constructMIDIMessage(
 		NOTE_OFF, channel, note, velocity
 	));
 
@@ -40,14 +40,14 @@ export function noteOff(
 export function onNoteOff(callback, channel = ALL_CHANNEL) {
 	var mask = channel === ALL_CHANNEL ? EVENT_ONLY : EVENT_AND_CHANNEL;
 	var channel = channel === ALL_CHANNEL ? 1 : channel;
-	var message1 = Midium.constructMIDIMessage(NOTE_OFF, channel, 0, 0);
-	var message2 = Midium.constructMIDIMessage(NOTE_ON, channel, 0, 0);
+	var message1 = Utils.constructMIDIMessage(NOTE_OFF, channel, 0, 0);
+	var message2 = Utils.constructMIDIMessage(NOTE_ON, channel, 0, 0);
 
 	return [
 		this.addEventListener(message1, mask, function(event) {
 			/* Extending the MIDI event with useful infos. */
 			event.status = STATUS_STRING;
-			event.channel = Midium.getChannelFromStatus(event.data[0]);
+			event.channel = Utils.getChannelFromStatus(event.data[0]);
 			event.note = event.data[1];
 			event.velocity = event.data[2];
 			callback(event);
@@ -59,7 +59,7 @@ export function onNoteOff(callback, channel = ALL_CHANNEL) {
 			}
 			/* Extending the MIDI event with useful infos. */
 			event.status = STATUS_STRING;
-			event.channel = Midium.getChannelFromStatus(event.data[0]);
+			event.channel = utils.getChannelFromStatus(event.data[0]);
 			event.note = event.data[1];
 			event.velocity = 0;
 			callback(event);

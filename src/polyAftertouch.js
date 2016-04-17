@@ -1,4 +1,4 @@
-import Midium from 'midium-core';
+import Midium from 'midinette';
 
 const EVENT_ONLY = 0xf00000;
 const EVENT_AND_CHANNEL = 0xff0000;
@@ -16,9 +16,9 @@ const ALL_CHANNEL = 0;
  * @returns {object}
  */
 export function polyAftertouch(note, pressure, channel = this.defaultChannel) {
-	note = Midium.noteStringToMIDICode(note);
+	note = Utils.noteStringToMIDICode(note);
 
-	this.send(Midium.constructMIDIMessage(
+	this.send(Utils.constructMIDIMessage(
 		POLYPHONIC_AFTERTOUCH, channel, note, pressure
 	));
 
@@ -36,14 +36,14 @@ export function polyAftertouch(note, pressure, channel = this.defaultChannel) {
 export function onPolyAftertouch(callback, channel = ALL_CHANNEL) {
 	var mask = channel === ALL_CHANNEL ? EVENT_ONLY : EVENT_AND_CHANNEL;
 	var channel = channel === ALL_CHANNEL ? 1 : channel;
-	var message = Midium.constructMIDIMessage(
+	var message = Utils.constructMIDIMessage(
 		POLYPHONIC_AFTERTOUCH, channel, 0, 0
 	);
 
 	return this.addEventListener(message, mask, function(event) {
 		/* Extending the MIDI event with useful infos. */
 		event.status = STATUS_STRING;
-		event.channel = Midium.getChannelFromStatus(event.data[0]);
+		event.channel = Utils.getChannelFromStatus(event.data[0]);
 		event.note = event.data[1];
 		event.pressure = event.data[2];
 		callback(event);

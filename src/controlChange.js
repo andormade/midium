@@ -1,4 +1,4 @@
-import Midium from 'midium-core';
+import Utils from 'midinette';
 
 const EVENT_ONLY = 0xf00000;
 const EVENT_AND_CHANNEL = 0xff0000;
@@ -18,7 +18,7 @@ const ALL_CHANNEL = 0;
 export function controlChange(
 	controller, value, channel = this.defaultChannel
 ) {
-	this.send(Midium.constructMIDIMessage(
+	this.send(Utils.constructMIDIMessage(
 		CONTROL_CHANGE, channel, controller, value
 	));
 
@@ -36,12 +36,12 @@ export function controlChange(
 export function onControlChange(callback, channel = ALL_CHANNEL) {
 	var mask = channel === ALL_CHANNEL ? EVENT_ONLY : EVENT_AND_CHANNEL;
 	var channel = channel === ALL_CHANNEL ? 1 : channel;
-	var message = Midium.constructMIDIMessage(CONTROL_CHANGE, channel, 0, 0);
+	var message = Utils.constructMIDIMessage(CONTROL_CHANGE, channel, 0, 0);
 
 	return this.addEventListener(message, mask, function(event) {
 		/* Extending the MIDI event with useful infos. */
 		event.status = STATUS_STRING;
-		event.channel = Midium.getChannelFromStatus(event.data[0]);
+		event.channel = Utils.getChannelFromStatus(event.data[0]);
 		event.controller = event.data[1];
 		event.controllerValue = event.data[2];
 		callback(event);

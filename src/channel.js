@@ -1,5 +1,3 @@
-import Midium from 'midium-core';
-
 /**
  * Setter function for the default channel.
  *

@@ -5,3 +5,4 @@ browser
 .eslintrc
 .babelrc
 .gitignore
+test.html
