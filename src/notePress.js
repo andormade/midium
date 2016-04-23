@@ -30,7 +30,7 @@ export function notePress(
 
 	this.send(Utils.constructMIDIMessage(
 		NOTE_OFF, channel, note, 0
-	), window.performance.now() + time);
+	), time);
 
 	return this;
 }

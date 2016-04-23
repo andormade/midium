@@ -9,6 +9,9 @@ import {notePress} from './notePress';
 import {pitchWheel, onPitchWheel} from './pitchWheel';
 import {polyAftertouch, onPolyAftertouch} from './polyAftertouch';
 import {programChange, onProgramChange} from './programChange';
+import {startBuffer, stopBuffer, sendBuffer, clearBuffer, wait} from './buffer';
+import {strum} from './strum';
+import {startClock, stopClock} from './clock';
 
 Object.assign(Midium, Midinette);
 
@@ -28,7 +31,15 @@ Object.assign(Midium.prototype, {
 	pitchWheel          : pitchWheel,
 	polyAftertouch      : polyAftertouch,
 	programChange       : programChange,
-	setDefaultChannel   : setDefaultChannel
+	setDefaultChannel   : setDefaultChannel,
+	startBuffer         : startBuffer,
+	stopBuffer          : stopBuffer,
+	sendBuffer          : sendBuffer,
+	clearBuffer         : clearBuffer,
+	wait                : wait,
+	strum               : strum,
+	startClock          : startClock,
+	stopClock           : stopClock
 });
 
 export default Midium;
