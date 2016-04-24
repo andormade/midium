@@ -11,7 +11,9 @@ import {polyAftertouch, onPolyAftertouch} from './polyAftertouch';
 import {programChange, onProgramChange} from './programChange';
 import {startBuffer, stopBuffer, sendBuffer, clearBuffer, wait} from './buffer';
 import {strum} from './strum';
-import {startClock, stopClock} from './clock';
+import {startClock, stopClock, onClock, onWhole, onHalf, onQuarter, onEight,
+	onSixteenth, onBeat} from './clock';
+import {getMirror} from './mirror';
 
 Object.assign(Midium, Midinette);
 
@@ -39,7 +41,14 @@ Object.assign(Midium.prototype, {
 	wait                : wait,
 	strum               : strum,
 	startClock          : startClock,
-	stopClock           : stopClock
+	stopClock           : stopClock,
+	onClock             : onClock,
+	onWhole             : onWhole,
+	onHalf              : onHalf,
+	onQuarter           : onQuarter,
+	onEight             : onEight,
+	onSixteenth         : onSixteenth,
+	getMirror           : getMirror
 });
 
 export default Midium;
