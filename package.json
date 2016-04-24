@@ -23,7 +23,7 @@
   "dependencies": {
     "eucledian-rhythm": "^1.0.1",
     "midinette": "^1.0.4",
-    "midium-core": "^1.0.14",
+    "midium-core": "^1.0.15",
     "musictheory": "^1.0.8"
   },
   "devDependencies": {
