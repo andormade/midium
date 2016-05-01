@@ -12,7 +12,8 @@ import {programChange, onProgramChange} from './programChange';
 import {startBuffer, stopBuffer, sendBuffer, clearBuffer, wait} from './buffer';
 import {strum} from './strum';
 import {startClock, stopClock, onClock, onWhole, onHalf, onQuarter, onEight,
-	onSixteenth, onBeat} from './clock';
+	onSixteenth, onBeat, onSelfClock, onSelfWhole, onSelfHalf, onSelfQuarter,
+	onSelfEight, onSelfSixteenth, onSelfBeat} from './clock';
 import {getMirror} from './mirror';
 
 Object.assign(Midium, Midinette);
@@ -43,6 +44,12 @@ Object.assign(Midium.prototype, {
 	onQuarter           : onQuarter,
 	onEight             : onEight,
 	onSixteenth         : onSixteenth,
+	onSelfClock         : onSelfClock,
+	onSelfWhole         : onSelfWhole,
+	onSelfHalf          : onSelfHalf,
+	onSelfQuarter       : onSelfQuarter,
+	onSelfEight         : onSelfEight,
+	onSelfSixteenth     : onSelfSixteenth,
 	getMirror           : getMirror
 });
 

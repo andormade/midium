@@ -15,8 +15,14 @@ export function startClock(bpm) {
 	this.send([START]);
 
 	this.clock = setInterval(() => {
-		this.send([CLOCK]);
-	}, Math.floor((1000 / (bpm / 60)) / QUARTER_NOTE));
+		/* Don't worry, it will look better after constant folding. */
+		this.send([CLOCK], ((1000 / 4) / 6) * 0);
+		this.send([CLOCK], ((1000 / 4) / 6) * 1);
+		this.send([CLOCK], ((1000 / 4) / 6) * 2);
+		this.send([CLOCK], ((1000 / 4) / 6) * 3);
+		this.send([CLOCK], ((1000 / 4) / 6) * 4);
+		this.send([CLOCK], ((1000 / 4) / 6) * 5);
+	}, Math.floor((1000 / (bpm / 60)) / 4));
 
 	return this;
 }
@@ -73,4 +79,32 @@ export function onEight(callback) {
 
 export function onSixteenth(callback) {
 	return this.onClock(callback, SIXTEENTH_NOTE);
+}
+
+export function onSelfClock(callback, divider = 1) {
+	return this.getMirror().onClock(callback, divider);
+}
+
+export function onSelfBeat(callback) {
+	return this.getMirror().onClock(callback, QUARTER_NOTE);
+}
+
+export function onSelfWhole(callback) {
+	return this.getMirror().onClock(callback, WHOLE_NOTE);
+}
+
+export function onSelfHalf(callback) {
+	return this.getMirror().onClock(callback, HALF_NOTE);
+}
+
+export function onSelfQuarter(callback) {
+	return this.getMirror().onClock(callback, QUARTER_NOTE);
+}
+
+export function onSelfEight(callback) {
+	return this.getMirror().onClock(callback, EIGHT_NOTE);
+}
+
+export function onSelfSixteenth(callback) {
+	return this.getMirror().onClock(callback, SIXTEENTH_NOTE);
 }
