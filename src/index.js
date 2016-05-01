@@ -1,5 +1,6 @@
 import Midinette from 'midinette';
 import Midium from './midium';
+import Musictheory from 'musictheory';
 import {setDefaultChannel} from './channel';
 import {channelAftertouch, onChannelAftertouch} from './channelAftertouch';
 import {controlChange, onControlChange} from './controlChange';
@@ -9,13 +10,13 @@ import {notePress} from './notePress';
 import {pitchWheel, onPitchWheel} from './pitchWheel';
 import {polyAftertouch, onPolyAftertouch} from './polyAftertouch';
 import {programChange, onProgramChange} from './programChange';
-import {startBuffer, stopBuffer, sendBuffer, clearBuffer, wait} from './buffer';
 import {strum} from './strum';
 import {startClock, stopClock, onClock, onWhole, onHalf, onQuarter, onEight,
 	onSixteenth, onBeat, onSelfClock, onSelfWhole, onSelfHalf, onSelfQuarter,
 	onSelfEight, onSelfSixteenth, onSelfBeat} from './clock';
 import {getMirror} from './mirror';
 
+Object.assign(Midium, Musictheory)
 Object.assign(Midium, Midinette);
 
 Object.assign(Midium.prototype, {

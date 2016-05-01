@@ -5,7 +5,7 @@
     "email": "hngrhorace@gmail.com",
     "url": "http://polgarand.org"
   },
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "Web MIDI API wrapper designed for humans and MIDI instruments",
   "keywords": [
     "midi",
@@ -24,7 +24,7 @@
     "eucledian-rhythm": "^1.0.1",
     "midinette": "^1.0.4",
     "midium-core": "^1.0.15",
-    "musictheory": "^1.0.8"
+    "musictheory": "^1.0.11"
   },
   "devDependencies": {
     "babel-cli": "^6.5.1",
