@@ -38,10 +38,10 @@ export function noteOff(
  * @returns {object} Reference of the event listener for unbinding.
  */
 export function onNoteOff(callback, channel = ALL_CHANNEL) {
-	var mask = channel === ALL_CHANNEL ? EVENT_ONLY : EVENT_AND_CHANNEL;
-	var channel = channel === ALL_CHANNEL ? 1 : channel;
-	var message1 = Utils.constructMIDIMessage(NOTE_OFF, channel, 0, 0);
-	var message2 = Utils.constructMIDIMessage(NOTE_ON, channel, 0, 0);
+	let mask = channel === ALL_CHANNEL ? EVENT_ONLY : EVENT_AND_CHANNEL;
+	channel = channel === ALL_CHANNEL ? 1 : channel;
+	let message1 = Utils.constructMIDIMessage(NOTE_OFF, channel, 0, 0);
+	let message2 = Utils.constructMIDIMessage(NOTE_ON, channel, 0, 0);
 
 	return [
 		this.addEventListener(message1, mask, function(event) {

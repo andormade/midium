@@ -11,9 +11,9 @@ import {pitchWheel, onPitchWheel} from './pitchWheel';
 import {polyAftertouch, onPolyAftertouch} from './polyAftertouch';
 import {programChange, onProgramChange} from './programChange';
 import {strum} from './strum';
-import {startClock, stopClock, onClock, onWhole, onHalf, onQuarter, onEight,
-	onSixteenth, onBeat, onSelfClock, onSelfWhole, onSelfHalf, onSelfQuarter,
-	onSelfEight, onSelfSixteenth, onSelfBeat} from './clock';
+import {startClock, stopClock, setClockBpm, onClock, onWhole, onHalf, onQuarter,
+	onEight, onSixteenth, onBeat, onSelfClock, onSelfWhole, onSelfHalf,
+	onSelfQuarter, onSelfEight, onSelfSixteenth, onSelfBeat} from './clock';
 import {getMirror} from './mirror';
 
 Object.assign(Midium, Musictheory)
@@ -39,6 +39,7 @@ Object.assign(Midium.prototype, {
 	strum               : strum,
 	startClock          : startClock,
 	stopClock           : stopClock,
+	setClockBpm         : setClockBpm,
 	onClock             : onClock,
 	onWhole             : onWhole,
 	onHalf              : onHalf,

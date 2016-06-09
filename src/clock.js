@@ -13,16 +13,31 @@ export function startClock(bpm) {
 	}
 
 	this.send([START]);
+	this.setClockBpm(bpm);
+
+	return this;
+}
+
+export function setClockBpm(bpm) {
+	if (this.clock) {
+		clearInterval(this.clock);
+	}
+
+	let interval = (1000 / (bpm / 60)) / 4;
+	let clockTimes = [];
+
+	for (let i = 0; i < 6; i++) {
+		clockTimes[i] = (interval / 6) * i;
+	}
 
 	this.clock = setInterval(() => {
-		/* Don't worry, it will look better after constant folding. */
-		this.send([CLOCK], ((1000 / 4) / 6) * 0);
-		this.send([CLOCK], ((1000 / 4) / 6) * 1);
-		this.send([CLOCK], ((1000 / 4) / 6) * 2);
-		this.send([CLOCK], ((1000 / 4) / 6) * 3);
-		this.send([CLOCK], ((1000 / 4) / 6) * 4);
-		this.send([CLOCK], ((1000 / 4) / 6) * 5);
-	}, Math.floor((1000 / (bpm / 60)) / 4));
+		this.send([CLOCK], clockTimes[0]);
+		this.send([CLOCK], clockTimes[1]);
+		this.send([CLOCK], clockTimes[2]);
+		this.send([CLOCK], clockTimes[3]);
+		this.send([CLOCK], clockTimes[4]);
+		this.send([CLOCK], clockTimes[5]);
+	}, Math.floor(interval));
 
 	return this;
 }

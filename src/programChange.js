@@ -31,9 +31,9 @@ export function programChange(program, channel = this.defaultChannel) {
  * @returns {object} Reference of the event listener for unbinding.
  */
 export function onProgramChange(callback, channel = ALL_CHANNEL) {
-	var mask = channel === ALL_CHANNEL ? EVENT_ONLY : EVENT_AND_CHANNEL;
-	var channel = channel === ALL_CHANNEL ? 1 : channel;
-	var message = Utils.constructMIDIMessage(
+	let mask = channel === ALL_CHANNEL ? EVENT_ONLY : EVENT_AND_CHANNEL;
+	channel = channel === ALL_CHANNEL ? 1 : channel;
+	let message = Utils.constructMIDIMessage(
 		PROGRAM_CHANGE, channel, 0, 0
 	);
 

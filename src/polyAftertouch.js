@@ -1,4 +1,4 @@
-import Midium from 'midinette';
+import Utils from 'midinette';
 
 const EVENT_ONLY = 0xf00000;
 const EVENT_AND_CHANNEL = 0xff0000;
@@ -34,9 +34,9 @@ export function polyAftertouch(note, pressure, channel = this.defaultChannel) {
  * @returns {object} Reference of the event listener for unbinding.
  */
 export function onPolyAftertouch(callback, channel = ALL_CHANNEL) {
-	var mask = channel === ALL_CHANNEL ? EVENT_ONLY : EVENT_AND_CHANNEL;
-	var channel = channel === ALL_CHANNEL ? 1 : channel;
-	var message = Utils.constructMIDIMessage(
+	let mask = channel === ALL_CHANNEL ? EVENT_ONLY : EVENT_AND_CHANNEL;
+	channel = channel === ALL_CHANNEL ? 1 : channel;
+	let message = Utils.constructMIDIMessage(
 		POLYPHONIC_AFTERTOUCH, channel, 0, 0
 	);
 
