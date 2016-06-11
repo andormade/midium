@@ -20,9 +20,9 @@ const ALL_CHANNEL = 0;
 export function noteOff(
 	note, velocity = DEFAULT_VELOCITY, channel = this.defaultChannel
 ) {
-	note = Midinette.noteStringToMIDICode(note);
+	note = Utils.noteStringToMIDICode(note);
 
-	this.send(Midinette.constructMIDIMessage(
+	this.send(Utils.constructMIDIMessage(
 		NOTE_OFF, channel, note, velocity
 	));
 
