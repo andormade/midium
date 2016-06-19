@@ -1,18 +1,22 @@
 import Utils from './utils';
 import {NOTE_ON, NOTE_OFF} from './constants/statusCodes';
-import {ALL_CHANNELS, ALL_NOTES} from './constants/defaults';
+import {ALL_CHANNELS, ALL_NOTES, DATA_STATUS, DATA_NOTE,
+	DATA_VELOCITY} from './constants/defaults';
 import Midium from './midium';
 
 const STATUS_STRING = 'noteoff';
 const DEFAULT_VELOCITY = 0;
 
+/**
+ * @extends Midium
+ */
 export default class NoteOff extends Midium {
 	/**
 	 * Sets the specified note off.
 	 *
-	 * @param {string|number|array} notes    MIDI note 0-127
+	 * @param {string|number|array} notes    MIDI note 0-127 or C0 - G8
 	 * @param {number} [velocity]            Velocity 0-127
-	 * @param {number} [channel]             Channel 1-16
+	 * @param {number} [channel]             MIDI channel 1-16
 	 *
 	 * @returns {object}
 	 */
@@ -32,8 +36,9 @@ export default class NoteOff extends Midium {
 	/**
 	 * Registers an event listener for the note off events.
 	 *
-	 * @param {function} callback
-	 * @param {number} [channel]
+	 * @param {function} callback     Callback function
+	 * @param {number|string} note    MIDI note 0-127 or C0 - G8
+	 * @param {number} [channel]      MIDI channel number 1-16
 	 *
 	 * @returns {object} Reference of the event listener for unbinding.
 	 */
@@ -48,20 +53,22 @@ export default class NoteOff extends Midium {
 			this.addEventListener(message1, mask, function(event) {
 				/* Extending the MIDI event with useful infos. */
 				event.status = STATUS_STRING;
-				event.channel = Utils.getChannelFromStatus(event.data[0]);
-				event.note = event.data[1];
-				event.velocity = event.data[2];
+				event.channel = Utils.getChannelFromStatus(
+					event.data[DATA_STATUS]);
+				event.note = event.data[DATA_NOTE];
+				event.velocity = event.data[DATA_VELOCITY];
 				callback(event);
 			}),
 			this.addEventListener(message2, mask, function(event) {
 				/* By note on event, velocity 0 means note off. */
-				if (event.data[2] !== 0) {
+				if (event.data[DATA_VELOCITY] !== 0) {
 					return;
 				}
 				/* Extending the MIDI event with useful infos. */
 				event.status = STATUS_STRING;
-				event.channel = Utils.getChannelFromStatus(event.data[0]);
-				event.note = event.data[1];
+				event.channel = Utils.getChannelFromStatus(
+					event.data[DATA_STATUS]);
+				event.note = event.data[DATA_NOTE];
 				event.velocity = 0;
 				callback(event);
 			})

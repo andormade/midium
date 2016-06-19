@@ -77,7 +77,11 @@
         "no-labels": [2],
         "no-lone-blocks": [2],
         "no-loop-func": [2],
-        "no-magic-numbers": [1],
+        "no-magic-numbers": ["error", {
+            "ignore": [0],
+            "enforceConst": true,
+            "detectObjects": true
+        }],
         "no-multi-spaces": [2, {
             "exceptions": {
                 "VariableDeclarator": true,

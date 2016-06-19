@@ -1,25 +1,31 @@
 import Utils from './utils';
 import {POLYPHONIC_AFTERTOUCH} from './constants/statusCodes';
-import {ALL_CHANNELS, ALL_NOTES} from './constants/defaults';
+import {ALL_CHANNELS, ALL_NOTES, DATA_PRESSURE, DATA_STATUS,
+	DATA_NOTE} from './constants/defaults';
 import Midium from './midium';
+
 const STATUS_STRING = 'polyaftertouch';
 
+/**
+ * @extends Midium
+ */
 export default class PolyAftertouch extends Midium {
 	/**
 	 * Sends a polyphonic aftertouch message.
 	 *
-	 * @param {string|number} note    MIDI note 0-127
-	 * @param {number} pressure       Pressure 0-127
-	 * @param {number} [channel]      Channel 1-16
+	 * @param {string|number|array} notes    MIDI note 0-127 or C0 - G8
+	 * @param {number} pressure              Pressure 0-127
+	 * @param {number} [channel]             MIDI channel 1-16
 	 *
 	 * @returns {object}
 	 */
-	polyAftertouch(note, pressure, channel = this.defaultChannel) {
-		note = Utils.noteStringToMIDICode(note);
-
-		this.send(Utils.constructMIDIMessage(
-			POLYPHONIC_AFTERTOUCH, channel, note, pressure
-		));
+	polyAftertouch(notes, pressure, channel = this.defaultChannel) {
+		Array.prototype.concat(notes).forEach((note) => {
+			note = Utils.noteStringToMIDICode(note);
+			this.send(Utils.constructMIDIMessage(
+				POLYPHONIC_AFTERTOUCH, channel, note, pressure
+			));
+		});
 
 		return this;
 	}
@@ -27,8 +33,9 @@ export default class PolyAftertouch extends Midium {
 	/**
 	 * Registers an event listener for the polyphonic aftertouch events.
 	 *
-	 * @param {function} callback
-	 * @param {number} [channel]
+	 * @param {function} callback     Callback function
+	 * @param {number|string} note    MIDI note 0-127 or C0 - G8
+	 * @param {number} [channel]      MIDI channel
 	 *
 	 * @returns {object} Reference of the event listener for unbinding.
 	 */
@@ -43,9 +50,9 @@ export default class PolyAftertouch extends Midium {
 		return this.addEventListener(message, mask, function(event) {
 			/* Extending the MIDI event with useful infos. */
 			event.status = STATUS_STRING;
-			event.channel = Utils.getChannelFromStatus(event.data[0]);
-			event.note = event.data[1];
-			event.pressure = event.data[2];
+			event.channel = Utils.getChannelFromStatus(event.data[DATA_STATUS]);
+			event.note = event.data[DATA_NOTE];
+			event.pressure = event.data[DATA_PRESSURE];
 			callback(event);
 		});
 	}

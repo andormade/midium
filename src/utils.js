@@ -95,7 +95,7 @@ class Utils {
 			code >= PITCH_WHEEL_CH1 &&
 			code <= PITCH_WHEEL_CH16
 		);
-	};
+	}
 
 	static isPolyphonicAftertouch(data) {
 		return (
@@ -148,6 +148,7 @@ class Utils {
 
 	static eventMask(status, channel, data1, data2) {
 		let mask = 0x000000;
+
 		mask |= status ? MASK_EVENT : 0x000000;
 		mask |= channel ? MASK_CHANNEL : 0x000000;
 		mask |= data1 ? MASK_DATA_1 : 0x000000;

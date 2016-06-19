@@ -65,7 +65,8 @@ export default class Clock extends Midium {
 	}
 
 	onClock(callback, divider = 1) {
-		var counter = 0;
+		let counter = 0;
+
 		return this.addEventListener(CLOCK * 0x10000, 0xff0000, function() {
 			counter++;
 			if (counter === divider) {

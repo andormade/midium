@@ -1,16 +1,20 @@
 import Utils from './utils';
-import {CHANNEL_AFTERTOUCH} from './constants/statusCodes';
+import {CHANNEL_AFTERTOUCH, DATA_STATUS,
+	DATA_PRESSURE} from './constants/statusCodes';
 import {ALL_CHANNELS} from './constants/defaults';
 import Midium from './midium';
 
 const STATUS_STRING = 'channelaftertouch';
 
+/**
+ * @extends Midium
+ */
 export default class ChannelAftertouch extends Midium {
 	/**
 	 * Send a channel aftertouch message.
 	 *
 	 * @param {number} pressure      Pressure 0-127
-	 * @param {number} [channel]     Channel 1-16
+	 * @param {number} [channel]     MIDI channel 1-16
 	 *
 	 * @returns {object}
 	 */
@@ -25,8 +29,8 @@ export default class ChannelAftertouch extends Midium {
 	/**
 	 * Registers an event listener for the channel aftertouch events.
 	 *
-	 * @param {function} callback
-	 * @param {number} [channel]
+	 * @param {function} callback    Callback function
+	 * @param {number} [channel]     MIDI channel 1-16
 	 *
 	 * @returns {object} Reference of the event listener for unbinding.
 	 */
@@ -39,8 +43,8 @@ export default class ChannelAftertouch extends Midium {
 		return this.addEventListener(message, mask, function(event) {
 			/* Extending the MIDI event with useful infos. */
 			event.status = STATUS_STRING;
-			event.channel = Utils.getChannelFromStatus(event.data[0]);
-			event.pressure = event.data[1];
+			event.channel = Utils.getChannelFromStatus(event.data[DATA_STATUS]);
+			event.pressure = event.data[DATA_PRESSURE];
 			callback(event);
 		});
 	}
