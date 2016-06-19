@@ -3,7 +3,7 @@
   "author": {
     "name": "Andor Polgar",
     "email": "hngrhorace@gmail.com",
-    "url": "http://polgarand.org"
+    "url": "http://midium.io"
   },
   "version": "0.0.11",
   "description": "Web MIDI API wrapper designed for humans and MIDI instruments",
@@ -13,11 +13,11 @@
     "api"
   ],
   "bugs": {
-    "url": "https://github.com/midijs/midium/issues"
+    "url": "https://github.com/hngrhorace/midium/issues"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/midijs/midium.git"
+    "url": "https://github.com/hngrhorace/midium.git"
   },
   "main": "dist/index.js",
   "dependencies": {
