@@ -28,6 +28,8 @@ Object.assign(Midium.prototype, {
 	onPitchWheel        : PitchWheel.onPitchWheel,
 	onPolyAftertouch    : PolyAftertouch.onPolyAftertouch,
 	onProgramChange     : ProgramChange.onProgramChange,
+	getControlValue     : ControlChange.getControlValue,
+	allNotesOff         : NoteOff.allNotesOff,
 	setDefaultChannel   : setDefaultChannel,
 	startClock          : Clock.startClock,
 	stopClock           : Clock.stopClock,

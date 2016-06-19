@@ -28,6 +28,20 @@ export default class ControlChange extends Midium {
 	}
 
 	/**
+	 * Returns with the value of the sepcified controller.
+	 *
+	 * @param {number} controller    Controller number
+	 *
+	 * @returns {number}
+	 */
+	getControlValue(controller) {
+		if (typeof this.controllers[controller] !== 'undefined') {
+			return this.controllers[controller];
+		}
+		return 0;
+	}
+
+	/**
 	 * Registers an event listener for the control change events.
 	 *
 	 * @param {function} callback      Callback function
@@ -44,12 +58,15 @@ export default class ControlChange extends Midium {
 		let message = Utils.constructMIDIMessage(CONTROL_CHANGE, channel,
 			controller, 0);
 
-		return this.addEventListener(message, mask, function(event) {
+		return this.addEventListener(message, mask, (event) => {
 			/* Extending the MIDI event with useful infos. */
 			event.status = STATUS_STRING;
 			event.channel = Utils.getChannelFromStatus(event.data[DATA_STATUS]);
 			event.controller = event.data[DATA_CONTROLLER];
 			event.controllerValue = event.data[DATA_CONTROLLER_VALUE];
+
+			this.controllers[event.controller] = event.controllerValue;
+
 			callback(event);
 		});
 	}

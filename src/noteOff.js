@@ -34,6 +34,21 @@ export default class NoteOff extends Midium {
 	}
 
 	/**
+	 * Sets all notes off.
+	 *
+	 * @param {number} channel    MIDI channel 1-16
+	 *
+	 * @returns {object}
+	 */
+	allNotesOff(channel = this.defaultChannel) {
+		for (let note = 0; note < 128; note++) {
+			this.noteOff(note, 0, channel);
+		}
+
+		return this;
+	}
+
+	/**
 	 * Registers an event listener for the note off events.
 	 *
 	 * @param {function} callback     Callback function

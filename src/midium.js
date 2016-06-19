@@ -6,5 +6,6 @@ export default class Midium extends MidiumCore {
 	constructor(query) {
 		super(query);
 		this.defaultChannel = DEFAULT_CHANNEL;
+		this.controllers = [];
 	}
 }
