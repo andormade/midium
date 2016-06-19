@@ -10,20 +10,21 @@ const ALL_NOTES = -1;
 /**
  * Sets the specified note off.
  *
- * @param {string|number} note    MIDI note 0-127
- * @param {number} [velocity]     Velocity 0-127
- * @param {number} [channel]      Channel 1-16
+ * @param {string|number|array} notes    MIDI note 0-127
+ * @param {number} [velocity]            Velocity 0-127
+ * @param {number} [channel]             Channel 1-16
  *
  * @returns {object}
  */
 export function noteOff(
-	note, velocity = DEFAULT_VELOCITY, channel = this.defaultChannel
+	notes, velocity = DEFAULT_VELOCITY, channel = this.defaultChannel
 ) {
-	note = Utils.noteStringToMIDICode(note);
-
-	this.send(Utils.constructMIDIMessage(
-		NOTE_OFF, channel, note, velocity
-	));
+	Array.prototype.concat(notes).forEach((note) => {
+		note = Utils.noteStringToMIDICode(note);
+		this.send(Utils.constructMIDIMessage(
+			NOTE_OFF, channel, note, velocity
+		));
+	});
 
 	return this;
 };
