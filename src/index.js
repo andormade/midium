@@ -1,51 +1,49 @@
 import Midium from './midium';
 import Utils from './utils';
 import {setDefaultChannel} from './channel';
-import {channelAftertouch, onChannelAftertouch} from './channelAftertouch';
-import {controlChange, onControlChange} from './controlChange';
-import {noteOff, onNoteOff} from './noteOff';
-import {noteOn, onNoteOn} from './noteOn';
-import {pitchWheel, onPitchWheel} from './pitchWheel';
-import {polyAftertouch, onPolyAftertouch} from './polyAftertouch';
-import {programChange, onProgramChange} from './programChange';
-import {startClock, stopClock, setClockBpm, onClock, onWhole, onHalf, onQuarter,
-	onEight, onSixteenth, onBeat, onSelfClock, onSelfWhole, onSelfHalf,
-	onSelfQuarter, onSelfEight, onSelfSixteenth, onSelfBeat} from './clock';
+import {prototype as ChannelAftertouch} from './channelAftertouch';
+import {prototype as ControlChange} from './controlChange';
+import {prototype as NoteOff} from './noteOff';
+import {prototype as NoteOn} from './noteOn';
+import {prototype as PitchWheel} from './pitchWheel';
+import {prototype as PolyAftertouch} from './polyAftertouch';
+import {prototype as ProgramChange} from './programChange';
+import {prototype as Clock} from './clock';
 import {getMirror} from './mirror';
 
 Object.assign(Midium, Utils);
 
 Object.assign(Midium.prototype, {
-	onChannelAftertouch : onChannelAftertouch,
-	onControlChange     : onControlChange,
-	onNoteOff           : onNoteOff,
-	onNoteOn            : onNoteOn,
-	onPitchWheel        : onPitchWheel,
-	onPolyAftertouch    : onPolyAftertouch,
-	onProgramChange     : onProgramChange,
-	channelAftertouch   : channelAftertouch,
-	controlChange       : controlChange,
-	noteOff             : noteOff,
-	noteOn              : noteOn,
-	pitchWheel          : pitchWheel,
-	polyAftertouch      : polyAftertouch,
-	programChange       : programChange,
+	channelAftertouch   : ChannelAftertouch.channelAftertouch,
+	controlChange       : ControlChange.controlChange,
+	noteOff             : NoteOff.noteOff,
+	noteOn              : NoteOn.noteOn,
+	pitchWheel          : PitchWheel.pitchWheel,
+	polyAftertouch      : PolyAftertouch.polyAftertouch,
+	programChange       : ProgramChange.programChange,
+	onChannelAftertouch : ChannelAftertouch.onChannelAftertouch,
+	onControlChange     : ControlChange.onControlChange,
+	onNoteOff           : NoteOff.onNoteOff,
+	onNoteOn            : NoteOn.onNoteOn,
+	onPitchWheel        : PitchWheel.onPitchWheel,
+	onPolyAftertouch    : PolyAftertouch.onPolyAftertouch,
+	onProgramChange     : ProgramChange.onProgramChange,
 	setDefaultChannel   : setDefaultChannel,
-	startClock          : startClock,
-	stopClock           : stopClock,
-	setClockBpm         : setClockBpm,
-	onClock             : onClock,
-	onWhole             : onWhole,
-	onHalf              : onHalf,
-	onQuarter           : onQuarter,
-	onEight             : onEight,
-	onSixteenth         : onSixteenth,
-	onSelfClock         : onSelfClock,
-	onSelfWhole         : onSelfWhole,
-	onSelfHalf          : onSelfHalf,
-	onSelfQuarter       : onSelfQuarter,
-	onSelfEight         : onSelfEight,
-	onSelfSixteenth     : onSelfSixteenth,
+	startClock          : Clock.startClock,
+	stopClock           : Clock.stopClock,
+	setClockBpm         : Clock.setClockBpm,
+	onClock             : Clock.onClock,
+	onWhole             : Clock.onWhole,
+	onHalf              : Clock.onHalf,
+	onQuarter           : Clock.onQuarter,
+	onEight             : Clock.onEight,
+	onSixteenth         : Clock.onSixteenth,
+	onSelfClock         : Clock.onSelfClock,
+	onSelfWhole         : Clock.onSelfWhole,
+	onSelfHalf          : Clock.onSelfHalf,
+	onSelfQuarter       : Clock.onSelfQuarter,
+	onSelfEight         : Clock.onSelfEight,
+	onSelfSixteenth     : Clock.onSelfSixteenth,
 	getMirror           : getMirror
 });
 

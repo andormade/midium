@@ -1,3 +1,5 @@
+import Midium from './midium';
+
 const START = 0xfa;
 const CLOCK = 0xf8;
 const STOP = 0xfc;
@@ -7,119 +9,121 @@ const QUARTER_NOTE = 24;
 const HALF_NOTE = 48;
 const WHOLE_NOTE = 96;
 
-export function startClock(bpm) {
-	if (this.clock) {
+export default class Clock extends Midium {
+	startClock(bpm) {
+		if (this.clock) {
+			return this;
+		}
+
+		this.send([START]);
+		this.setClockBpm(bpm);
+
 		return this;
 	}
 
-	this.send([START]);
-	this.setClockBpm(bpm);
-
-	return this;
-}
-
-export function setClockBpm(bpm) {
-	if (this.clock) {
-		clearInterval(this.clock);
-	}
-
-	let interval = (1000 / (bpm / 60)) / 4;
-	let clockTimes = [];
-
-	for (let i = 0; i < 6; i++) {
-		clockTimes[i] = (interval / 6) * i;
-	}
-
-	this.clock = setInterval(() => {
-		this.send([CLOCK], clockTimes[0]);
-		this.send([CLOCK], clockTimes[1]);
-		this.send([CLOCK], clockTimes[2]);
-		this.send([CLOCK], clockTimes[3]);
-		this.send([CLOCK], clockTimes[4]);
-		this.send([CLOCK], clockTimes[5]);
-	}, Math.floor(interval));
-
-	return this;
-}
-
-export function stopClock() {
-	clearInterval(this.clock);
-	this.send([STOP]);
-	return this;
-}
-
-export function sendClock() {
-	this.send([CLOCK]);
-	return this;
-}
-
-export function onStart(callback) {
-	return this.addEventListener(START * 0x10000, 0xff0000, callback);
-}
-
-export function onStop(callback) {
-	return this.addEventListener(STOP * 0x10000, 0xff0000, callback);
-}
-
-export function onClock(callback, divider = 1) {
-	var counter = 0;
-	return this.addEventListener(CLOCK * 0x10000, 0xff0000, function() {
-		counter++;
-		if (counter === divider) {
-			counter = 0;
-			callback();
+	setClockBpm(bpm) {
+		if (this.clock) {
+			clearInterval(this.clock);
 		}
-	});
-}
 
-export function onBeat(callback) {
-	return this.onClock(callback, QUARTER_NOTE);
-}
+		let interval = (1000 / (bpm / 60)) / 4;
+		let clockTimes = [];
 
-export function onWhole(callback) {
-	return this.onClock(callback, WHOLE_NOTE);
-}
+		for (let i = 0; i < 6; i++) {
+			clockTimes[i] = (interval / 6) * i;
+		}
 
-export function onHalf(callback) {
-	return this.onClock(callback, HALF_NOTE);
-}
+		this.clock = setInterval(() => {
+			this.send([CLOCK], clockTimes[0]);
+			this.send([CLOCK], clockTimes[1]);
+			this.send([CLOCK], clockTimes[2]);
+			this.send([CLOCK], clockTimes[3]);
+			this.send([CLOCK], clockTimes[4]);
+			this.send([CLOCK], clockTimes[5]);
+		}, Math.floor(interval));
 
-export function onQuarter(callback) {
-	return this.onClock(callback, QUARTER_NOTE);
-}
+		return this;
+	}
 
-export function onEight(callback) {
-	return this.onClock(callback, EIGHT_NOTE);
-}
+	stopClock() {
+		clearInterval(this.clock);
+		this.send([STOP]);
+		return this;
+	}
 
-export function onSixteenth(callback) {
-	return this.onClock(callback, SIXTEENTH_NOTE);
-}
+	sendClock() {
+		this.send([CLOCK]);
+		return this;
+	}
 
-export function onSelfClock(callback, divider = 1) {
-	return this.getMirror().onClock(callback, divider);
-}
+	onStart(callback) {
+		return this.addEventListener(START * 0x10000, 0xff0000, callback);
+	}
 
-export function onSelfBeat(callback) {
-	return this.getMirror().onClock(callback, QUARTER_NOTE);
-}
+	onStop(callback) {
+		return this.addEventListener(STOP * 0x10000, 0xff0000, callback);
+	}
 
-export function onSelfWhole(callback) {
-	return this.getMirror().onClock(callback, WHOLE_NOTE);
-}
+	onClock(callback, divider = 1) {
+		var counter = 0;
+		return this.addEventListener(CLOCK * 0x10000, 0xff0000, function() {
+			counter++;
+			if (counter === divider) {
+				counter = 0;
+				callback();
+			}
+		});
+	}
 
-export function onSelfHalf(callback) {
-	return this.getMirror().onClock(callback, HALF_NOTE);
-}
+	onBeat(callback) {
+		return this.onClock(callback, QUARTER_NOTE);
+	}
 
-export function onSelfQuarter(callback) {
-	return this.getMirror().onClock(callback, QUARTER_NOTE);
-}
+	onWhole(callback) {
+		return this.onClock(callback, WHOLE_NOTE);
+	}
 
-export function onSelfEight(callback) {
-	return this.getMirror().onClock(callback, EIGHT_NOTE);
-}
+	onHalf(callback) {
+		return this.onClock(callback, HALF_NOTE);
+	}
 
-export function onSelfSixteenth(callback) {
-	return this.getMirror().onClock(callback, SIXTEENTH_NOTE);
+	onQuarter(callback) {
+		return this.onClock(callback, QUARTER_NOTE);
+	}
+
+	onEight(callback) {
+		return this.onClock(callback, EIGHT_NOTE);
+	}
+
+	onSixteenth(callback) {
+		return this.onClock(callback, SIXTEENTH_NOTE);
+	}
+
+	onSelfClock(callback, divider = 1) {
+		return this.getMirror().onClock(callback, divider);
+	}
+
+	onSelfBeat(callback) {
+		return this.getMirror().onClock(callback, QUARTER_NOTE);
+	}
+
+	onSelfWhole(callback) {
+		return this.getMirror().onClock(callback, WHOLE_NOTE);
+	}
+
+	onSelfHalf(callback) {
+		return this.getMirror().onClock(callback, HALF_NOTE);
+	}
+
+	onSelfQuarter(callback) {
+		return this.getMirror().onClock(callback, QUARTER_NOTE);
+	}
+
+	onSelfEight(callback) {
+		return this.getMirror().onClock(callback, EIGHT_NOTE);
+	}
+
+	onSelfSixteenth(callback) {
+		return this.getMirror().onClock(callback, SIXTEENTH_NOTE);
+	}
 }
