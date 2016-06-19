@@ -1,10 +1,8 @@
-import Utils from 'midinette';
+import Utils from './utils';
+import {POLYPHONIC_AFTERTOUCH} from './constants/statusCodes';
+import {ALL_CHANNELS, ALL_NOTES} from './constants/defaults';
 
-const EVENT_ONLY = 0xf00000;
-const EVENT_AND_CHANNEL = 0xff0000;
-const POLYPHONIC_AFTERTOUCH = 0xa0;
 const STATUS_STRING = 'polyaftertouch';
-const ALL_CHANNEL = 0;
 
 /**
  * Sends a polyphonic aftertouch message.
@@ -33,11 +31,14 @@ export function polyAftertouch(note, pressure, channel = this.defaultChannel) {
  *
  * @returns {object} Reference of the event listener for unbinding.
  */
-export function onPolyAftertouch(callback, channel = ALL_CHANNEL) {
-	let mask = channel === ALL_CHANNEL ? EVENT_ONLY : EVENT_AND_CHANNEL;
-	channel = channel === ALL_CHANNEL ? 1 : channel;
+export function onPolyAftertouch(
+	callback, note = ALL_NOTES, channel = ALL_CHANNELS
+) {
+	note = Utils.noteStringToMIDICode(note);
+	let mask = Utils.eventMask(true, channel !== ALL_CHANNELS,
+		note !== ALL_NOTES);
 	let message = Utils.constructMIDIMessage(
-		POLYPHONIC_AFTERTOUCH, channel, 0, 0
+		POLYPHONIC_AFTERTOUCH, channel, note, 0
 	);
 
 	return this.addEventListener(message, mask, function(event) {

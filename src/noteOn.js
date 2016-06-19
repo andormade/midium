@@ -1,10 +1,9 @@
-import Utils from 'midinette';
+import Utils from './utils';
+import {NOTE_ON} from './constants/statusCodes';
+import {ALL_CHANNELS, ALL_NOTES} from './constants/defaults';
 
-const NOTE_ON = 0x90;
 const STATUS_STRING = 'noteon';
 const DEFAULT_VELOCITY = 127;
-const ALL_CHANNEL = -1;
-const ALL_NOTES = -1;
 
 /**
  * Sets the specified note on.
@@ -38,8 +37,9 @@ export function noteOn(
  *
  * @returns {object} Reference of the event listener for unbinding.
  */
-export function onNoteOn(callback, note = ALL_NOTES, channel = ALL_CHANNEL) {
-	let mask = Utils.eventMask(true, channel !== ALL_CHANNEL,
+export function onNoteOn(callback, note = ALL_NOTES, channel = ALL_CHANNELS) {
+	note = Utils.noteStringToMIDICode(note);
+	let mask = Utils.eventMask(true, channel !== ALL_CHANNELS,
 		note !== ALL_NOTES);
 	let message = Utils.constructMIDIMessage(NOTE_ON, channel, note, 0);
 

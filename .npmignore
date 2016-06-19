@@ -7,3 +7,4 @@ browser
 .gitignore
 test.html
 docs
+tests

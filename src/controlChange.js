@@ -1,10 +1,8 @@
-import Utils from 'midinette';
+import Utils from './utils';
+import {CONTROL_CHANGE} from './constants/statusCodes';
+import {ALL_CHANNELS, ALL_CONTROLLERS} from './constants/defaults';
 
-const EVENT_ONLY = 0xf00000;
-const EVENT_AND_CHANNEL = 0xff0000;
-const CONTROL_CHANGE = 0xb0;
 const STATUS_STRING = 'controlchange';
-const ALL_CHANNEL = 0;
 
 /**
  * Sets the value of the specified controller
@@ -33,10 +31,13 @@ export function controlChange(
  *
  * @returns {object} Reference of the event listener for unbinding.
  */
-export function onControlChange(callback, channel = ALL_CHANNEL) {
-	let mask = channel === ALL_CHANNEL ? EVENT_ONLY : EVENT_AND_CHANNEL;
-	channel = channel === ALL_CHANNEL ? 1 : channel;
-	let message = Utils.constructMIDIMessage(CONTROL_CHANGE, channel, 0, 0);
+export function onControlChange(
+	callback, controller = ALL_CONTROLLERS, channel = ALL_CHANNELS
+) {
+	let mask = Utils.eventMask(true, channel !== ALL_CHANNELS,
+		controller !== ALL_CONTROLLERS);
+	let message = Utils.constructMIDIMessage(CONTROL_CHANGE, channel,
+		controller, 0);
 
 	return this.addEventListener(message, mask, function(event) {
 		/* Extending the MIDI event with useful infos. */

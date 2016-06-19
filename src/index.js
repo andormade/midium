@@ -1,5 +1,5 @@
-import Midinette from 'midinette';
 import Midium from './midium';
+import Utils from './utils';
 import {setDefaultChannel} from './channel';
 import {channelAftertouch, onChannelAftertouch} from './channelAftertouch';
 import {controlChange, onControlChange} from './controlChange';
@@ -13,7 +13,7 @@ import {startClock, stopClock, setClockBpm, onClock, onWhole, onHalf, onQuarter,
 	onSelfQuarter, onSelfEight, onSelfSixteenth, onSelfBeat} from './clock';
 import {getMirror} from './mirror';
 
-Object.assign(Midium, Midinette);
+Object.assign(Midium, Utils);
 
 Object.assign(Midium.prototype, {
 	onChannelAftertouch : onChannelAftertouch,

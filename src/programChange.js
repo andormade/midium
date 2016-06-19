@@ -1,10 +1,8 @@
-import Utils from 'midinette';
+import Utils from './utils';
+import {PROGRAM_CHANGE} from './constants/statusCodes';
+import {ALL_CHANNELS} from './constants/defaults';
 
-const EVENT_ONLY = 0xf00000;
-const EVENT_AND_CHANNEL = 0xff0000;
-const PROGRAM_CHANGE = 0xc0;
 const STATUS_STRING = 'programchange';
-const ALL_CHANNEL = 0;
 
 /**
  * Sets the specified program.
@@ -30,9 +28,8 @@ export function programChange(program, channel = this.defaultChannel) {
  *
  * @returns {object} Reference of the event listener for unbinding.
  */
-export function onProgramChange(callback, channel = ALL_CHANNEL) {
-	let mask = channel === ALL_CHANNEL ? EVENT_ONLY : EVENT_AND_CHANNEL;
-	channel = channel === ALL_CHANNEL ? 1 : channel;
+export function onProgramChange(callback, channel = ALL_CHANNELS) {
+	let mask = Utils.eventMask(true, channel !== ALL_CHANNELS);
 	let message = Utils.constructMIDIMessage(
 		PROGRAM_CHANGE, channel, 0, 0
 	);

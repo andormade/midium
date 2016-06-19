@@ -1,10 +1,8 @@
-import Utils from 'midinette';
+import Utils from './utils';
+import {PITCH_WHEEL} from './constants/statusCodes';
+import {ALL_CHANNELS} from './constants/defaults';
 
-const EVENT_ONLY = 0xf00000;
-const EVENT_AND_CHANNEL = 0xff0000;
-const PITCH_WHEEL = 0xe0;
 const STATUS_STRING = 'pitchwheel';
-const ALL_CHANNEL = 0;
 
 /**
  * Sets the value of the pitch wheel.
@@ -30,9 +28,8 @@ export function pitchWheel(value, channel = this.defaultChannel) {
  *
  * @returns {object} Reference of the event listener for unbinding.
  */
-export function onPitchWheel(callback, channel = ALL_CHANNEL) {
-	let mask = channel === ALL_CHANNEL ? EVENT_ONLY : EVENT_AND_CHANNEL;
-	channel = channel === ALL_CHANNEL ? 1 : channel;
+export function onPitchWheel(callback, channel = ALL_CHANNELS) {
+	let mask = Utils.eventMask(true, channel !== ALL_CHANNELS);
 	let message = Utils.constructMIDIMessage(
 		PITCH_WHEEL, channel, 0, 0
 	);

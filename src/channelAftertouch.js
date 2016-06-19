@@ -1,10 +1,8 @@
-import Utils from 'midinette';
+import Utils from './utils';
+import {CHANNEL_AFTERTOUCH} from './constants/statusCodes';
+import {ALL_CHANNELS} from './constants/defaults';
 
-const EVENT_ONLY = 0xf00000;
-const EVENT_AND_CHANNEL = 0xff0000;
-const CHANNEL_AFTERTOUCH = 0xd0;
 const STATUS_STRING = 'channelaftertouch';
-const ALL_CHANNEL = 0;
 
 /**
  * Send a channel aftertouch message.
@@ -30,9 +28,8 @@ export function channelAftertouch(pressure, channel = this.defaultChannel) {
  *
  * @returns {object} Reference of the event listener for unbinding.
  */
-export function onChannelAftertouch(callback, channel = ALL_CHANNEL) {
-	let mask = channel === ALL_CHANNEL ? EVENT_ONLY : EVENT_AND_CHANNEL;
-	channel = channel === ALL_CHANNEL ? 1 : channel;
+export function onChannelAftertouch(callback, channel = ALL_CHANNELS) {
+	let mask = Utils.eventMask(true, channel !== ALL_CHANNELS);
 	let message = Utils.constructMIDIMessage(
 		CHANNEL_AFTERTOUCH, channel, 0, 0
 	);
